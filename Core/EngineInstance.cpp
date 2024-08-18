@@ -1,7 +1,12 @@
 #include "EngineInstance.h"
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 
 bool EngineInstance::Start()
 {
+	if (!glewInit()) return false;
+	if (!glfwInit()) return false;
+
 	return OnStart();
 }
 
