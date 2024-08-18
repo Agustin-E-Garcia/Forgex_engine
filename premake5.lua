@@ -13,7 +13,8 @@ workspace "Voxel_Engine"
 		
 		includedirs {
 			"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
-			"ExternalLibraries/GLEW/glew-2.2.0/include"
+			"ExternalLibraries/GLEW/glew-2.2.0/include",
+			"ExternalLibraries/GLM"
 		}
 
 		libdirs {
@@ -33,5 +34,7 @@ workspace "Voxel_Engine"
 		files { "App/**.cpp", "App/**.h" }
 		includedirs { "Core" }
 		links { "Engine_Core" }
-		postbuildcommands { "{COPYFILE} %[Build/Bin/Engine_Core/%{cfg.longname}/Engine_Core.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]" }
-		postbuildcommands { "{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]" }
+		postbuildcommands { 
+			"{COPYFILE} %[Build/Bin/Engine_Core/%{cfg.longname}/Engine_Core.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]", 
+			"{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]"
+		}
