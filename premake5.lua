@@ -19,7 +19,7 @@ workspace "Voxel_Engine"
 
 		libdirs {
 			"ExternalLibraries/GLEW/glew-2.2.0/lib/Release/x64",
-			"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/lib-vc2022"
+			"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/lib-vc2017"
 		}
 
 		links {
