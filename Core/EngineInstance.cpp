@@ -1,7 +1,15 @@
 #include "EngineInstance.h"
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
 
 bool EngineInstance::Start()
 {
+	if (!glewInit()) return false;
+	if (!glfwInit()) return false;
+
+	glm::vec3 vector = { 0.0f, 0.0f, 0.0f };
+
 	return OnStart();
 }
 
