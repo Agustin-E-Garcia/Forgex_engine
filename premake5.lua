@@ -4,6 +4,10 @@ workspace "Voxel_Engine"
 
 	targetdir ("Build/Bin/%{prj.name}/%{cfg.longname}")
 
+	includedirs {
+		"ExternalLibraries/Spdlog/spdlog-1.14.1/include"
+	}
+
 	project "Engine_Core"
 		location "Core"
 		kind "SharedLib"
@@ -24,7 +28,8 @@ workspace "Voxel_Engine"
 
 		links {
 			"glew32.lib",
-			"glfw3.lib"
+			"glfw3.lib",
+			"opengl32.lib"
 		}
 	
 	project "Engine_Application"
