@@ -1,6 +1,9 @@
 workspace "Voxel_Engine"
 	architecture "x64"
 	configurations { "Debug", "Release" }
+	
+	language "C++"
+	cppdialect "C++17"
 
 	targetdir ("Build/Bin/%{prj.name}/%{cfg.longname}")
 
@@ -11,7 +14,6 @@ workspace "Voxel_Engine"
 	project "Engine_Core"
 		location "Core"
 		kind "SharedLib"
-		language "C++"
 		files { "Core/**.cpp", "Core/**.h" }
 		defines { "ENGINE_DLL" }
 		
@@ -35,7 +37,6 @@ workspace "Voxel_Engine"
 	project "Engine_Application"
 		location "App"
 		kind "ConsoleApp"
-		language "C++"
 		files { "App/**.cpp", "App/**.h" }
 		includedirs { "Core" }
 		links { "Engine_Core" }

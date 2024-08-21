@@ -24,10 +24,10 @@ Renderer::Renderer()
 { 
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
-	LOG_CORE_INFO("Renderer initialized successfully");
-
 	glGenVertexArrays(1, &vertexArrayID);
 	glBindVertexArray(vertexArrayID);
+
+	LOG_CORE_INFO("Renderer initialized successfully");
 
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -50,8 +50,6 @@ Renderer::~Renderer()
 
 void Renderer::Draw()
 {
-	LOG_CORE_TRACE("Renderer::Draw");
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(shaderID);
@@ -91,4 +89,13 @@ void Renderer::Draw()
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+}
+
+unsigned int Renderer::GenerateBuffer(size_t size, const float* data)
+{
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	return buffer;
 }
