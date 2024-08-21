@@ -19,12 +19,36 @@
     <ClInclude Include="src\Log.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderLoader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureLoader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Log.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderLoader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureLoader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

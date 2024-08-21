@@ -8,7 +8,7 @@ public:
 	~EngineInstance();
 };
 
-Application* CreateApplication() 
+Application* CreateApplication()
 {
 	return new EngineInstance();
 }

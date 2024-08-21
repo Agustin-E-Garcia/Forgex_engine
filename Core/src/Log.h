@@ -2,15 +2,14 @@
 
 #include "Exports.h"
 #include <spdlog/spdlog.h>
-#include <memory>
 
 class ENGINE_API Log
 {
 public:
 	static void Init();
 
-	inline static std::shared_ptr<spdlog::logger> GetCoreLogger() { return spdlog::get(s_CoreLogger); };
-	inline static std::shared_ptr<spdlog::logger> GetClientLogger() { return spdlog::get(s_ClientLogger); };
+	inline static auto GetCoreLogger() { return spdlog::get(s_CoreLogger); };
+	inline static auto GetClientLogger() { return spdlog::get(s_ClientLogger); };
 
 private:
 	static const std::string s_CoreLogger;
