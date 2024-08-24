@@ -1,4 +1,5 @@
 #include "Entity.h"
+#include "GL/glew.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 #include "Renderer.h"
@@ -50,17 +51,21 @@ DrawInfo Entity::GetDrawInfo()
 {
 	DrawInfo info{};
 	info.vertexBufferID = m_VertexBufferID;
-	// uv
+	info.indexBufferID = m_IndexBufferID;
+	info.uvBufferID = m_UVBufferID;
 	// shader
 	// texture
 	info.modelMatrix = m_ModelMatrix;
+	info.indexCount = m_Indices.size();
 
 	return info;
 }
 
-void Entity::GenerateVertexBuffer()
+void Entity::GenerateBuffers()
 {
-	m_VertexBufferID = Renderer::GenerateBuffer(sizeof(m_Vertices), m_Vertices.data());
+	m_VertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), m_Vertices.data());
+	m_IndexBufferID = Renderer::GenerateBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(unsigned int), m_Indices.data());
+	m_UVBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_UVs.size() * sizeof(float), m_UVs.data());
 }
 
 void Entity::UpdateModelMatrix()

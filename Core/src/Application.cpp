@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "Window.h"
 #include "Renderer.h"
+#include "Cube.h"
 
 Application::Application() 
 {
@@ -23,9 +24,12 @@ void Application::InitializeSystems()
 
 void Application::Run()
 {
+	Cube cube;
+
 	do
 	{
-		m_Renderer->Draw();
+		m_Renderer->ClearScreen();
+		m_Renderer->Draw(cube.GetDrawInfo());
 		m_Window->Update();
 	} while (!m_Window->ShouldClose());
 }

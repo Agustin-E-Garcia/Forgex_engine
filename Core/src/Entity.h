@@ -32,8 +32,10 @@ protected:
 	std::vector<unsigned int> m_Indices;
 
 	unsigned int m_VertexBufferID = 0;
+	unsigned int m_IndexBufferID = 0;
+	unsigned int m_UVBufferID;
 
-	void GenerateVertexBuffer();
+	void GenerateBuffers();
 
 private:
 	glm::vec3 m_Position = glm::vec3(1.0f);
