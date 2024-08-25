@@ -3,6 +3,8 @@
 #include <optional>
 #include <glm/glm.hpp>
 
+class Camera;
+
 struct DrawInfo
 {
 	unsigned int vertexBufferID;
@@ -23,6 +25,7 @@ public:
 
 	void ClearScreen();
 	void Draw(DrawInfo info);
+	void SetActiveCamera(Camera* activeCamera);
 
 	static unsigned int GenerateBuffer(unsigned int target, int size, const void* data);
 
@@ -30,4 +33,6 @@ private:
 	unsigned int vertexArrayID;
 	unsigned int shaderID;
 	unsigned int textureID;
+
+	Camera* m_ActiveCamera;
 };

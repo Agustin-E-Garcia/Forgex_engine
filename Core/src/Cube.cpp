@@ -1,5 +1,6 @@
 #include "Cube.h"
 #include "Renderer.h"
+#include "GL/glew.h"
 
 Cube::Cube()
 {
@@ -87,3 +88,24 @@ Cube::Cube()
 }
 
 Cube::~Cube() {}
+
+DrawInfo Cube::GetDrawInfo()
+{
+	DrawInfo info{};
+	info.vertexBufferID = m_VertexBufferID;
+	info.indexBufferID = m_IndexBufferID;
+	info.uvBufferID = m_UVBufferID;
+	// shader
+	// texture
+	info.modelMatrix = GetModelMatrix();
+	info.indexCount = m_Indices.size();
+
+	return info;
+}
+
+void Cube::GenerateBuffers()
+{
+	m_VertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), m_Vertices.data());
+	m_IndexBufferID = Renderer::GenerateBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(unsigned int), m_Indices.data());
+	m_UVBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_UVs.size() * sizeof(float), m_UVs.data());
+}

@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
+#include "Camera.h"
 
 Renderer::Renderer() 
 { 
@@ -36,8 +37,8 @@ void Renderer::ClearScreen()
 
 void Renderer::Draw(DrawInfo info)
 {
-	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
-	glm::mat4 View = glm::lookAt(glm::vec3(4, 3, 3),glm::vec3(0, 0, 0),	glm::vec3(0, 1, 0));
+	glm::mat4 Projection = m_ActiveCamera->GetProjectionMatrix();
+	glm::mat4 View = m_ActiveCamera->GetViewMatrix();
 	glm::mat4 Model = info.modelMatrix;
 
 	glm::mat4 mvp = Projection * View * Model;
@@ -68,6 +69,11 @@ void Renderer::Draw(DrawInfo info)
 	
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+}
+
+void Renderer::SetActiveCamera(Camera* activeCamera)
+{
+	m_ActiveCamera = activeCamera;
 }
 
 unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void* data)

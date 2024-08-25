@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "Cube.h"
+#include "Camera.h"
 
 Application::Application() 
 {
@@ -24,7 +25,12 @@ void Application::InitializeSystems()
 
 void Application::Run()
 {
+	Camera camera;
 	Cube cube;
+
+	camera.SetPosition(glm::vec3(0.0f, 2.0f, -10.0f));
+	cube.SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	m_Renderer->SetActiveCamera(&camera);
 
 	do
 	{
