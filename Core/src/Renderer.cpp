@@ -19,14 +19,16 @@ Renderer::Renderer()
 
 	LOG_CORE_INFO("Renderer initialized successfully");
 
-	shaderID = ShaderLoader::LoadShader("Resources/Shaders/SimpleVertexShader.vertexshader", "Resources/Shaders/SimpleFragmentShader.fragmentshader");
+	colorShaderID = ShaderLoader::LoadShader("Resources/Shaders/ColorVertexShader.vertexshader", "Resources/Shaders/ColorFragmentShader.fragmentshader");
+	textureShaderID = ShaderLoader::LoadShader("Resources/Shaders/TextureVertexShader.vertexshader", "Resources/Shaders/TextureFragmentShader.fragmentshader");
 	textureID = TextureLoader::LoadTexture("Resources/Textures/uvtemplate.bmp");
 }
 
 Renderer::~Renderer() 
 {
 	glDeleteTextures(1, &textureID);
-	glDeleteProgram(shaderID);
+	glDeleteProgram(textureShaderID);
+	glDeleteProgram(colorShaderID);
 	glDeleteVertexArrays(1, &vertexArrayID);
 }
 
@@ -45,12 +47,12 @@ void Renderer::Draw(DrawInfo info)
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glUseProgram(shaderID);
+	glUseProgram(textureShaderID);
 
-	unsigned int MatrixID = glGetUniformLocation(shaderID, "MVP");
+	unsigned int MatrixID = glGetUniformLocation(textureShaderID, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 	
-	unsigned int TexID = glGetUniformLocation(shaderID, "myTextureSampler");
+	unsigned int TexID = glGetUniformLocation(textureShaderID, "myTextureSampler");
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glUniform1i(TexID, 0);
@@ -71,6 +73,27 @@ void Renderer::Draw(DrawInfo info)
 	glDisableVertexAttribArray(1);
 }
 
+void Renderer::DrawVoxel(DrawInfo info)
+{
+	glm::mat4 Projection = m_ActiveCamera->GetProjectionMatrix();
+	glm::mat4 View = m_ActiveCamera->GetViewMatrix();
+	glm::mat4 Model = info.modelMatrix;
+
+	glm::mat4 mvp = Projection * View * Model;
+
+	glUseProgram(colorShaderID);
+
+	unsigned int MatrixID = glGetUniformLocation(colorShaderID, "MVP");
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, info.vertexBufferID);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glDrawArrays(GL_TRIANGLES, 0, info.indexCount);
+	glDisableVertexAttribArray(0);
+}
+
 void Renderer::SetActiveCamera(Camera* activeCamera)
 {
 	m_ActiveCamera = activeCamera;
@@ -83,4 +106,9 @@ unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void*
 	glBindBuffer(target, buffer);
 	glBufferData(target, size, data, GL_STATIC_DRAW);
 	return buffer;
+}
+
+void Renderer::DeleteBuffer(unsigned int bufferID)
+{
+	glDeleteBuffers(1, &bufferID);
 }

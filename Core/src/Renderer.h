@@ -25,13 +25,16 @@ public:
 
 	void ClearScreen();
 	void Draw(DrawInfo info);
+	void DrawVoxel(DrawInfo info);
 	void SetActiveCamera(Camera* activeCamera);
 
 	static unsigned int GenerateBuffer(unsigned int target, int size, const void* data);
+	static void DeleteBuffer(unsigned int bufferID);
 
 private:
 	unsigned int vertexArrayID;
-	unsigned int shaderID;
+	unsigned int colorShaderID;
+	unsigned int textureShaderID;
 	unsigned int textureID;
 
 	Camera* m_ActiveCamera;
