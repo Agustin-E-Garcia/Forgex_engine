@@ -12,6 +12,7 @@ Renderer::Renderer()
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
 
 	glGenVertexArrays(1, &vertexArrayID);
@@ -75,6 +76,8 @@ void Renderer::Draw(DrawInfo info)
 
 void Renderer::DrawVoxel(DrawInfo info)
 {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	glm::mat4 Projection = m_ActiveCamera->GetProjectionMatrix();
 	glm::mat4 View = m_ActiveCamera->GetViewMatrix();
 	glm::mat4 Model = info.modelMatrix;

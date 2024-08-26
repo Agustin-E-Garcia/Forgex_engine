@@ -18,9 +18,12 @@ private:
 	std::vector<Voxel*> m_Voxels;
 
 	std::vector<float> m_Vertices;
+	std::vector<float> m_UVs;
 	unsigned int m_VertexBufferID;
+	unsigned int m_UVBufferID;
 
+	int FlattenIndex(int x, int y, int z);
 	void GenerateVertices();
 	void PushVertex(float x, float y, float z);
-	void GenerateVertexBuffer();
+	void GenerateBuffers();
 };
