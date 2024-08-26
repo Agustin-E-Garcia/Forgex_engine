@@ -2,8 +2,8 @@
 #include "Log.h"
 #include "Window.h"
 #include "Renderer.h"
-#include "Cube.h"
 #include "Camera.h"
+#include "Chunk.h"
 #include "InputDetector.h"
 #include "GLFW/glfw3.h"
 
@@ -29,10 +29,9 @@ void Application::InitializeSystems()
 void Application::Run()
 {
 	Camera camera;
-	Cube cube;
+	Chunk chunk;
 
-	camera.SetPosition(glm::vec3(0.0f, 2.0f, -10.0f));
-	cube.SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	camera.SetPosition(glm::vec3(0.0f, 10.0f, -25.0f));
 	m_Renderer->SetActiveCamera(&camera);
 
 	glm::vec3 speed(0.0f);
@@ -62,7 +61,7 @@ void Application::Run()
 		}
 		
 		m_Renderer->ClearScreen();
-		m_Renderer->Draw(cube.GetDrawInfo());
+		m_Renderer->DrawVoxel(chunk.GetDrawInfo());
 		m_Window->Update();
 	} while (!m_Window->ShouldClose() && !IS_KEY_PRESSED(GLFW_KEY_ESCAPE));
 }
