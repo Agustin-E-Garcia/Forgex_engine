@@ -1,6 +1,7 @@
 .vs/
 *.vcxproj
 *.vcxproj.user
+*.vcxproj.filters
 *.sln
 Build/
 App/obj/
