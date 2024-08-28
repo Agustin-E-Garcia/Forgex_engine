@@ -1,0 +1,13 @@
+#version 450 core
+
+flat in uint blockType;
+in vec2 uv_Coords;
+
+out vec3 color;
+
+uniform sampler2D textureSampler;
+
+void main()
+{
+   color = texture(textureSampler, uv_Coords).rgb;
+}

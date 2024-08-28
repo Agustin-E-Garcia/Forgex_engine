@@ -21,7 +21,7 @@ Application::~Application()
 void Application::InitializeSystems()
 {
 	Log::Init();
-	m_Window = new Window(800, 600, "Voxel_Engine");
+	m_Window = new Window(1720, 1080, "Voxel_Engine");
 	InputDetector::Init();
 	m_Renderer = new Renderer();
 }
@@ -31,7 +31,7 @@ void Application::Run()
 	Camera camera;
 	Chunk chunk;
 
-	camera.SetPosition(glm::vec3(0.0f, 10.0f, -25.0f));
+	camera.SetPosition(glm::vec3(0.0f, 10.0f, -25.0));
 	m_Renderer->SetActiveCamera(&camera);
 
 	glm::vec3 speed(0.0f);
@@ -49,10 +49,12 @@ void Application::Run()
 		{
 			if (IS_KEY_PRESSED(KEY_W))			 speed.z += 10.0f * deltaTime;
 			if (IS_KEY_PRESSED(KEY_S))			 speed.z -= 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_A))			 speed.x += 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_D))			 speed.x -= 10.0f * deltaTime;
+			if (IS_KEY_PRESSED(KEY_A))			 speed.x += 5.0f * deltaTime;
+			if (IS_KEY_PRESSED(KEY_D))			 speed.x -= 5.0f * deltaTime;
 			if (IS_KEY_PRESSED(KEY_SPACE))		 speed.y += 10.0f * deltaTime;
 			if (IS_KEY_PRESSED(KEY_LEFT_SHIFT))  speed.y -= 10.0f * deltaTime;
+			if (IS_KEY_PRESSED(GLFW_KEY_R))		 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			if (IS_KEY_PRESSED(GLFW_KEY_T))		 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			camera.SetPosition(camera.GetPosition() + (camera.GetForward() * speed.z) + (camera.GetUp() * speed.y));
 			camera.SetRotationY(camera.GetRotation().y + speed.x);

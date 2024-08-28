@@ -17,13 +17,11 @@ private:
 
 	std::vector<Voxel*> m_Voxels;
 
-	std::vector<float> m_Vertices;
-	std::vector<float> m_UVs;
+	std::vector<uint32_t> m_Vertices;
 	unsigned int m_VertexBufferID;
-	unsigned int m_UVBufferID;
 
 	int FlattenIndex(int x, int y, int z);
 	void GenerateVertices();
-	void PushVertex(float x, float y, float z);
+	void PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType);
 	void GenerateBuffers();
 };

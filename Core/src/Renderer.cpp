@@ -20,7 +20,7 @@ Renderer::Renderer()
 
 	LOG_CORE_INFO("Renderer initialized successfully");
 
-	colorShaderID = ShaderLoader::LoadShader("Resources/Shaders/ColorVertexShader.vertexshader", "Resources/Shaders/ColorFragmentShader.fragmentshader");
+	colorShaderID = ShaderLoader::LoadShader("Resources/Shaders/VoxelVertexShader.vertexshader", "Resources/Shaders/VoxelFragmentShader.fragmentshader");
 	textureShaderID = ShaderLoader::LoadShader("Resources/Shaders/TextureVertexShader.vertexshader", "Resources/Shaders/TextureFragmentShader.fragmentshader");
 	textureID = TextureLoader::LoadTexture("Resources/Textures/uvtemplate.bmp");
 }
@@ -45,8 +45,6 @@ void Renderer::Draw(DrawInfo info)
 	glm::mat4 Model = info.modelMatrix;
 
 	glm::mat4 mvp = Projection * View * Model;
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glUseProgram(textureShaderID);
 
@@ -76,8 +74,6 @@ void Renderer::Draw(DrawInfo info)
 
 void Renderer::DrawVoxel(DrawInfo info)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	glm::mat4 Projection = m_ActiveCamera->GetProjectionMatrix();
 	glm::mat4 View = m_ActiveCamera->GetViewMatrix();
 	glm::mat4 Model = info.modelMatrix;
@@ -89,9 +85,14 @@ void Renderer::DrawVoxel(DrawInfo info)
 	unsigned int MatrixID = glGetUniformLocation(colorShaderID, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
+	unsigned int TexID = glGetUniformLocation(colorShaderID, "textureSampler");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glUniform1i(TexID, 0);
+
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, info.vertexBufferID);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, (void*)0);
 
 	glDrawArrays(GL_TRIANGLES, 0, info.indexCount);
 	glDisableVertexAttribArray(0);

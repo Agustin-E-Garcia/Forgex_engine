@@ -1,8 +1,11 @@
 #include "Chunk.h"
 #include "Renderer.h"
 #include "GL/glew.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/noise.hpp"
+#include "Log.h"
 
-const int Chunk::s_ChunkSize = 16;
+const int Chunk::s_ChunkSize = 32;
 
 Chunk::Chunk()
 {
@@ -10,7 +13,7 @@ Chunk::Chunk()
 	
 	for (int i = 0; i < m_Voxels.capacity(); i++)
 	{
-		m_Voxels.push_back(new Voxel());
+		m_Voxels.push_back(new Voxel(VoxelType::Dirt));
 	}
 
     GenerateVertices();
@@ -28,7 +31,6 @@ DrawInfo Chunk::GetDrawInfo()
 {
 	DrawInfo info{};
 	info.vertexBufferID = m_VertexBufferID;
-    info.uvBufferID = m_UVBufferID;
 	info.modelMatrix = glm::mat4(1.0f);
     info.indexCount = m_Vertices.size();
 	return info;
@@ -49,78 +51,79 @@ void Chunk::GenerateVertices()
 		{
             for (int x = 0; x < s_ChunkSize; x++)
             {
-                if (!m_Voxels[FlattenIndex(x, y ,z)]->IsActive()) continue; // if voxel is not active, we don't render it
+                int voxelIndex = FlattenIndex(x, y, z);
+                if (!m_Voxels[voxelIndex]->IsActive()) continue; // if voxel is not active, we don't render it
 
                 // Render Front triangles only if they are visible
                 if (z + 1 >= s_ChunkSize || !m_Voxels[FlattenIndex(x, y, z + 1)]->IsActive())
                 {
-                    PushVertex(-0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, -0.5f + y, 0.5f + z);
-                    PushVertex(0.5f + x, -0.5f + y, 0.5f + z);
+                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
 
-                    PushVertex(0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(0.5f + x, -0.5f + y, 0.5f + z);
+                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
                 }
 
                 // Render Back triangles only if they are visible
                 if (z - 1 < 0 || !m_Voxels[FlattenIndex(x, y, z - 1)]->IsActive())
                 {
-                    PushVertex(0.5f + x, 0.5f + y, -0.5f + z);
-                    PushVertex(-0.5f + x, -0.5f + y, -0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, -0.5f + z);
-
-                    PushVertex(0.5f + x, 0.5f + y, -0.5f + z);
-                    PushVertex(0.5f + x, -0.5f + y, -0.5f + z);
-                    PushVertex(-0.5f + x, -0.5f + y, -0.5f + z);
+                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    
+                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
                 }
 
                 // Render Top triangles only if they are visible
                 if (y + 1 >= s_ChunkSize || !m_Voxels[FlattenIndex(x, y + 1, z)]->IsActive())
                 {
-                    PushVertex(0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(0.5f + x, 0.5f + y, -0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, -0.5f + z);
-
-                    PushVertex(0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, -0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, 0.5f + z);
+                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    
+                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
                 }
 
                 // Render Bottom triangles only if they are visible
                 if (y - 1 < 0 || !m_Voxels[FlattenIndex(x, y - 1, z)]->IsActive())
                 {
-                    PushVertex(0.5f + x, -0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, -0.5f + y, -0.5f + z);
-                    PushVertex(0.5f + x, -0.5f + y, -0.5f + z);
-
-                    PushVertex(0.5f + x, -0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, -0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, -0.5f + y, -0.5f + z);
+                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    
+                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
                 }
 
                 // Render Right triangles only if they are visible
                 if (x + 1 >= s_ChunkSize || !m_Voxels[FlattenIndex(x + 1, y, z)]->IsActive())
                 {
-                    PushVertex(0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(0.5f + x, -0.5f + y, -0.5f + z);
-                    PushVertex(0.5f + x, 0.5f + y, -0.5f + z);
-
-                    PushVertex(0.5f + x, -0.5f + y, -0.5f + z);
-                    PushVertex(0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(0.5f + x, -0.5f + y, 0.5f + z);
+                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    
+                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
                 }
 
-                // Render Back triangles only if they are visible
+                // Render Left triangles only if they are visible
                 if (x - 1 < 0 || !m_Voxels[FlattenIndex(x - 1, y, z)]->IsActive())
                 {
-                    PushVertex(-0.5f + x, -0.5f + y, -0.5f + z);
-                    PushVertex(-0.5f + x, -0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, 0.5f + z);
-
-                    PushVertex(-0.5f + x, -0.5f + y, -0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, 0.5f + z);
-                    PushVertex(-0.5f + x, 0.5f + y, -0.5f + z);
+                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    
+                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
                 }
 			}
 		}
@@ -129,18 +132,17 @@ void Chunk::GenerateVertices()
     GenerateBuffers();
 }
 
-void Chunk::PushVertex(float x, float y, float z) 
+void Chunk::PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType)
 {
-    m_Vertices.push_back(x);
-    m_Vertices.push_back(y);
-    m_Vertices.push_back(z);
+    // First we pack the values into a 32-bit integer
+    uint32_t packedValue = (static_cast<uint32_t>(x) << 24) | (static_cast<uint32_t>(y) << 16) | (static_cast<uint32_t>(z) << 8) | (static_cast<uint32_t>(blockType));
+    m_Vertices.push_back(packedValue);
 }
 
 void Chunk::GenerateBuffers()
 {
 	Renderer::DeleteBuffer(m_VertexBufferID);
-	m_VertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), m_Vertices.data());
-    m_UVBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_UVs.size() * sizeof(float), m_UVs.data());
+	m_VertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(uint32_t), m_Vertices.data());
 }
 
 Voxel* Chunk::GetVoxel(int x, int y, int z) 
