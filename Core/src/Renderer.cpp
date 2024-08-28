@@ -22,7 +22,7 @@ Renderer::Renderer()
 
 	colorShaderID = ShaderLoader::LoadShader("Resources/Shaders/VoxelVertexShader.vertexshader", "Resources/Shaders/VoxelFragmentShader.fragmentshader");
 	textureShaderID = ShaderLoader::LoadShader("Resources/Shaders/TextureVertexShader.vertexshader", "Resources/Shaders/TextureFragmentShader.fragmentshader");
-	textureID = TextureLoader::LoadTexture("Resources/Textures/uvtemplate.bmp");
+	textureID = TextureLoader::LoadTexture("Resources/Textures/0.png");
 }
 
 Renderer::~Renderer() 
@@ -89,6 +89,10 @@ void Renderer::DrawVoxel(DrawInfo info)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glUniform1i(TexID, 0);
+
+	glm::uvec2 atlasSize = glm::uvec2(16, 16);
+	unsigned int atlasID = glGetUniformLocation(colorShaderID, "AtlasSize");
+	glUniform2uiv(atlasID, 1, &atlasSize[0]);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, info.vertexBufferID);

@@ -8,7 +8,8 @@ workspace "Voxel_Engine"
 	targetdir ("Build/Bin/%{prj.name}/%{cfg.longname}")
 
 	includedirs {
-		"ExternalLibraries/Spdlog/spdlog-1.14.1/include"
+		"ExternalLibraries/Spdlog/spdlog-1.14.1/include",
+		"ExternalLibraries/STB_Image"
 	}
 
 	project "Engine_Core"

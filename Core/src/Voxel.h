@@ -5,10 +5,10 @@
 enum VoxelType : uint8_t // range 0 - 255
 {
 	Empty = 0,
-	Default,
-	Dirt,
+	Default = 1,
+	Dirt = 3,
 	Water,
-	Stone,
+	Stone = 17,
 	TYPE_COUNT
 };
 

@@ -1,11 +1,9 @@
 #include "Chunk.h"
 #include "Renderer.h"
 #include "GL/glew.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/noise.hpp"
 #include "Log.h"
 
-const int Chunk::s_ChunkSize = 32;
+const int Chunk::s_ChunkSize = 64;
 
 Chunk::Chunk()
 {
