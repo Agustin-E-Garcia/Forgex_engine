@@ -6,9 +6,8 @@ enum VoxelType : uint8_t // range 0 - 255
 {
 	Empty = 0,
 	Default = 1,
+	Stone = 2,
 	Dirt = 3,
-	Water,
-	Stone = 17,
 	TYPE_COUNT
 };
 

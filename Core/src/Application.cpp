@@ -1,11 +1,17 @@
 #include "Application.h"
+
 #include "Log.h"
+#include "InputManager.h"
+#include "DeltaTime.h"
+
 #include "Window.h"
 #include "Renderer.h"
+
+/* to be moved to a scene class */
+/**/
 #include "Camera.h"
 #include "Chunk.h"
-#include "InputDetector.h"
-#include "GLFW/glfw3.h"
+/**/
 
 Application::Application() 
 {
@@ -21,8 +27,9 @@ Application::~Application()
 void Application::InitializeSystems()
 {
 	Log::Init();
+	DeltaTime::Init();
 	m_Window = new Window(1720, 1080, "Voxel_Engine");
-	InputDetector::Init();
+	InputManager::Init();
 	m_Renderer = new Renderer();
 }
 
@@ -36,28 +43,28 @@ void Application::Run()
 
 	glm::vec3 speed(0.0f);
 
-	float lastTime = glfwGetTime();
-
 	do
 	{
-		// Delta time calculation
-		float currentTime = glfwGetTime();
-		float deltaTime = currentTime - lastTime;
-		lastTime = currentTime;
+
+		DeltaTime::Update();
+		float deltaTime = DeltaTime::GetTime();
+		InputManager::Update();
 
 		// Camera Controls
 		{
 			if (IS_KEY_PRESSED(KEY_W))			 speed.z += 10.0f * deltaTime;
 			if (IS_KEY_PRESSED(KEY_S))			 speed.z -= 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_A))			 speed.x += 5.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_D))			 speed.x -= 5.0f * deltaTime;
+			if (IS_KEY_PRESSED(KEY_A))			 speed.x += 10.0f * deltaTime;
+			if (IS_KEY_PRESSED(KEY_D))			 speed.x -= 10.0f * deltaTime;
 			if (IS_KEY_PRESSED(KEY_SPACE))		 speed.y += 10.0f * deltaTime;
 			if (IS_KEY_PRESSED(KEY_LEFT_SHIFT))  speed.y -= 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(GLFW_KEY_R))		 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			if (IS_KEY_PRESSED(GLFW_KEY_T))		 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			camera.SetPosition(camera.GetPosition() + (camera.GetForward() * speed.z) + (camera.GetUp() * speed.y));
-			camera.SetRotationY(camera.GetRotation().y + speed.x);
+			camera.SetPosition(camera.GetPosition() + (camera.GetRight() * speed.x) + (camera.GetForward() * speed.z) + (camera.GetUp() * speed.y));
+			
+			float x, y;
+			InputManager::GetMouseInput(&x, &y);
+			camera.SetRotationX(camera.GetRotation().x + y * 1.0 * deltaTime);
+			camera.SetRotationY(camera.GetRotation().y + x * 1.0 * deltaTime);
 
 			speed = glm::vec3(0.0f);
 		}
@@ -65,5 +72,6 @@ void Application::Run()
 		m_Renderer->ClearScreen();
 		m_Renderer->DrawVoxel(chunk.GetDrawInfo());
 		m_Window->Update();
+
 	} while (!m_Window->ShouldClose() && !IS_KEY_PRESSED(GLFW_KEY_ESCAPE));
 }
