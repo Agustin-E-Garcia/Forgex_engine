@@ -1,7 +1,8 @@
 workspace "Voxel_Engine"
 	architecture "x64"
 	configurations { "Debug", "Release" }
-	
+	buildoptions "/MDd"
+
 	language "C++"
 	cppdialect "C++17"
 
@@ -17,7 +18,7 @@ workspace "Voxel_Engine"
 		kind "SharedLib"
 		files { "Core/**.cpp", "Core/**.h" }
 		defines { "ENGINE_DLL" }
-		
+
 		includedirs {
 			"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
 			"ExternalLibraries/GLEW/glew-2.2.0/include",

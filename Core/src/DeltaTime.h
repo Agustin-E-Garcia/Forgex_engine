@@ -10,8 +10,7 @@ public:
 		if(s_Instance == nullptr) s_Instance = new DeltaTime();
 	}
 
-	static void Update() { s_Instance->UpdateImp(); };
-	static float GetTime() { return s_Instance->GetTimeImp(); };
+	static float Update() { return s_Instance->UpdateImp(); };
 
 private:
 	DeltaTime();
@@ -21,6 +20,5 @@ private:
 	float m_DeltaTime;
 	double m_LastTime;
 
-	void UpdateImp();
-	float GetTimeImp();
+	float UpdateImp();
 };
