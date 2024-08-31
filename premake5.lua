@@ -68,10 +68,7 @@ workspace "Voxel_Engine"
 
 		files { 
 			"ExternalLibraries/ImGUI/imgui/*.cpp", "ExternalLibraries/ImGUI/imgui/*.h",
-			"ExternalLibraries/ImGUI/imgui/backends/imgui_impl_opengl3.h",
-			"ExternalLibraries/ImGUI/imgui/backends/imgui_impl_opengl3.cpp",
-			"ExternalLibraries/ImGUI/imgui/backends/imgui_impl_glfw.h",
-			"ExternalLibraries/ImGUI/imgui/backends/imgui_impl_glfw.cpp",
+			"ExternalLibraries/ImGUI/imgui/backends/OpenGL/*.h", "ExternalLibraries/ImGUI/imgui/backends/OpenGL/*.cpp",
 			"ExternalLibraries/ImGUI/imgui/misc/cpp/imgui_stdlib.cpp",
 			"ExternalLibraries/ImGUI/imgui/misc/cpp/imgui_stdlib.h"
 		}

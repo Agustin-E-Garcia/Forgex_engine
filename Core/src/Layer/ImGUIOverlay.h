@@ -3,7 +3,7 @@
 #include "../Application.h"
 
 #include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/backends/OpenGL/imgui_impl_opengl3.h>
 
 class ENGINE_API ImGUIOverlay : public Layer
 {
