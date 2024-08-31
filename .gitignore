@@ -6,3 +6,5 @@
 Build/
 App/obj/
 Core/Obj/
+ExternalLibraries/ImGUI/imgui/bin/
+ExternalLibraries/ImGUI/imgui/obj/

@@ -1,20 +1,21 @@
 #include "Application.h"
 
 #include "Log.h"
-#include "InputManager.h"
 #include "DeltaTime.h"
 
-#include "Window.h"
 #include "Renderer.h"
+#include "Layer/ImGUIOverlay.h"
 
-/* to be moved to a scene class */
-/**/
-#include "Camera.h"
-#include "Chunk.h"
-/**/
+Application* Application::s_Instance = nullptr;
 
 Application::Application() 
 {
+	if (s_Instance == nullptr)
+		s_Instance = this;
+	else
+		delete this;
+
+	m_ShouldClose = false;
 	InitializeSystems();
 }
 
@@ -29,49 +30,56 @@ void Application::InitializeSystems()
 	Log::Init();
 	DeltaTime::Init();
 	m_Window = new Window(1720, 1080, "Voxel_Engine");
-	InputManager::Init();
+	m_Window->SetEventCallback(BIND_EVENT_FUNCTION(Application::HandleEvents));
 	m_Renderer = new Renderer();
+
+	PushOverlay(new ImGUIOverlay());
+}
+
+void Application::HandleEvents(Event& event)
+{
+	EventDispatcher dispatcher(event);
+	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNCTION(Application::OnWindowClose));
+
+	for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
+	{
+		(*--it)->OnEvent(event);
+		if (event.m_Handled)
+			break;
+	}
+}
+
+bool Application::OnWindowClose(WindowCloseEvent& e) 
+{
+	m_ShouldClose = true;
+	return true;
+}
+
+void Application::PushLayer(Layer* layer) 
+{
+	m_LayerStack.PushLayer(layer);
+}
+
+void Application::PushOverlay(Layer* layer) 
+{
+	m_LayerStack.PushOverlay(layer);
 }
 
 void Application::Run()
 {
-	Camera camera;
-	Chunk chunk;
-
-	camera.SetPosition(glm::vec3(0.0f, 10.0f, -25.0));
-	m_Renderer->SetActiveCamera(&camera);
-
-	glm::vec3 speed(0.0f);
-
 	do
 	{
+		float deltaTime = DeltaTime::Update();
 
-		DeltaTime::Update();
-		float deltaTime = DeltaTime::GetTime();
-		InputManager::Update();
-
-		// Camera Controls
-		{
-			if (IS_KEY_PRESSED(KEY_W))			 speed.z += 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_S))			 speed.z -= 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_A))			 speed.x += 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_D))			 speed.x -= 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_SPACE))		 speed.y += 10.0f * deltaTime;
-			if (IS_KEY_PRESSED(KEY_LEFT_SHIFT))  speed.y -= 10.0f * deltaTime;
-
-			camera.SetPosition(camera.GetPosition() + (camera.GetRight() * speed.x) + (camera.GetForward() * speed.z) + (camera.GetUp() * speed.y));
-			
-			float x, y;
-			InputManager::GetMouseInput(&x, &y);
-			camera.SetRotationX(camera.GetRotation().x + y * 1.0 * deltaTime);
-			camera.SetRotationY(camera.GetRotation().y + x * 1.0 * deltaTime);
-
-			speed = glm::vec3(0.0f);
-		}
-		
 		m_Renderer->ClearScreen();
-		m_Renderer->DrawVoxel(chunk.GetDrawInfo());
+
+		for (Layer* layer : m_LayerStack)
+			layer->OnUpdate(deltaTime);
+
+		for (Layer* layer : m_LayerStack)
+			layer->OnRender();
+
 		m_Window->Update();
 
-	} while (!m_Window->ShouldClose() && !IS_KEY_PRESSED(GLFW_KEY_ESCAPE));
+	} while (!m_ShouldClose);
 }

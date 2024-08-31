@@ -1,7 +1,8 @@
 #include "Chunk.h"
-#include "Renderer.h"
-#include "GL/glew.h"
-#include "Log.h"
+#include "../Renderer.h"
+#include "../Log.h"
+
+#include <GL/glew.h>
 
 const int Chunk::s_ChunkSize = 64;
 

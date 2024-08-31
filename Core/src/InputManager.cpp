@@ -1,79 +1,25 @@
 #include "InputManager.h"
-#include "GLFW/glfw3.h"
-#include "Log.h"
+#include "Application.h"
+#include <GLFW/glfw3.h>
 
-InputManager* InputManager::s_Instance = nullptr;
-
-InputManager::InputManager() 
+bool InputManager::IsKeyPressed(int keyCode)
 {
-	GLFWwindow* window = glfwGetCurrentContext();
-
-	if (window == nullptr)
-	{
-		LOG_CORE_ERROR("Input detector could not be initialized as there is no current context available");
-		return;
-	}
-
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-	int w, h;
-	glfwGetWindowSize(window, &w, &h);
-
-	offsetX = 0;
-	offsetY = 0;
-	lastXPosition = w / 2;
-	lastYPosition = h / 2;
-
-	LOG_CORE_INFO("Input detector intialized for window '{0}'", glfwGetWindowTitle(window));
-};
-
-InputManager::~InputManager() {}
-
-void InputManager::UpdateImp()
-{
-	double x, y;
-	glfwGetCursorPos(glfwGetCurrentContext(), &x, &y);
-
-	offsetX = (x - lastXPosition) * -1;
-	offsetY = (lastYPosition - y) * -1;
-
-	lastXPosition = x;
-	lastYPosition = y;
-
-	const float sensitivity = 0.1f;
-	offsetX *= sensitivity;
-	offsetY *= sensitivity;
+	GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetWindowPtr());
+	return glfwGetKey(window, keyCode) == GLFW_PRESS;
 }
 
-bool InputManager::IsKeyPressed(int key)
+float InputManager::IsMouseButtonPressed(int button)
 {
-	return glfwGetKey(glfwGetCurrentContext(), key) == GLFW_PRESS;
+	GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetWindowPtr());
+	return glfwGetMouseButton(window, button) == GLFW_PRESS;
 }
 
-void InputManager::GetMouseInput(float* x, float* y)
+void InputManager::GetMousePosition(float& xPositon, float& yPosition)
 {
-	if (s_Instance == nullptr) 
-	{
-		LOG_CORE_ERROR("No input manager initialized, make sure to initialize once before any calls to GetMouseInput()");
-		return;
-	}
+	GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetWindowPtr());
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
 
-	*x = s_Instance->offsetX;
-	*y = s_Instance->offsetY;
+	xPositon = (float)xpos;
+	yPosition = (float)ypos;
 }
-
-
-
-//void InputDetector::Mouse_Callback(GLFWwindow* window, double xPos, double yPos)
-//{
-//	float xOffset = xPos - s_LastMousePosition.x;
-//	float yOffset = s_LastMousePosition.y - yPos;
-//	s_LastMousePosition = glm::vec2(xPos, yPos);
-//
-//	const float sensitivity = 0.1f;
-//	xOffset *= sensitivity;
-//	yOffset *= sensitivity;
-//
-//	s_MouseDelta = glm::vec2(xOffset, yOffset);
-//}
