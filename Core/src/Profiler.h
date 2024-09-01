@@ -6,7 +6,7 @@
 
 struct ProfileInfo 
 {
-	std::string m_Label;
+	const char* m_Label;
 	double value;
 
 	template<typename T>

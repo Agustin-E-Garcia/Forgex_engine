@@ -12,7 +12,7 @@ Renderer::Renderer()
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
 
 	glGenVertexArrays(1, &vertexArrayID);
@@ -119,4 +119,10 @@ unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void*
 void Renderer::DeleteBuffer(unsigned int bufferID)
 {
 	glDeleteBuffers(1, &bufferID);
+}
+
+void Renderer::ToggleWireframe(bool wireframe) 
+{
+	if(wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }

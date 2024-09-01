@@ -3,8 +3,13 @@
 #include "Log.h"
 #include "DeltaTime.h"
 
+#include "InputManager.h"
+
 #include "Renderer.h"
 #include "Layer/ImGUIOverlay.h"
+
+#include "Camera.h"
+#include "Voxels/ChunkManager.h"
 
 Application* Application::s_Instance = nullptr;
 
@@ -67,6 +72,18 @@ void Application::PushOverlay(Layer* layer)
 
 void Application::Run()
 {
+	Camera camera;
+	//ChunkManager manager;
+
+	camera.SetPosition(glm::vec3(0.0f, 70.0f, 0.0f));
+	m_Renderer->SetActiveCamera(&camera);
+
+	glm::vec3 speed = glm::vec3(0.0f);
+
+	int cameraX = Profiler::AddProfile("Camera Pos X", 0);
+	int cameraY = Profiler::AddProfile("Camera Pos Y", 0);
+	int cameraZ = Profiler::AddProfile("Camera Pos Z", 0);
+
 	do
 	{
 		float deltaTime = DeltaTime::Update();
@@ -75,6 +92,33 @@ void Application::Run()
 
 		for (Layer* layer : m_LayerStack)
 			layer->OnUpdate(deltaTime);
+
+		{
+			if (InputManager::IsKeyPressed(GLFW_KEY_A))				speed.x = 10.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_D))				speed.x = -10.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_W))				speed.z = 10.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_S))				speed.z = -10.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))	speed.y = 10.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_SPACE))			speed.y = -10.0;
+
+			camera.SetPosition(camera.GetPosition() + camera.GetForward() * speed.z * deltaTime);
+			camera.SetPosition(camera.GetPosition() + camera.GetUp() * speed.y * deltaTime);
+			camera.SetRotationY(camera.GetRotation().y + speed.x * deltaTime);
+
+			speed = glm::vec3(0);
+
+			Profiler::UpdateProfile(cameraX, camera.GetPosition().x);
+			Profiler::UpdateProfile(cameraY, camera.GetPosition().y);
+			Profiler::UpdateProfile(cameraZ, camera.GetPosition().z);
+		}
+
+		//manager.Update();
+
+		//auto drawInfos = manager.GetDrawInfo();
+		//for (int i = 0; i < drawInfos.size(); i++) 
+		//{
+		//	m_Renderer->DrawVoxel(drawInfos[i]);
+		//}
 
 		for (Layer* layer : m_LayerStack)
 			layer->OnRender();

@@ -9,8 +9,8 @@ class ENGINE_API ImGUIOverlay : public Layer
 {
 public:
 	ImGUIOverlay() : Layer("ImGUI") {}
-	
-	~ImGUIOverlay() 
+
+	~ImGUIOverlay()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui::DestroyContext();
@@ -21,18 +21,51 @@ public:
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
-		
+
 		ImGui_ImplOpenGL3_Init();
 	}
 
-	void OnUpdate(float deltaTime) override 
+	void OnUpdate(float deltaTime) override
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2(1720.0f, 1080.0f);
 
+		Renderer::ToggleWireframe(m_WireframeActive);
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
+		DisplayMenu();
+		DisplayStats();
+	}
+
+	void DisplayMenu()
+	{
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("Utils"))
+			{
+				ImGui::Checkbox("Wireframe", &m_WireframeActive);
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+	}
+
+	void DisplayStats() 
+	{
+		ImGui::SetNextWindowBgAlpha(0.35f);
+		if (ImGui::Begin("Profiler"))
+		{
+			ImGui::Text("Displaying all profiles");
+			ImGui::Separator();
+
+			for (auto it = Profiler::begin(); it != Profiler::end(); it++)
+			{
+				ImGui::Text("%s: %.4f", it->second.m_Label, it->second.ReadValue<float>());
+			}
+		}
+		ImGui::End();
 	}
 
 	void OnRender() override
@@ -70,4 +103,7 @@ public:
 		io.MouseDown[e.GetButton()] = false;
 		return false;
 	}
+
+private:
+	bool m_WireframeActive = false;
 };
