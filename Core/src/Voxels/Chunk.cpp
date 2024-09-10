@@ -1,47 +1,42 @@
 #include "Chunk.h"
-#include "../Renderer.h"
 #include "../Log.h"
 #include "ChunkManager.h"
+#include "../Profiler.h"
 
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/noise.hpp>
+#include <algorithm>
+
+static int s_GenerateVertexKey = -1;
 
 Chunk::Chunk(glm::vec3 chunkPosition, int chunkSize) : m_ChunkPosition(chunkPosition), m_ChunkSize(chunkSize), m_UpToDate(false)
 {
-	m_Voxels.reserve(m_ChunkSize * m_ChunkSizeY * m_ChunkSize);
+    m_Voxels.resize(m_ChunkSize * m_ChunkSizeY * m_ChunkSize);
 }
 
 Chunk::~Chunk() 
 {
-    for (int i = m_Voxels.size() - 1; i >= 0; i--)
-    {
-        delete m_Voxels[i];
-    }
 }
 
-void Chunk::Update(ChunkManager& manager)
+bool Chunk::Update(ChunkManager& manager)
 {
-    if (m_UpToDate) return;
+    if (m_UpToDate) return false;
 
     GenerateVertices(manager);
+    GenerateBuffers();
+    UpdateDrawInfo();
+
     m_UpToDate = true;
+
+    return true;
 }
 
-void Chunk::LoadChunk()
+void Chunk::LoadChunk(glm::vec3 newPosition)
 {
-    for (int i = 0; i < m_Voxels.capacity(); i++)
-    {
-        m_Voxels.push_back(new Voxel(VoxelType::Dirt));
-    }
-}
+    SetPosition(newPosition);
 
-DrawInfo Chunk::GetDrawInfo()
-{
-	DrawInfo info{};
-	info.vertexBufferID = m_VertexBufferID;
-    info.modelMatrix = glm::translate(glm::mat4(1.0f), m_ChunkPosition * glm::vec3(m_ChunkSize));
-    info.indexCount = m_Vertices.size();
-	return info;
+    m_UpToDate = false;
 }
 
 int Chunk::FlattenIndex(int x, int y, int z)
@@ -49,9 +44,16 @@ int Chunk::FlattenIndex(int x, int y, int z)
     return (y * m_ChunkSize * m_ChunkSize) + (z * m_ChunkSize) + x;
 }
 
-void Chunk::GenerateVertices(ChunkManager& manager) 
+void Chunk::GenerateVertices(ChunkManager& manager)
 {
+    Timer timer("Chunk::GenerateVertices", &s_GenerateVertexKey);
+
 	m_Vertices.clear();
+
+    Chunk* frontChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3( 0, 0,  1));
+    Chunk* backChunk  = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3( 0, 0, -1));
+    Chunk* rightChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3( 1, 0,  0));
+    Chunk* leftChunk  = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3(-1, 0,  0));
 
 	for (int y = 0; y < m_ChunkSizeY; y++)
 	{
@@ -60,127 +62,124 @@ void Chunk::GenerateVertices(ChunkManager& manager)
             for (int x = 0; x < m_ChunkSize; x++)
             {
                 int voxelIndex = FlattenIndex(x, y, z);
-                if (!m_Voxels[voxelIndex]->IsActive()) continue; // if voxel is not active, we don't render it
+                if (!m_Voxels[voxelIndex].IsActive()) continue; // if voxel is not active, we don't render it
 
                 bool shouldSkip = false;
-                Chunk* otherChunk;
+                uint8_t voxelType = m_Voxels[voxelIndex].GetType();
 
                 // Render Front triangles only if they are visible
                 if (z + 1 == m_ChunkSize)
                 {
-                    otherChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3(0, 0, 1));
-                    shouldSkip = otherChunk != nullptr ? otherChunk->IsVoxelActive(glm::vec3(x, y, 0)) : false;
+                    shouldSkip = frontChunk != nullptr ? frontChunk->IsVoxelActive(x, y, 0) : true;
                 }
-                else shouldSkip = IsVoxelActive(glm::vec3(x, y, z + 1));
+                else shouldSkip = IsVoxelActive(x, y, z + 1);
 
                 if (!shouldSkip)
                 {
-                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
 
-                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
                 }
 
                 // Render Back triangles only if they are visible
                 if (z - 1 < 0)
                 {
-                    otherChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3(0, 0, -1));
-                    shouldSkip = otherChunk != nullptr ? otherChunk->IsVoxelActive(glm::vec3(x, y, m_ChunkSize - 1)) : false;
+                    shouldSkip = backChunk != nullptr ? backChunk->IsVoxelActive(x, y, m_ChunkSize - 1) : true;
                 }
-                else shouldSkip = IsVoxelActive(glm::vec3(x, y, z - 1));
+                else shouldSkip = IsVoxelActive(x, y, z - 1);
 
                 if (!shouldSkip)
                 {
-                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
                     
-                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
                 }
 
                 // Render Top triangles only if they are visible
-                if (!IsVoxelActive(glm::vec3(x, y + 1, z)))
+                if (!IsVoxelActive(x, y + 1, z))
                 {
-                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
                     
-                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
                 }
 
                 // Render Bottom triangles only if they are visible
-                if (!IsVoxelActive(glm::vec3(x, y - 1, z)))
+                if (!IsVoxelActive(x, y - 1, z))
                 {
-                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
                     
-                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
                 }
 
                 // Render Right triangles only if they are visible
                 if (x + 1 == m_ChunkSize)
                 {
-                    otherChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3(1, 0, 0));
-                    shouldSkip = otherChunk != nullptr ? otherChunk->IsVoxelActive(glm::vec3(0, y, z)) : false;
+                    shouldSkip = rightChunk != nullptr ? rightChunk->IsVoxelActive(0, y, z) : true;
                 }
-                else shouldSkip = IsVoxelActive(glm::vec3(x + 1, y, z));
+                else shouldSkip = IsVoxelActive(x + 1, y, z);
 
                 if (!shouldSkip)
                 {
-                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
                     
-                    PushVertexData(1 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(1 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
                 }
 
                 // Render Left triangles only if they are visible
                 if (x - 1 < 0)
                 {
-                    otherChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3(-1, 0, 0));
-                    shouldSkip = otherChunk != nullptr ? otherChunk->IsVoxelActive(glm::vec3(m_ChunkSize - 1, y, z)) : false;
+                    shouldSkip = leftChunk != nullptr ? leftChunk->IsVoxelActive(m_ChunkSize - 1, y, z) : true;
                 }
-                else shouldSkip = IsVoxelActive(glm::vec3(x - 1, y, z));
+                else shouldSkip = IsVoxelActive(x - 1, y, z);
 
                 if (!shouldSkip)
                 {
-                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 0 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
                     
-                    PushVertexData(0 + x, 1 + y, 1 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 1 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
-                    PushVertexData(0 + x, 0 + y, 0 + z, m_Voxels[voxelIndex]->GetType());
+                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
                 }
 			}
 		}
 	}
-
-    GenerateBuffers();
 }
 
-Voxel* Chunk::GetVoxelAtPosition(glm::vec3 position)
+bool Chunk::TryGetVoxelAtPosition(float x, float y, float z, Voxel& voxel)
 {
-    int index = FlattenIndex(position.x, position.y, position.z);
-    return index < m_Voxels.size() && index >= 0 ? m_Voxels[index] : nullptr;
+    int index = FlattenIndex(x, y, z);
+    bool result = index < m_Voxels.size() && index >= 0;
+    if (result) voxel = m_Voxels[index];
+    return result;
 }
 
-bool Chunk::IsVoxelActive(glm::vec3 position) 
+bool Chunk::IsVoxelActive(float x, float y, float z) 
 {
-    Voxel* voxel = GetVoxelAtPosition(position);
-    return voxel != nullptr ? voxel->IsActive() : false;
+    Voxel voxel;
+    bool result = TryGetVoxelAtPosition(x, y, z, voxel);
+    return result ? voxel.IsActive() : false;
 }
 
 void Chunk::PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType)
@@ -194,4 +193,11 @@ void Chunk::GenerateBuffers()
 {
 	Renderer::DeleteBuffer(m_VertexBufferID);
 	m_VertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(uint32_t), m_Vertices.data());
+}
+
+void Chunk::UpdateDrawInfo()
+{
+    m_DrawInfo.vertexBufferID = m_VertexBufferID;
+    m_DrawInfo.modelMatrix = glm::translate(glm::mat4(1.0f), m_ChunkPosition * glm::vec3(m_ChunkSize));
+    m_DrawInfo.indexCount = m_Vertices.size();
 }

@@ -73,10 +73,10 @@ void Application::PushOverlay(Layer* layer)
 void Application::Run()
 {
 	Camera camera;
-	//ChunkManager manager;
-
 	camera.SetPosition(glm::vec3(0.0f, 70.0f, 0.0f));
 	m_Renderer->SetActiveCamera(&camera);
+	
+	ChunkManager manager(camera.GetPosition());
 
 	glm::vec3 speed = glm::vec3(0.0f);
 
@@ -112,13 +112,15 @@ void Application::Run()
 			Profiler::UpdateProfile(cameraZ, camera.GetPosition().z);
 		}
 
-		//manager.Update();
-
-		//auto drawInfos = manager.GetDrawInfo();
-		//for (int i = 0; i < drawInfos.size(); i++) 
-		//{
-		//	m_Renderer->DrawVoxel(drawInfos[i]);
-		//}
+		manager.Update(camera.GetPosition());
+		
+		{
+			auto drawInfos = manager.GetDrawInfo();
+			for (int i = 0; i < drawInfos.size(); i++) 
+			{
+				m_Renderer->DrawVoxel(drawInfos[i]);
+			}
+		}
 
 		for (Layer* layer : m_LayerStack)
 			layer->OnRender();
