@@ -8,196 +8,231 @@
 #include <glm/gtc/noise.hpp>
 #include <algorithm>
 
-static int s_GenerateVertexKey = -1;
+static int s_SubchunkSize = 32;
 
-Chunk::Chunk(glm::vec3 chunkPosition, int chunkSize) : m_ChunkPosition(chunkPosition), m_ChunkSize(chunkSize), m_UpToDate(false)
+static int s_ChunkMeshingKey = -1;
+static int s_SubchunkMeshingKey = -1;
+
+Chunk::Chunk(glm::vec3 chunkPosition) : m_ChunkPosition(chunkPosition), m_UpToDate(false)
 {
-    m_Voxels.resize(m_ChunkSize * m_ChunkSizeY * m_ChunkSize);
+    m_SubChunks.resize(255 / s_SubchunkSize);
 }
 
 Chunk::~Chunk() 
 {
 }
 
-bool Chunk::Update(ChunkManager& manager)
+void Chunk::Update(std::vector<Chunk*> adjacentChunks)
 {
-    if (m_UpToDate) return false;
-
-    GenerateVertices(manager);
-    GenerateBuffers();
+    Timer timer("Chunk::Update", &s_ChunkMeshingKey);
+    
+    BuildMesh(adjacentChunks);
     UpdateDrawInfo();
 
     m_UpToDate = true;
+}
 
-    return true;
+void Chunk::BuildMesh(std::vector<Chunk*> adjacentChunks)
+{
+    // adjacentChunks:
+    // [0] right
+    // [1] left
+    // [2] front
+    // [3] back
+
+    for (int i = 0; i < m_SubChunks.size(); i++)
+    {
+        if (m_SubChunks[i].m_UptoDate) continue;
+
+        std::vector<uint32_t> top = (i + 1) < m_SubChunks.size() ? m_SubChunks[i + 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
+        std::vector<uint32_t> bottom = (i - 1) >= 0 ? m_SubChunks[i - 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
+        std::vector<uint32_t> right = adjacentChunks[0] && adjacentChunks[0]->GetSubchunk(i) ? adjacentChunks[0]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
+        std::vector<uint32_t> left = adjacentChunks[1] && adjacentChunks[1]->GetSubchunk(i) ? adjacentChunks[1]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
+        std::vector<uint32_t> front = adjacentChunks[2] && adjacentChunks[2]->GetSubchunk(i) ? adjacentChunks[2]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
+        std::vector<uint32_t> back = adjacentChunks[3] && adjacentChunks[3]->GetSubchunk(i) ? adjacentChunks[3]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
+
+
+        m_SubChunks[i].BinaryMeshing(i, top, bottom, right, left, front, back);
+    }
 }
 
 void Chunk::LoadChunk(glm::vec3 newPosition)
 {
     SetPosition(newPosition);
-
     m_UpToDate = false;
+
+    for (int i = 0; i < m_SubChunks.size(); i++)
+    {
+        m_SubChunks[i].m_UptoDate = false;
+    }
 }
 
-int Chunk::FlattenIndex(int x, int y, int z)
+void Chunk::UpdateDrawInfo()
 {
-    return (y * m_ChunkSize * m_ChunkSize) + (z * m_ChunkSize) + x;
+    std::vector<uint32_t> vertices;
+    for (int i = 0; i < m_SubChunks.size(); i++)
+    {
+        m_SubChunks[i].CopyVertices(&vertices);
+    }
+
+    Renderer::DeleteBuffer(m_DrawInfo.vertexBufferID);
+    m_DrawInfo.vertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, vertices.size() * sizeof(uint32_t), vertices.data());
+    m_DrawInfo.modelMatrix = glm::translate(glm::mat4(1.0f), m_ChunkPosition * glm::vec3(s_SubchunkSize));
+    m_DrawInfo.indexCount = vertices.size();
 }
 
-void Chunk::GenerateVertices(ChunkManager& manager)
+/* ============================= SUBCHUNK =================================== */
+
+Subchunk::Subchunk() : m_UptoDate(false)
 {
-    Timer timer("Chunk::GenerateVertices", &s_GenerateVertexKey);
+    m_Voxels.resize(std::pow(s_SubchunkSize, 3));
 
-	m_Vertices.clear();
+    m_BinaryMap.resize(std::pow(s_SubchunkSize, 2));
+    std::fill(m_BinaryMap.begin(), m_BinaryMap.end(), UINT32_MAX);
+}
 
-    Chunk* frontChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3( 0, 0,  1));
-    Chunk* backChunk  = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3( 0, 0, -1));
-    Chunk* rightChunk = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3( 1, 0,  0));
-    Chunk* leftChunk  = manager.GetChunkAtPosition(m_ChunkPosition + glm::vec3(-1, 0,  0));
+Subchunk::~Subchunk() {}
 
-	for (int y = 0; y < m_ChunkSizeY; y++)
-	{
-		for (int z = 0; z < m_ChunkSize; z++)
-		{
-            for (int x = 0; x < m_ChunkSize; x++)
+int Subchunk::FlattenIndex(int x, int y, int z) 
+{
+    return (y * s_SubchunkSize * s_SubchunkSize) + (z * s_SubchunkSize) + x;
+}
+
+int Subchunk::FlattenIndex(int x, int z)
+{
+    return x + (z * s_SubchunkSize);
+}
+
+uint32_t Subchunk::GetBinaryMap(int x, int z)
+{
+    if (x < 0 || x >= s_SubchunkSize || z < 0 || z >= s_SubchunkSize) return 0;
+
+    int index = FlattenIndex(x, z);
+    return index < m_BinaryMap.size() && index >= 0 ? m_BinaryMap[index] : 0;
+}
+
+void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::vector<uint32_t> bottom, std::vector<uint32_t> right, std::vector<uint32_t> left, std::vector<uint32_t> front, std::vector<uint32_t> back)
+{
+    Timer timer("Subchunk::BinaryMeshing", &s_SubchunkMeshingKey);
+
+    m_Vertices.clear();
+
+    int subchunkPosition = subChunkIndex * s_SubchunkSize;
+
+    for (int z = 0; z < s_SubchunkSize; z++)
+    {
+        for (int x = 0; x < s_SubchunkSize; x++)
+        {
+            uint32_t column = GetBinaryMap(x, z);
+
+            if (column == 0) continue;
+
+            uint32_t topMask = ((~(column >> 1)) & column) & ~((top[FlattenIndex(x, z)] & 1) << 31);
+            uint32_t bottomMask = ((~(column << 1)) & column) & ~(bottom[FlattenIndex(x, z)] >> 31);
+            uint32_t rightMask = ~GetBinaryMap(x - 1, z) & column;
+            uint32_t leftMask = ~GetBinaryMap(x + 1, z) & column;
+            uint32_t frontMask = ~GetBinaryMap(x, z + 1) & column;
+            uint32_t backMask = ~GetBinaryMap(x, z - 1) & column;
+
+            if (x + 1 >= s_SubchunkSize) leftMask &= ~(left[FlattenIndex(0, z)]);
+            if (x - 1 <= 0) rightMask &= ~(right[FlattenIndex(s_SubchunkSize - 1, z)]);
+            
+            if (z + 1 >= s_SubchunkSize) frontMask &= ~(front[FlattenIndex(x, 0)]);
+            if (z - 1 <= 0) backMask &= ~(back[FlattenIndex(x, s_SubchunkSize - 1)]);
+
+            uint32_t fullmask = topMask | bottomMask | rightMask | leftMask | frontMask | backMask;
+
+            if (fullmask == 0) continue;
+
+            for (int y = 0; y < s_SubchunkSize; y++)
             {
-                int voxelIndex = FlattenIndex(x, y, z);
-                if (!m_Voxels[voxelIndex].IsActive()) continue; // if voxel is not active, we don't render it
+                if ((fullmask >> y & 1) == 0) continue;
 
-                bool shouldSkip = false;
+                int voxelIndex = FlattenIndex(x, y, z);
                 uint8_t voxelType = m_Voxels[voxelIndex].GetType();
 
-                // Render Front triangles only if they are visible
-                if (z + 1 == m_ChunkSize)
-                {
-                    shouldSkip = frontChunk != nullptr ? frontChunk->IsVoxelActive(x, y, 0) : true;
-                }
-                else shouldSkip = IsVoxelActive(x, y, z + 1);
+                int aux = topMask << y;
 
-                if (!shouldSkip)
+                if ((topMask >> y) & 1)
                 {
-                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
-                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
 
-                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
-                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
                 }
 
-                // Render Back triangles only if they are visible
-                if (z - 1 < 0)
+                if ((bottomMask << y) & 1) 
                 {
-                    shouldSkip = backChunk != nullptr ? backChunk->IsVoxelActive(x, y, m_ChunkSize - 1) : true;
-                }
-                else shouldSkip = IsVoxelActive(x, y, z - 1);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
 
-                if (!shouldSkip)
-                {
-                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
-                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
-                    
-                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
-                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
                 }
 
-                // Render Top triangles only if they are visible
-                if (!IsVoxelActive(x, y + 1, z))
+                if ((rightMask >> y) & 1) 
                 {
-                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
-                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
-                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
-                    
-                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
-                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
-                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
                 }
 
-                // Render Bottom triangles only if they are visible
-                if (!IsVoxelActive(x, y - 1, z))
+                if ((leftMask >> y) & 1)
                 {
-                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
-                    
-                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
+
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
                 }
 
-                // Render Right triangles only if they are visible
-                if (x + 1 == m_ChunkSize)
+                if ((frontMask >> y) & 1) 
                 {
-                    shouldSkip = rightChunk != nullptr ? rightChunk->IsVoxelActive(0, y, z) : true;
-                }
-                else shouldSkip = IsVoxelActive(x + 1, y, z);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
 
-                if (!shouldSkip)
-                {
-                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y, 0 + z, voxelType);
-                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
-                    
-                    PushVertexData(1 + x, 1 + y, 0 + z, voxelType);
-                    PushVertexData(1 + x, 1 + y, 1 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y, 1 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
                 }
 
-                // Render Left triangles only if they are visible
-                if (x - 1 < 0)
+                if ((backMask >> y) & 1) 
                 {
-                    shouldSkip = leftChunk != nullptr ? leftChunk->IsVoxelActive(m_ChunkSize - 1, y, z) : true;
-                }
-                else shouldSkip = IsVoxelActive(x - 1, y, z);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
 
-                if (!shouldSkip)
-                {
-                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y, 1 + z, voxelType);
-                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
-                    
-                    PushVertexData(0 + x, 1 + y, 1 + z, voxelType);
-                    PushVertexData(0 + x, 1 + y, 0 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y, 0 + z, voxelType);
+                    PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 }
 
-bool Chunk::TryGetVoxelAtPosition(float x, float y, float z, Voxel& voxel)
-{
-    int index = FlattenIndex(x, y, z);
-    bool result = index < m_Voxels.size() && index >= 0;
-    if (result) voxel = m_Voxels[index];
-    return result;
-}
-
-bool Chunk::IsVoxelActive(float x, float y, float z) 
-{
-    Voxel voxel;
-    bool result = TryGetVoxelAtPosition(x, y, z, voxel);
-    return result ? voxel.IsActive() : false;
-}
-
-void Chunk::PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType)
+void Subchunk::PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType)
 {
     // First we pack the values into a 32-bit integer
     uint32_t packedValue = (static_cast<uint32_t>(x) << 24) | (static_cast<uint32_t>(y) << 16) | (static_cast<uint32_t>(z) << 8) | (static_cast<uint32_t>(blockType));
     m_Vertices.push_back(packedValue);
 }
 
-void Chunk::GenerateBuffers()
+void Subchunk::CopyVertices(std::vector<uint32_t>* vertices) 
 {
-	Renderer::DeleteBuffer(m_VertexBufferID);
-	m_VertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(uint32_t), m_Vertices.data());
-}
+    if (m_Vertices.empty()) return;
 
-void Chunk::UpdateDrawInfo()
-{
-    m_DrawInfo.vertexBufferID = m_VertexBufferID;
-    m_DrawInfo.modelMatrix = glm::translate(glm::mat4(1.0f), m_ChunkPosition * glm::vec3(m_ChunkSize));
-    m_DrawInfo.indexCount = m_Vertices.size();
+    vertices->insert(vertices->end(), m_Vertices.begin(), m_Vertices.end());
 }

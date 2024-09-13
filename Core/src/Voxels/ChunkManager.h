@@ -27,7 +27,7 @@ private:
 	glm::vec3 m_LastPlayerChunkPosition;
 
 	unsigned int m_LoadDistance = 16;
-	unsigned int m_ChunkSize = 16;
+	const unsigned int m_ChunkSize = 32;
 
 	std::unordered_map<glm::vec3, Chunk*> m_ChunkGrid;
 

@@ -112,16 +112,16 @@ void Application::Run()
 			Profiler::UpdateProfile(cameraZ, camera.GetPosition().z);
 		}
 
-		manager.Update(camera.GetPosition());
-		
 		{
+			manager.Update(camera.GetPosition());
+		
 			auto drawInfos = manager.GetDrawInfo();
-			for (int i = 0; i < drawInfos.size(); i++) 
+			for (int i = 0; i < drawInfos.size(); i++)
 			{
 				m_Renderer->DrawVoxel(drawInfos[i]);
 			}
 		}
-
+		
 		for (Layer* layer : m_LayerStack)
 			layer->OnRender();
 

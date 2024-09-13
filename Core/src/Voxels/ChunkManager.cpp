@@ -14,7 +14,7 @@ ChunkManager::ChunkManager(glm::vec3 playerPosition)
 		for (int x = smallesPos.x; x <= biggestPos.x; x++)
 		{
 			glm::vec3 position = glm::vec3(x, 0, z);
-			Chunk* newChunk = new Chunk(position, m_ChunkSize);
+			Chunk* newChunk = new Chunk(position);
 			
 			m_ChunkGrid.emplace(position, newChunk);
 		}
@@ -48,7 +48,16 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 
 	for (auto it = m_ChunkGrid.begin(); it != m_ChunkGrid.end(); it++)
 	{
-		it->second->Update(*this);
+		if (!it->second->NeedsUpdate()) continue;
+
+		glm::vec3 position = it->second->GetPosition();
+		std::vector<Chunk*> adjacents;
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(-1, 0,  0)));
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 1, 0,  0)));
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 0, 0,  1)));
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 0, 0, -1)));
+		
+		it->second->Update(adjacents);
 	}
 
 	m_LastPlayerChunkPosition = newPlayerChunkPos;
