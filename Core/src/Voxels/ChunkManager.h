@@ -2,6 +2,8 @@
 #include "../Exports.h"
 #include "Chunk.h"
 #include <unordered_map>
+#include <queue>
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
@@ -33,7 +35,7 @@ private:
 
 	std::vector<Chunk*> m_UnloadedChunks;
 	std::vector<glm::vec3> m_ChunksToLoad;
-	std::vector<Chunk*> m_LoadedChunks;
+	std::queue<glm::vec3> m_UpdateQueue;
 
 	void UnloadChunks(glm::vec3 direction);
 	void CheckChunksToLoad(glm::vec3 playerPosition);

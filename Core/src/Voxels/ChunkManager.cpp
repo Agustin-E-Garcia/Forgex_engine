@@ -17,6 +17,7 @@ ChunkManager::ChunkManager(glm::vec3 playerPosition)
 			Chunk* newChunk = new Chunk(position);
 			
 			m_ChunkGrid.emplace(position, newChunk);
+			m_UpdateQueue.push(position);
 		}
 	}
 
@@ -46,18 +47,37 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 		CheckChunksToLoad(newPlayerChunkPos);
 	}
 
-	for (auto it = m_ChunkGrid.begin(); it != m_ChunkGrid.end(); it++)
+	while (!m_UpdateQueue.empty())
 	{
-		if (!it->second->NeedsUpdate()) continue;
+		glm::vec3 position = m_UpdateQueue.front();
+		Chunk* chunk = GetChunkAtPosition(position);
+		m_UpdateQueue.pop();
 
-		glm::vec3 position = it->second->GetPosition();
+		if (!chunk) continue;
+
 		std::vector<Chunk*> adjacents;
 		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(-1, 0,  0)));
 		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 1, 0,  0)));
 		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 0, 0,  1)));
 		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 0, 0, -1)));
-		
-		it->second->Update(adjacents);
+
+		if (!chunk->IsLoaded()) 
+		{
+			chunk->LoadChunk();
+
+			for (int i = 0; i < adjacents.size(); i++)
+			{
+				if (!adjacents[i]) continue;
+
+				adjacents[i]->RequestMeshUpdate();
+				m_UpdateQueue.push(adjacents[i]->GetPosition());
+			}
+		}
+
+		if (!chunk->IsMeshed())
+		{
+			if (!chunk->TryMeshChunk(adjacents)) m_UpdateQueue.push(position);
+		}
 	}
 
 	m_LastPlayerChunkPosition = newPlayerChunkPos;
@@ -67,7 +87,7 @@ void ChunkManager::UnloadChunks(glm::vec3 playerPosition)
 {
 	glm::vec3 direction = glm::normalize(playerPosition - m_LastPlayerChunkPosition);
 
-	for (auto it = (--m_ChunkGrid.end()); it != m_ChunkGrid.begin(); --it)
+	for (auto it = (--m_ChunkGrid.end());; --it)
 	{
 		glm::vec3 distanceVector = (playerPosition - it->first) * direction;
 		int distance = abs(distanceVector.x) + abs(distanceVector.z);
@@ -78,6 +98,8 @@ void ChunkManager::UnloadChunks(glm::vec3 playerPosition)
 			m_UnloadedChunks.push_back(chunk);
 			it = m_ChunkGrid.erase(it);
 		}
+
+		if (it == m_ChunkGrid.begin()) break;
 	}
 }
 
@@ -99,7 +121,13 @@ void ChunkManager::CheckChunksToLoad(glm::vec3 playerPosition)
 			Chunk* chunk = m_UnloadedChunks.back();
 			m_UnloadedChunks.pop_back();
 
-			chunk->LoadChunk(position);
+			chunk->ChangePosition(position);
+
+			m_UpdateQueue.push(position);
+			m_UpdateQueue.push(position + glm::vec3(-1, 0,  0));
+			m_UpdateQueue.push(position + glm::vec3( 1, 0,  0));
+			m_UpdateQueue.push(position + glm::vec3( 0, 0,  1));
+			m_UpdateQueue.push(position + glm::vec3( 0, 0, -1));
 
 			m_ChunkGrid.emplace(position, chunk);
 		}

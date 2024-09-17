@@ -13,7 +13,7 @@ static int s_SubchunkSize = 32;
 static int s_ChunkMeshingKey = -1;
 static int s_SubchunkMeshingKey = -1;
 
-Chunk::Chunk(glm::vec3 chunkPosition) : m_ChunkPosition(chunkPosition), m_UpToDate(false)
+Chunk::Chunk(glm::vec3 chunkPosition) : m_ChunkPosition(chunkPosition)
 {
     m_SubChunks.resize(255 / s_SubchunkSize);
 }
@@ -22,14 +22,39 @@ Chunk::~Chunk()
 {
 }
 
-void Chunk::Update(std::vector<Chunk*> adjacentChunks)
+bool Chunk::TryMeshChunk(std::vector<Chunk*> adjacentChunks)
 {
     Timer timer("Chunk::Update", &s_ChunkMeshingKey);
+
+    for (int i = 0; i < adjacentChunks.size(); i++)
+    {
+        if (!adjacentChunks[i]) continue;
+        if (!adjacentChunks[i]->IsLoaded()) return false;
+    }
     
     BuildMesh(adjacentChunks);
     UpdateDrawInfo();
 
-    m_UpToDate = true;
+    return true;
+}
+
+void Chunk::ChangePosition(glm::vec3 newPosition)
+{
+    m_ChunkPosition = newPosition;
+
+    for (int i = 0; i < m_SubChunks.size(); i++)
+    {
+        m_SubChunks[i].m_IsLoaded = false;
+        m_SubChunks[i].m_IsMeshed = false;
+    }
+}
+
+void Chunk::RequestMeshUpdate()
+{
+    for (int i = 0; i < m_SubChunks.size(); i++)
+    {
+        m_SubChunks[i].m_IsMeshed = false;
+    }
 }
 
 void Chunk::BuildMesh(std::vector<Chunk*> adjacentChunks)
@@ -42,29 +67,45 @@ void Chunk::BuildMesh(std::vector<Chunk*> adjacentChunks)
 
     for (int i = 0; i < m_SubChunks.size(); i++)
     {
-        if (m_SubChunks[i].m_UptoDate) continue;
+        if (m_SubChunks[i].m_IsMeshed) continue;
 
         std::vector<uint32_t> top = (i + 1) < m_SubChunks.size() ? m_SubChunks[i + 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
         std::vector<uint32_t> bottom = (i - 1) >= 0 ? m_SubChunks[i - 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
-        std::vector<uint32_t> right = adjacentChunks[0] && adjacentChunks[0]->GetSubchunk(i) ? adjacentChunks[0]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
-        std::vector<uint32_t> left = adjacentChunks[1] && adjacentChunks[1]->GetSubchunk(i) ? adjacentChunks[1]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
-        std::vector<uint32_t> front = adjacentChunks[2] && adjacentChunks[2]->GetSubchunk(i) ? adjacentChunks[2]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
-        std::vector<uint32_t> back = adjacentChunks[3] && adjacentChunks[3]->GetSubchunk(i) ? adjacentChunks[3]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
-
+        std::vector<uint32_t> right = adjacentChunks[0] && adjacentChunks[0]->GetSubchunk(i) ? adjacentChunks[0]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
+        std::vector<uint32_t> left  = adjacentChunks[1] && adjacentChunks[1]->GetSubchunk(i) ? adjacentChunks[1]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
+        std::vector<uint32_t> front = adjacentChunks[2] && adjacentChunks[2]->GetSubchunk(i) ? adjacentChunks[2]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
+        std::vector<uint32_t> back  = adjacentChunks[3] && adjacentChunks[3]->GetSubchunk(i) ? adjacentChunks[3]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
 
         m_SubChunks[i].BinaryMeshing(i, top, bottom, right, left, front, back);
     }
 }
 
-void Chunk::LoadChunk(glm::vec3 newPosition)
+void Chunk::LoadChunk()
 {
-    SetPosition(newPosition);
-    m_UpToDate = false;
-
     for (int i = 0; i < m_SubChunks.size(); i++)
     {
-        m_SubChunks[i].m_UptoDate = false;
+        m_SubChunks[i].LoadSubchunk();
     }
+}
+
+bool Chunk::IsLoaded()
+{
+    for (int i = 0; i < m_SubChunks.size(); i++)
+    {
+        if (!m_SubChunks[i].m_IsLoaded) return false;
+    }
+
+    return true;
+}
+
+bool Chunk::IsMeshed()
+{
+    for (int i = 0; i < m_SubChunks.size(); i++)
+    {
+        if (!m_SubChunks[i].m_IsMeshed) return false;
+    }
+
+    return true;
 }
 
 void Chunk::UpdateDrawInfo()
@@ -83,7 +124,7 @@ void Chunk::UpdateDrawInfo()
 
 /* ============================= SUBCHUNK =================================== */
 
-Subchunk::Subchunk() : m_UptoDate(false)
+Subchunk::Subchunk() : m_IsLoaded(false), m_IsMeshed(false)
 {
     m_Voxels.resize(std::pow(s_SubchunkSize, 3));
 
@@ -111,6 +152,11 @@ uint32_t Subchunk::GetBinaryMap(int x, int z)
     return index < m_BinaryMap.size() && index >= 0 ? m_BinaryMap[index] : 0;
 }
 
+void Subchunk::LoadSubchunk()
+{
+    m_IsLoaded = true;
+}
+
 void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::vector<uint32_t> bottom, std::vector<uint32_t> right, std::vector<uint32_t> left, std::vector<uint32_t> front, std::vector<uint32_t> back)
 {
     Timer timer("Subchunk::BinaryMeshing", &s_SubchunkMeshingKey);
@@ -134,11 +180,11 @@ void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::
             uint32_t frontMask = ~GetBinaryMap(x, z + 1) & column;
             uint32_t backMask = ~GetBinaryMap(x, z - 1) & column;
 
-            if (x + 1 >= s_SubchunkSize) leftMask &= ~(left[FlattenIndex(0, z)]);
-            if (x - 1 <= 0) rightMask &= ~(right[FlattenIndex(s_SubchunkSize - 1, z)]);
+            if (x + 1 >= s_SubchunkSize && !left.empty()) leftMask &= ~(left[FlattenIndex(0, z)]);
+            if (x - 1 <= 0 && !right.empty()) rightMask &= ~(right[FlattenIndex(s_SubchunkSize - 1, z)]);
             
-            if (z + 1 >= s_SubchunkSize) frontMask &= ~(front[FlattenIndex(x, 0)]);
-            if (z - 1 <= 0) backMask &= ~(back[FlattenIndex(x, s_SubchunkSize - 1)]);
+            if (z + 1 >= s_SubchunkSize && !front.empty()) frontMask &= ~(front[FlattenIndex(x, 0)]);
+            if (z - 1 <= 0 && !back.empty()) backMask &= ~(back[FlattenIndex(x, s_SubchunkSize - 1)]);
 
             uint32_t fullmask = topMask | bottomMask | rightMask | leftMask | frontMask | backMask;
 
@@ -221,6 +267,8 @@ void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::
             }
         }
     }
+
+    m_IsMeshed = true;
 }
 
 void Subchunk::PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType)

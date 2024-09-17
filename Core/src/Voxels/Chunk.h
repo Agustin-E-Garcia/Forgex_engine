@@ -21,12 +21,14 @@ private:
 	std::vector<uint32_t> m_Vertices;
 	std::vector<uint32_t> m_BinaryMap;
 
-	bool m_UptoDate;
+	bool m_IsLoaded;
+	bool m_IsMeshed;
 
 	int FlattenIndex(int x, int y, int z);
 	int FlattenIndex(int x, int z);
 	uint32_t GetBinaryMap(int x, int z);
 
+	void LoadSubchunk();
 	void BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::vector<uint32_t> bottom, std::vector<uint32_t> right, std::vector<uint32_t> left, std::vector<uint32_t> front, std::vector<uint32_t> back);
 	void PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType);
 	void CopyVertices(std::vector<uint32_t>* vertices);
@@ -38,15 +40,17 @@ public:
 	Chunk(glm::vec3 chunkPosition);
 	~Chunk();
 
-	void Update(std::vector<Chunk*> adjacentChunks);
-	void BuildMesh(std::vector<Chunk*> adjacentChunks);
-	void LoadChunk(glm::vec3 newPosition);
+	bool TryMeshChunk(std::vector<Chunk*> adjacentChunks);
+	void ChangePosition(glm::vec3 newPosition);
+	void RequestMeshUpdate();
+	void LoadChunk();
 
-	inline const Subchunk* GetSubchunk(int index) { return index >= 0 && index < m_SubChunks.size() ? &m_SubChunks[index] : nullptr; }
+	bool IsLoaded();
+	bool IsMeshed();
+
+	inline Subchunk* GetSubchunk(int index) { return index >= 0 && index < m_SubChunks.size() ? &m_SubChunks[index] : nullptr; }
 	inline glm::vec3 GetPosition() { return m_ChunkPosition; }
 	inline DrawInfo GetDrawInfo() { return m_DrawInfo; }
-	inline bool NeedsUpdate() { return !m_UpToDate; }
-
 private:
 	glm::vec3 m_ChunkPosition;
 
@@ -55,10 +59,6 @@ private:
 	unsigned int m_VertexBufferID;
 	DrawInfo m_DrawInfo;
 
-	bool m_UpToDate;
-
-	void GenerateBuffers();
+	void BuildMesh(std::vector<Chunk*> adjacentChunks);
 	void UpdateDrawInfo();
-
-	inline void SetPosition(glm::vec3 newPosition) { m_ChunkPosition = newPosition; }
 };
