@@ -12,7 +12,7 @@ Renderer::Renderer()
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
 
 	glGenVertexArrays(1, &vertexArrayID);
@@ -113,6 +113,15 @@ unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void*
 	glGenBuffers(1, &buffer);
 	glBindBuffer(target, buffer);
 	glBufferData(target, size, data, GL_STATIC_DRAW);
+	return buffer;
+}
+
+unsigned int Renderer::GenerateVertexBuffer(int size, const void* data) 
+{
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	return buffer;
 }
 

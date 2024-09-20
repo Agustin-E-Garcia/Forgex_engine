@@ -28,7 +28,7 @@ private:
 	int FlattenIndex(int x, int z);
 	uint32_t GetBinaryMap(int x, int z);
 
-	void LoadSubchunk();
+	void LoadSubchunk(int subChunkIndex, std::vector<uint8_t> chunkHeightMap);
 	void BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::vector<uint32_t> bottom, std::vector<uint32_t> right, std::vector<uint32_t> left, std::vector<uint32_t> front, std::vector<uint32_t> back);
 	void PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType);
 	void CopyVertices(std::vector<uint32_t>* vertices);

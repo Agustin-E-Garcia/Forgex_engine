@@ -2,8 +2,8 @@
 #include "../Log.h"
 #include "ChunkManager.h"
 #include "../Profiler.h"
+#include "../Utils/NoiseGenerator.h"
 
-#include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/noise.hpp>
 #include <algorithm>
@@ -82,9 +82,20 @@ void Chunk::BuildMesh(std::vector<Chunk*> adjacentChunks)
 
 void Chunk::LoadChunk()
 {
+    std::vector<uint8_t> heightMap;
+    std::vector<float> noiseMap = NoiseGenerator::GenerateNoiseMap(m_ChunkPosition.x * s_SubchunkSize, (m_ChunkPosition.x + 1) * s_SubchunkSize, m_ChunkPosition.z * s_SubchunkSize, (m_ChunkPosition.z + 1) * s_SubchunkSize, 30.0f, 4, 0.3f, 1.3f);
+
+    for (int z = 0; z < s_SubchunkSize; z++)
+    {
+        for (int x = 0; x < s_SubchunkSize; x++)
+        {
+            heightMap.push_back(static_cast<unsigned int>((noiseMap[x + (z * s_SubchunkSize)] * 60.0f) + 60.0f));
+        }
+    }
+
     for (int i = 0; i < m_SubChunks.size(); i++)
     {
-        m_SubChunks[i].LoadSubchunk();
+        m_SubChunks[i].LoadSubchunk(i, heightMap);
     }
 }
 
@@ -117,7 +128,7 @@ void Chunk::UpdateDrawInfo()
     }
 
     Renderer::DeleteBuffer(m_DrawInfo.vertexBufferID);
-    m_DrawInfo.vertexBufferID = Renderer::GenerateBuffer(GL_ARRAY_BUFFER, vertices.size() * sizeof(uint32_t), vertices.data());
+    m_DrawInfo.vertexBufferID = Renderer::GenerateVertexBuffer(vertices.size() * sizeof(uint32_t), vertices.data());
     m_DrawInfo.modelMatrix = glm::translate(glm::mat4(1.0f), m_ChunkPosition * glm::vec3(s_SubchunkSize));
     m_DrawInfo.indexCount = vertices.size();
 }
@@ -127,9 +138,7 @@ void Chunk::UpdateDrawInfo()
 Subchunk::Subchunk() : m_IsLoaded(false), m_IsMeshed(false)
 {
     m_Voxels.resize(std::pow(s_SubchunkSize, 3));
-
     m_BinaryMap.resize(std::pow(s_SubchunkSize, 2));
-    std::fill(m_BinaryMap.begin(), m_BinaryMap.end(), UINT32_MAX);
 }
 
 Subchunk::~Subchunk() {}
@@ -152,8 +161,27 @@ uint32_t Subchunk::GetBinaryMap(int x, int z)
     return index < m_BinaryMap.size() && index >= 0 ? m_BinaryMap[index] : 0;
 }
 
-void Subchunk::LoadSubchunk()
+void Subchunk::LoadSubchunk(int subChunkIndex, std::vector<uint8_t> chunkHeightMap)
 {
+    int subchunkMin = s_SubchunkSize * subChunkIndex;
+    int subchunkMax = s_SubchunkSize * (subChunkIndex + 1);
+
+    std::fill(m_BinaryMap.begin(), m_BinaryMap.end(), UINT32_MAX);
+
+    for (int i = 0; i < m_BinaryMap.size(); i++)
+    {
+        if (chunkHeightMap[i] > subchunkMax) continue;
+
+        if (chunkHeightMap[i] < subchunkMin) m_BinaryMap[i] = 0;
+        else
+        {
+            for (int y = 0; y < s_SubchunkSize; y++)
+            {
+                if ((y + subchunkMin) > chunkHeightMap[i]) m_BinaryMap[i] &= ~(1 << y);
+            }
+        }
+    }
+
     m_IsLoaded = true;
 }
 
@@ -208,9 +236,10 @@ void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::
                     PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
+
                 }
 
-                if ((bottomMask << y) & 1) 
+                if ((bottomMask << y) & 1)
                 {
                     PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);

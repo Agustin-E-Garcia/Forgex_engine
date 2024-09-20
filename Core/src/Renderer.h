@@ -29,6 +29,7 @@ public:
 	void SetActiveCamera(Camera* activeCamera);
 
 	static unsigned int GenerateBuffer(unsigned int target, int size, const void* data);
+	static unsigned int GenerateVertexBuffer(int size, const void* data);
 	static void DeleteBuffer(unsigned int bufferID);
 	static void ToggleWireframe(bool wireframe);
 
