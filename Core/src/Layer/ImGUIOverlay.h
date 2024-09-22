@@ -25,8 +25,6 @@ public:
 		ImGui::StyleColorsDark();
 
 		ImGui_ImplOpenGL3_Init();
-
-		noisemapTexture = TextureLoader::LoadHeightmapIntoTexture(NoiseGenerator::GenerateNoiseMap(posX, posX + 32, posZ + 0, posZ + 32, scale, octaves, persistance, lacunarity).data(), 32, 32);
 	}
 
 	void OnUpdate(float deltaTime) override
@@ -41,7 +39,7 @@ public:
 		//ImGui::ShowDemoWindow();
 		DisplayMenu();
 		DisplayStats();
-		DisplayNoiseGenerationMenu();
+		//DisplayNoiseGenerationMenu();
 	}
 
 	void DisplayMenu()

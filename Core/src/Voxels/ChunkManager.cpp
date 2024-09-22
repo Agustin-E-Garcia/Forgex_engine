@@ -41,11 +41,11 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 {
 	glm::vec3 newPlayerChunkPos = GetChunkPositionFromWorld(playerPosition);
 
-	//if (newPlayerChunkPos != m_LastPlayerChunkPosition)
-	//{
-	//	UnloadChunks(newPlayerChunkPos);
-	//	CheckChunksToLoad(newPlayerChunkPos);
-	//}
+	if (newPlayerChunkPos != m_LastPlayerChunkPosition)
+	{
+		UnloadChunks(newPlayerChunkPos);
+		CheckChunksToLoad(newPlayerChunkPos);
+	}
 
 	while (!m_UpdateQueue.empty())
 	{

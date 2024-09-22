@@ -83,13 +83,14 @@ void Chunk::BuildMesh(std::vector<Chunk*> adjacentChunks)
 void Chunk::LoadChunk()
 {
     std::vector<uint8_t> heightMap;
-    std::vector<float> noiseMap = NoiseGenerator::GenerateNoiseMap(m_ChunkPosition.x * s_SubchunkSize, (m_ChunkPosition.x + 1) * s_SubchunkSize, m_ChunkPosition.z * s_SubchunkSize, (m_ChunkPosition.z + 1) * s_SubchunkSize, 30.0f, 4, 0.3f, 1.3f);
+    std::vector<float> noiseMap = NoiseGenerator::GenerateNoiseMap(m_ChunkPosition.x * s_SubchunkSize, (m_ChunkPosition.x + 1) * s_SubchunkSize, m_ChunkPosition.z * s_SubchunkSize, (m_ChunkPosition.z + 1) * s_SubchunkSize, 300.0f, 4, 0.5f, 2.0f);
 
     for (int z = 0; z < s_SubchunkSize; z++)
     {
         for (int x = 0; x < s_SubchunkSize; x++)
         {
-            heightMap.push_back(static_cast<unsigned int>((noiseMap[x + (z * s_SubchunkSize)] * 60.0f) + 60.0f));
+            int height = std::floor(40.0f + noiseMap[x + (z * s_SubchunkSize)] * 15.0f);
+            heightMap.push_back(std::min(height, 220));
         }
     }
 
@@ -177,7 +178,8 @@ void Subchunk::LoadSubchunk(int subChunkIndex, std::vector<uint8_t> chunkHeightM
         {
             for (int y = 0; y < s_SubchunkSize; y++)
             {
-                if ((y + subchunkMin) > chunkHeightMap[i]) m_BinaryMap[i] &= ~(1 << y);
+                int voxelPoisition = y + subchunkMin;
+                if (voxelPoisition > chunkHeightMap[i]) m_BinaryMap[i] &= ~(1 << y);
             }
         }
     }
@@ -236,7 +238,6 @@ void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::
                     PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
-
                 }
 
                 if ((bottomMask << y) & 1)
