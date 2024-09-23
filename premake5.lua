@@ -11,7 +11,10 @@ workspace "Voxel_Engine"
 	includedirs {
 		"ExternalLibraries/Spdlog/spdlog-1.14.1/include",
 		"ExternalLibraries/STB_Image",
-		"ExternalLibraries/ImGUI"
+		"ExternalLibraries/ImGUI",
+		"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
+		"ExternalLibraries/GLEW/glew-2.2.0/include",
+		"ExternalLibraries/GLM",
 	}
 
 	project "Engine_Core"
@@ -20,13 +23,6 @@ workspace "Voxel_Engine"
 		files { "Core/**.cpp", "Core/**.h" }
 		links { "ImGui" }
 		defines { "ENGINE_DLL" }
-
-		includedirs {
-			"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
-			"ExternalLibraries/GLEW/glew-2.2.0/include",
-			"ExternalLibraries/GLM",
-			"ExternalLibraries/ImGUI"
-		}
 
 		libdirs {
 			"ExternalLibraries/GLEW/glew-2.2.0/lib/Release/x64",
@@ -63,8 +59,6 @@ workspace "Voxel_Engine"
 		}
 
 		targetdir("ExternalLibraries/ImGUI/imgui/bin")
-
-		includedirs { "ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include" }
 
 		files { 
 			"ExternalLibraries/ImGUI/imgui/*.cpp", "ExternalLibraries/ImGUI/imgui/*.h",

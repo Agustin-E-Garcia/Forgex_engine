@@ -1,8 +1,6 @@
 #pragma once
 #include "Layer.h"
 #include "../Application.h"
-#include "../TextureLoader.h"
-#include "../Utils/NoiseGenerator.h"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/OpenGL/imgui_impl_opengl3.h>
@@ -36,10 +34,8 @@ public:
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
-		//ImGui::ShowDemoWindow();
 		DisplayMenu();
 		DisplayStats();
-		//DisplayNoiseGenerationMenu();
 	}
 
 	void DisplayMenu()
@@ -71,30 +67,7 @@ public:
 		ImGui::End();
 	}
 
-	void DisplayNoiseGenerationMenu() 
-	{
-		if (ImGui::Begin("Noise Generator")) 
-		{
-			ImGui::Text("Noisemap values");
-			ImGui::SliderInt("Pos X", &posX, 1, 100);
-			ImGui::SliderInt("Pos Z", &posZ, 1, 100);
-			ImGui::SliderFloat("Scale", &scale, 0.1, 30);
-			ImGui::SliderInt("Octaves", &octaves, 1, 30);
-			ImGui::SliderFloat("Persistance", &persistance, 0.1, 30);
-			ImGui::SliderFloat("Lacunarity", &lacunarity, 0.1, 30);
-			
-			glDeleteTextures(1, &noisemapTexture);
-			noisemapTexture = TextureLoader::LoadHeightmapIntoTexture(NoiseGenerator::GenerateNoiseMap(posX, posX + 32, posZ +0, posZ + 32, scale, octaves, persistance, lacunarity).data(), 32, 32);
-
-			ImGui::Separator();
-			ImGui::Text("Generated Noisemap texture");
-			ImGui::Text("size = %d x %d", 32, 32);
-			ImGui::Image((void*)(intptr_t)noisemapTexture, ImVec2(256, 256));
-		}
-		ImGui::End();
-	}
-
-	void OnRender() override
+	void OnRender(const Renderer& renderer) override
 	{
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -132,13 +105,4 @@ public:
 
 private:
 	bool m_WireframeActive = false;
-
-	int posX = 0;
-	int posZ = 0;
-	float scale = 20.0f;
-	int octaves = 4;
-	float persistance = 0.5f;
-	float lacunarity = 2.0f;
-
-	unsigned int noisemapTexture = 0;
 };

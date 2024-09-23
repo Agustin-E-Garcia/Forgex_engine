@@ -3,7 +3,7 @@
 #include "../Profiler.h"
 #include "../Log.h"
 
-ChunkManager::ChunkManager(glm::vec3 playerPosition)
+ChunkManager::ChunkManager(glm::vec3 playerPosition) : Object("Chunk Manager")
 {
 	m_LastPlayerChunkPosition = GetChunkPositionFromWorld(playerPosition);
 	glm::vec3 smallesPos = m_LastPlayerChunkPosition - glm::vec3(m_LoadDistance);

@@ -2,7 +2,7 @@
 #include "Renderer.h"
 #include "GL/glew.h"
 
-Cube::Cube()
+Cube::Cube() : Object("Cube Object")
 {
 	m_Vertices.reserve(8 * 3);
 	m_Vertices = 
@@ -90,7 +90,7 @@ DrawInfo Cube::GetDrawInfo()
 	info.uvBufferID = m_UVBufferID;
 	// shader
 	// texture
-	info.modelMatrix = GetModelMatrix();
+	info.modelMatrix = GetTransform()->GetModelMatrix();
 	info.indexCount = m_Indices.size();
 
 	return info;

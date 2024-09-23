@@ -3,13 +3,11 @@
 #include <glm/glm.hpp>
 #include "glm/gtc/quaternion.hpp"
 
-struct DrawInfo;
-
-class ENGINE_API Entity
+class ENGINE_API Transform
 {
 public:
-	Entity();
-	~Entity();
+	Transform();
+	~Transform();
 
 	glm::mat4 GetModelMatrix();
 

@@ -2,7 +2,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Log.h"
 
-Camera::Camera()
+Camera::Camera() : Object("Camera")
 {
 	m_FieldOfView = glm::radians(90.0f);
 	m_AspectRatio = (float)4 / (float)3;
@@ -10,7 +10,7 @@ Camera::Camera()
 	m_FarPlane = 1000.0f;
 }
 
-Camera::Camera(float fieldOfView, float aspectRatio, float nearPlane, float farPlane)
+Camera::Camera(float fieldOfView, float aspectRatio, float nearPlane, float farPlane) : Object("Camera")
 {
 	m_FieldOfView = fieldOfView;
 	m_AspectRatio = aspectRatio;
@@ -27,5 +27,5 @@ glm::mat4 Camera::GetProjectionMatrix()
 
 glm::mat4 Camera::GetViewMatrix()
 {
-	return glm::lookAt(GetPosition(), GetPosition() + GetForward(), glm::vec3(0, 1, 0));
+	return glm::lookAt(GetTransform()->GetPosition(), GetTransform()->GetPosition() + GetTransform()->GetForward(), glm::vec3(0, 1, 0));
 }

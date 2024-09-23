@@ -1,7 +1,7 @@
 #pragma once
-#include "Entity.h"
+#include "Object.h"
 
-class ENGINE_API Camera : public Entity
+class ENGINE_API Camera : public Object
 {
 public:
 	Camera();

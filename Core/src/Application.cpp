@@ -73,10 +73,10 @@ void Application::PushOverlay(Layer* layer)
 void Application::Run()
 {
 	Camera camera;
-	camera.SetPosition(glm::vec3(0.0f, 70.0f, 0.0f));
+	camera.GetTransform()->SetPosition(glm::vec3(0.0f, 70.0f, 0.0f));
 	m_Renderer->SetActiveCamera(&camera);
 	
-	ChunkManager manager(camera.GetPosition());
+	ChunkManager manager(camera.GetTransform()->GetPosition());
 
 	glm::vec3 speed = glm::vec3(0.0f);
 
@@ -101,19 +101,19 @@ void Application::Run()
 			if (InputManager::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))	speed.y = -20.0;
 			if (InputManager::IsKeyPressed(GLFW_KEY_SPACE))			speed.y = 20.0;
 
-			camera.SetPosition(camera.GetPosition() + camera.GetForward() * speed.z * deltaTime);
-			camera.SetPosition(camera.GetPosition() + camera.GetUp() * speed.y * deltaTime);
-			camera.SetRotationY(camera.GetRotation().y + speed.x * deltaTime);
+			camera.GetTransform()->SetPosition (camera.GetTransform()->GetPosition() + camera.GetTransform()->GetForward() * speed.z * deltaTime);
+			camera.GetTransform()->SetPosition (camera.GetTransform()->GetPosition() + camera.GetTransform()->GetUp() * speed.y * deltaTime);
+			camera.GetTransform()->SetRotationY(camera.GetTransform()->GetRotation().y + speed.x * deltaTime);
 
 			speed = glm::vec3(0);
 
-			Profiler::UpdateProfile(cameraX, camera.GetPosition().x);
-			Profiler::UpdateProfile(cameraY, camera.GetPosition().y);
-			Profiler::UpdateProfile(cameraZ, camera.GetPosition().z);
+			Profiler::UpdateProfile(cameraX, camera.GetTransform()->GetPosition().x);
+			Profiler::UpdateProfile(cameraY, camera.GetTransform()->GetPosition().y);
+			Profiler::UpdateProfile(cameraZ, camera.GetTransform()->GetPosition().z);
 		}
 
 		{
-			manager.Update(camera.GetPosition());
+			manager.Update(camera.GetTransform()->GetPosition());
 		
 			auto drawInfos = manager.GetDrawInfo();
 			for (int i = 0; i < drawInfos.size(); i++)
@@ -123,7 +123,7 @@ void Application::Run()
 		}
 		
 		for (Layer* layer : m_LayerStack)
-			layer->OnRender();
+			layer->OnRender(*m_Renderer);
 
 		m_Window->Update();
 

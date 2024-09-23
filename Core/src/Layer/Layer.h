@@ -1,6 +1,7 @@
 #pragma once
 #include "../Exports.h"
 #include "../Event/EventList.h"
+#include "../Renderer.h"
 
 class ENGINE_API Layer 
 {
@@ -12,7 +13,7 @@ public:
 	virtual void OnDetach() {}
 	virtual void OnUpdate(float deltaTime) {}
 	virtual void OnEvent(Event& event) {}
-	virtual void OnRender() {}
+	virtual void OnRender(const Renderer& renderer) {}
 
 	inline const char* GetName() const { return m_Name; }
 

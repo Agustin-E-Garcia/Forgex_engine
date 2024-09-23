@@ -1,5 +1,5 @@
 #pragma once
-#include "../Exports.h"
+#include "../Object.h"
 #include "Chunk.h"
 #include <unordered_map>
 #include <queue>
@@ -9,7 +9,7 @@
 
 class DrawInfo;
 
-class ENGINE_API ChunkManager 
+class ENGINE_API ChunkManager : public Object 
 {
 public:
 	ChunkManager(glm::vec3 playerPosition);

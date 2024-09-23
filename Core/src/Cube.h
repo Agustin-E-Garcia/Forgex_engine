@@ -1,10 +1,10 @@
 #pragma once
-#include "Entity.h"
+#include "Object.h"
 #include <vector>
 
 struct DrawInfo;
 
-class ENGINE_API Cube : public Entity
+class ENGINE_API Cube : public Object
 {
 public:
 	Cube();
