@@ -22,9 +22,11 @@ Chunk::~Chunk()
 {
 }
 
-bool Chunk::TryMeshChunk(std::vector<Chunk*> adjacentChunks)
+bool Chunk::TryMeshChunk(std::vector<const Chunk*> adjacentChunks, bool forceMeshing)
 {
     Timer timer("Chunk::Update", &s_ChunkMeshingKey);
+
+    if (IsMeshed() && !forceMeshing) return true;
 
     for (int i = 0; i < adjacentChunks.size(); i++)
     {
@@ -57,7 +59,7 @@ void Chunk::RequestMeshUpdate()
     }
 }
 
-void Chunk::BuildMesh(std::vector<Chunk*> adjacentChunks)
+void Chunk::BuildMesh(std::vector<const Chunk*> adjacentChunks)
 {
     // adjacentChunks:
     // [0] right
@@ -71,10 +73,10 @@ void Chunk::BuildMesh(std::vector<Chunk*> adjacentChunks)
 
         std::vector<uint32_t> top = (i + 1) < m_SubChunks.size() ? m_SubChunks[i + 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
         std::vector<uint32_t> bottom = (i - 1) >= 0 ? m_SubChunks[i - 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
-        std::vector<uint32_t> right = adjacentChunks[0] && adjacentChunks[0]->GetSubchunk(i) ? adjacentChunks[0]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
-        std::vector<uint32_t> left  = adjacentChunks[1] && adjacentChunks[1]->GetSubchunk(i) ? adjacentChunks[1]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
-        std::vector<uint32_t> front = adjacentChunks[2] && adjacentChunks[2]->GetSubchunk(i) ? adjacentChunks[2]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
-        std::vector<uint32_t> back  = adjacentChunks[3] && adjacentChunks[3]->GetSubchunk(i) ? adjacentChunks[3]->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
+        std::vector<uint32_t> right = adjacentChunks[0] ? adjacentChunks.at(0)->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
+        std::vector<uint32_t> left  = adjacentChunks[1] ? adjacentChunks.at(1)->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
+        std::vector<uint32_t> front = adjacentChunks[2] ? adjacentChunks.at(2)->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
+        std::vector<uint32_t> back  = adjacentChunks[3] ? adjacentChunks.at(3)->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
 
         m_SubChunks[i].BinaryMeshing(i, top, bottom, right, left, front, back);
     }
@@ -100,7 +102,7 @@ void Chunk::LoadChunk()
     }
 }
 
-bool Chunk::IsLoaded()
+bool Chunk::IsLoaded() const
 {
     for (int i = 0; i < m_SubChunks.size(); i++)
     {
@@ -110,7 +112,7 @@ bool Chunk::IsLoaded()
     return true;
 }
 
-bool Chunk::IsMeshed()
+bool Chunk::IsMeshed() const
 {
     for (int i = 0; i < m_SubChunks.size(); i++)
     {

@@ -96,10 +96,10 @@ void Application::Run()
 		{
 			if (InputManager::IsKeyPressed(GLFW_KEY_A))				speed.x = 10.0;
 			if (InputManager::IsKeyPressed(GLFW_KEY_D))				speed.x = -10.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_W))				speed.z = 10.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_S))				speed.z = -10.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))	speed.y = 10.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_SPACE))			speed.y = -10.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_W))				speed.z = 20.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_S))				speed.z = -20.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))	speed.y = -20.0;
+			if (InputManager::IsKeyPressed(GLFW_KEY_SPACE))			speed.y = 20.0;
 
 			camera.SetPosition(camera.GetPosition() + camera.GetForward() * speed.z * deltaTime);
 			camera.SetPosition(camera.GetPosition() + camera.GetUp() * speed.y * deltaTime);

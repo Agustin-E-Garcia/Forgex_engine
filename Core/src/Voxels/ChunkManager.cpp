@@ -47,7 +47,8 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 		CheckChunksToLoad(newPlayerChunkPos);
 	}
 
-	while (!m_UpdateQueue.empty())
+	int chunksPerFrame = 10;
+	while (!m_UpdateQueue.empty() && chunksPerFrame > 0)
 	{
 		glm::vec3 position = m_UpdateQueue.front();
 		Chunk* chunk = GetChunkAtPosition(position);
@@ -55,7 +56,9 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 
 		if (!chunk) continue;
 
-		std::vector<Chunk*> adjacents;
+		chunksPerFrame--;
+
+		std::vector<const Chunk*> adjacents;
 		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(-1, 0,  0)));
 		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 1, 0,  0)));
 		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 0, 0,  1)));
@@ -68,16 +71,11 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 			for (int i = 0; i < adjacents.size(); i++)
 			{
 				if (!adjacents[i]) continue;
-
-				adjacents[i]->RequestMeshUpdate();
-				m_UpdateQueue.push(adjacents[i]->GetPosition());
+				m_UpdateQueue.push(adjacents.at(i)->GetPosition());
 			}
 		}
 
-		if (!chunk->IsMeshed())
-		{
-			if (!chunk->TryMeshChunk(adjacents)) m_UpdateQueue.push(position);
-		}
+		if (!chunk->TryMeshChunk(adjacents, true)) m_UpdateQueue.push(position);
 	}
 
 	m_LastPlayerChunkPosition = newPlayerChunkPos;

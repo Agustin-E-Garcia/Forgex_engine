@@ -40,16 +40,16 @@ public:
 	Chunk(glm::vec3 chunkPosition);
 	~Chunk();
 
-	bool TryMeshChunk(std::vector<Chunk*> adjacentChunks);
+	bool TryMeshChunk(std::vector<const Chunk*> adjacentChunks, bool forceMeshing = false);
 	void ChangePosition(glm::vec3 newPosition);
 	void RequestMeshUpdate();
 	void LoadChunk();
 
-	bool IsLoaded();
-	bool IsMeshed();
+	bool IsLoaded() const;
+	bool IsMeshed() const;
 
-	inline Subchunk* GetSubchunk(int index) { return index >= 0 && index < m_SubChunks.size() ? &m_SubChunks[index] : nullptr; }
-	inline glm::vec3 GetPosition() { return m_ChunkPosition; }
+	inline const Subchunk* GetSubchunk(int index) const { return index >= 0 && index < m_SubChunks.size() ? &m_SubChunks[index] : nullptr; }
+	inline glm::vec3 GetPosition() const { return m_ChunkPosition; }
 	inline DrawInfo GetDrawInfo() { return m_DrawInfo; }
 private:
 	glm::vec3 m_ChunkPosition;
@@ -59,6 +59,6 @@ private:
 	unsigned int m_VertexBufferID;
 	DrawInfo m_DrawInfo;
 
-	void BuildMesh(std::vector<Chunk*> adjacentChunks);
+	void BuildMesh(std::vector<const Chunk*> adjacentChunks);
 	void UpdateDrawInfo();
 };
