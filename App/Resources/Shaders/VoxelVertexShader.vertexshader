@@ -1,0 +1,51 @@
+#version 450 core
+
+layout(location = 0) in uint packedVertex;
+
+uniform mat4 MVP;
+uniform uvec2 AtlasSize;
+
+const vec2 uv_Coordinates[4] = vec2[4]
+(
+	vec2(0.0, 0.0), vec2(1.0, 0.0), vec2(1.0, 1.0), vec2(0.0, 1.0)
+);
+
+const int uv_Order[6] = int[6]
+(
+	3, 2, 1, 1, 0, 3
+);
+
+out vec2 uv_Coords;
+
+void unpackVertex(uint value, out uvec3 vertexPosition, out uint blockType)
+{
+	vertexPosition.x = (value >> 24) & 0xFFu;
+	vertexPosition.y = (value >> 16) & 0xFFu;
+	vertexPosition.z = (value >> 8) & 0xFFu;
+
+	blockType = value & 0xFFu;
+}
+
+uvec2 GetBlockUVIndex(uint blockType)
+{
+	uint x = blockType % AtlasSize.x;
+	uint y = blockType / AtlasSize.x;
+
+	return uvec2(x, y);
+}
+
+void main()
+{
+	uvec3 vertexPosition;
+	uint blockType;
+	unpackVertex(packedVertex, vertexPosition, blockType);
+
+	vec2 basic_uvs = uv_Coordinates[uv_Order[gl_VertexID % 6]];
+	uvec2 uvIndex = GetBlockUVIndex(blockType - 1);
+	vec2 spriteSize = vec2(1.0 / AtlasSize.x, 1.0 / AtlasSize.y);
+	
+	uv_Coords.x = spriteSize.x * (uvIndex.x + basic_uvs.x);
+	uv_Coords.y = spriteSize.y * (uvIndex.y + basic_uvs.y);
+
+	gl_Position = MVP * uvec4(vertexPosition, 1);
+}

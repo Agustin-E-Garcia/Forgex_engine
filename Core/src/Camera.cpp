@@ -4,7 +4,7 @@
 
 Camera::Camera()
 {
-	m_FieldOfView = glm::radians(45.0f);
+	m_FieldOfView = glm::radians(90.0f);
 	m_AspectRatio = (float)4 / (float)3;
 	m_NearPlane = 0.1f;
 	m_FarPlane = 1000.0f;

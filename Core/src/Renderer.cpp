@@ -12,6 +12,7 @@ Renderer::Renderer()
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
 
 	glGenVertexArrays(1, &vertexArrayID);
@@ -19,9 +20,9 @@ Renderer::Renderer()
 
 	LOG_CORE_INFO("Renderer initialized successfully");
 
-	colorShaderID = ShaderLoader::LoadShader("Resources/Shaders/ColorVertexShader.vertexshader", "Resources/Shaders/ColorFragmentShader.fragmentshader");
+	colorShaderID = ShaderLoader::LoadShader("Resources/Shaders/VoxelVertexShader.vertexshader", "Resources/Shaders/VoxelFragmentShader.fragmentshader");
 	textureShaderID = ShaderLoader::LoadShader("Resources/Shaders/TextureVertexShader.vertexshader", "Resources/Shaders/TextureFragmentShader.fragmentshader");
-	textureID = TextureLoader::LoadTexture("Resources/Textures/uvtemplate.bmp");
+	textureID = TextureLoader::LoadTexture("Resources/Textures/0.png");
 }
 
 Renderer::~Renderer() 
@@ -44,8 +45,6 @@ void Renderer::Draw(DrawInfo info)
 	glm::mat4 Model = info.modelMatrix;
 
 	glm::mat4 mvp = Projection * View * Model;
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glUseProgram(textureShaderID);
 
@@ -86,9 +85,18 @@ void Renderer::DrawVoxel(DrawInfo info)
 	unsigned int MatrixID = glGetUniformLocation(colorShaderID, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
+	unsigned int TexID = glGetUniformLocation(colorShaderID, "textureSampler");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glUniform1i(TexID, 0);
+
+	glm::uvec2 atlasSize = glm::uvec2(16, 16);
+	unsigned int atlasID = glGetUniformLocation(colorShaderID, "AtlasSize");
+	glUniform2uiv(atlasID, 1, &atlasSize[0]);
+
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, info.vertexBufferID);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, (void*)0);
 
 	glDrawArrays(GL_TRIANGLES, 0, info.indexCount);
 	glDisableVertexAttribArray(0);
@@ -108,7 +116,22 @@ unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void*
 	return buffer;
 }
 
+unsigned int Renderer::GenerateVertexBuffer(int size, const void* data) 
+{
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	return buffer;
+}
+
 void Renderer::DeleteBuffer(unsigned int bufferID)
 {
 	glDeleteBuffers(1, &bufferID);
+}
+
+void Renderer::ToggleWireframe(bool wireframe) 
+{
+	if(wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
