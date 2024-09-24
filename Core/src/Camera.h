@@ -4,8 +4,8 @@
 class ENGINE_API Camera : public Object
 {
 public:
-	Camera();
-	Camera(float fieldOfView, float aspectRatio, float nearPlane, float farPlane);
+	Camera(glm::vec3 position = glm::vec3(0.0f));
+	Camera(glm::vec3 position, float fieldOfView, float aspectRatio, float nearPlane, float farPlane);
 	~Camera();
 
 	glm::mat4 GetProjectionMatrix();

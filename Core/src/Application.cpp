@@ -10,6 +10,7 @@
 
 #include "Camera.h"
 #include "Voxels/ChunkManager.h"
+#include "Scene.h"
 
 Application* Application::s_Instance = nullptr;
 
@@ -72,11 +73,13 @@ void Application::PushOverlay(Layer* layer)
 
 void Application::Run()
 {
-	Camera camera;
-	camera.GetTransform()->SetPosition(glm::vec3(0.0f, 70.0f, 0.0f));
-	m_Renderer->SetActiveCamera(&camera);
+	Scene scene;
+	scene.CreateObject<Camera>(glm::vec3(0.0f, 70.0f, 0.0f));
+
+	Camera* camera = scene.GetObjectOfType<Camera>();
+	m_Renderer->SetActiveCamera(camera);
 	
-	ChunkManager manager(camera.GetTransform()->GetPosition());
+	ChunkManager* manager = scene.CreateObject<ChunkManager>(camera->GetTransform()->GetPosition());
 
 	glm::vec3 speed = glm::vec3(0.0f);
 
@@ -101,21 +104,20 @@ void Application::Run()
 			if (InputManager::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))	speed.y = -20.0;
 			if (InputManager::IsKeyPressed(GLFW_KEY_SPACE))			speed.y = 20.0;
 
-			camera.GetTransform()->SetPosition (camera.GetTransform()->GetPosition() + camera.GetTransform()->GetForward() * speed.z * deltaTime);
-			camera.GetTransform()->SetPosition (camera.GetTransform()->GetPosition() + camera.GetTransform()->GetUp() * speed.y * deltaTime);
-			camera.GetTransform()->SetRotationY(camera.GetTransform()->GetRotation().y + speed.x * deltaTime);
-
+			camera->GetTransform()->SetPosition (camera->GetTransform()->GetPosition() + camera->GetTransform()->GetForward() * speed.z * deltaTime);
+			camera->GetTransform()->SetPosition (camera->GetTransform()->GetPosition() + camera->GetTransform()->GetUp() * speed.y * deltaTime);
+			camera->GetTransform()->SetRotationY(camera->GetTransform()->GetRotation().y + speed.x * deltaTime);
 			speed = glm::vec3(0);
 
-			Profiler::UpdateProfile(cameraX, camera.GetTransform()->GetPosition().x);
-			Profiler::UpdateProfile(cameraY, camera.GetTransform()->GetPosition().y);
-			Profiler::UpdateProfile(cameraZ, camera.GetTransform()->GetPosition().z);
+			Profiler::UpdateProfile(cameraX, camera->GetTransform()->GetPosition().x);
+			Profiler::UpdateProfile(cameraY, camera->GetTransform()->GetPosition().y);
+			Profiler::UpdateProfile(cameraZ, camera->GetTransform()->GetPosition().z);
 		}
 
 		{
-			manager.Update(camera.GetTransform()->GetPosition());
+			manager->Update(camera->GetTransform()->GetPosition());
 		
-			auto drawInfos = manager.GetDrawInfo();
+			auto drawInfos = manager->GetDrawInfo();
 			for (int i = 0; i < drawInfos.size(); i++)
 			{
 				m_Renderer->DrawVoxel(drawInfos[i]);
