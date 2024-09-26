@@ -10,7 +10,8 @@ enum EventType : uint8_t
 {
 	WindowResized, WindowClose,
 	KeyPressed, KeyReleased,
-	MouseClicked, MouseUnclicked, MousePosition
+	MouseClicked, MouseUnclicked, MousePosition,
+	SceneChange, ItemSelected
 };
 
 enum EventCategory
@@ -20,14 +21,15 @@ enum EventCategory
 	InputEvent				= (1 << 1),
 	KeyboardEvent			= (1 << 2),
 	MouseEvent				= (1 << 3),
-	MouseButtonEvent		= (1 << 4)
+	MouseButtonEvent		= (1 << 4),
+	LayerEvent				= (1 << 5),
 };
 
 #define EVENT_SET_TYPE(x) 	static EventType GetStaticType() { return EventType::##x; }\
 							inline EventType GetEventType() const override { return GetStaticType(); }\
 							inline bool IsEventType(EventType type) const override { return type == GetStaticType(); }
 							
-#define EVENT_SET_CATEGORY(x) virtual int GetCategoryFlags() const override { return x; }
+#define EVENT_SET_CATEGORY(x) virtual int GetCategoryFlags() const override { return EventCategory::x; }
 
 // Event base class
 class ENGINE_API Event

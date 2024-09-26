@@ -3,8 +3,6 @@
 #include <GLFW/glfw3.h>
 #include "Log.h"
 
-#define GET_DISPATCHER EventDispatcher dispatcher = *(EventDispatcher*)glfwGetWindowUserPointer(window);
-
 Window::Window(int width, int height, char* title) : m_Width(width), m_Height(height)
 {
 	if (!glfwInit()) LOG_CORE_CRITICAL("Failed to initialize GLFW");

@@ -5,6 +5,7 @@
 #include "Profiler.h"
 
 class Renderer;
+class GameLayer;
 
 class ENGINE_API Application 
 {
@@ -28,6 +29,8 @@ private:
 	Renderer* m_Renderer;
 
 	LayerStack m_LayerStack;
+	GameLayer* m_GameLayer;
+
 	bool m_ShouldClose;
 
 	bool OnWindowClose(WindowCloseEvent& e);

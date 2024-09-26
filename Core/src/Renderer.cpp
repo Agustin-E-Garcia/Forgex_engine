@@ -38,8 +38,10 @@ void Renderer::ClearScreen()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::Draw(DrawInfo info)
+void Renderer::Draw(DrawInfo info) const
 {
+	if (!m_ActiveCamera) return;
+
 	glm::mat4 Projection = m_ActiveCamera->GetProjectionMatrix();
 	glm::mat4 View = m_ActiveCamera->GetViewMatrix();
 	glm::mat4 Model = info.modelMatrix;
@@ -72,8 +74,10 @@ void Renderer::Draw(DrawInfo info)
 	glDisableVertexAttribArray(1);
 }
 
-void Renderer::DrawVoxel(DrawInfo info)
+void Renderer::DrawVoxel(DrawInfo info) const
 {
+	if (!m_ActiveCamera) return;
+
 	glm::mat4 Projection = m_ActiveCamera->GetProjectionMatrix();
 	glm::mat4 View = m_ActiveCamera->GetViewMatrix();
 	glm::mat4 Model = info.modelMatrix;

@@ -1,12 +1,14 @@
 #pragma once
 #include "Event.h"
+/*TEMP*/
+#include "../Scene.h"
 
 class ENGINE_API WindowResizedEvent : public Event
 {
 public:
 	WindowResizedEvent(unsigned int width, unsigned int height) : m_Width(width), m_Height(height) {}
 	EVENT_SET_TYPE(WindowResized)
-	EVENT_SET_CATEGORY(EventCategory::ApplicationEvent)
+	EVENT_SET_CATEGORY(ApplicationEvent)
 
 	std::string ToString() const override
 	{
@@ -27,7 +29,7 @@ class ENGINE_API WindowCloseEvent : public Event
 public:
 	WindowCloseEvent() {}
 	EVENT_SET_TYPE(WindowClose)
-	EVENT_SET_CATEGORY(EventCategory::ApplicationEvent)
+	EVENT_SET_CATEGORY(ApplicationEvent)
 
 	std::string ToString() const override
 	{
@@ -44,7 +46,7 @@ class ENGINE_API KeyPressedEvent : public Event
 public:
 	KeyPressedEvent(unsigned int keyCode, bool isRepeat) : m_KeyCode(keyCode), m_IsRepeat(isRepeat) {}
 	EVENT_SET_TYPE(KeyPressed)
-	EVENT_SET_CATEGORY(EventCategory::InputEvent | EventCategory::KeyboardEvent)
+	EVENT_SET_CATEGORY(InputEvent | KeyboardEvent)
 
 	std::string ToString() const override
 	{
@@ -68,7 +70,7 @@ class ENGINE_API KeyReleasedEvent : public Event
 public:
 	KeyReleasedEvent(unsigned int keyCode) : m_KeyCode(keyCode) {}
 	EVENT_SET_TYPE(KeyReleased)
-	EVENT_SET_CATEGORY(EventCategory::InputEvent | EventCategory::KeyboardEvent)
+	EVENT_SET_CATEGORY(InputEvent | KeyboardEvent)
 
 	std::string ToString() const override
 	{
@@ -90,7 +92,7 @@ class ENGINE_API MouseClickEvent : public Event
 public:
 	MouseClickEvent(unsigned int button) : m_Button(button) {}
 	EVENT_SET_TYPE(MouseClicked)
-	EVENT_SET_CATEGORY(EventCategory::InputEvent | EventCategory::MouseButtonEvent)
+	EVENT_SET_CATEGORY(InputEvent | MouseButtonEvent)
 
 	std::string ToString() const override
 	{
@@ -112,7 +114,7 @@ class ENGINE_API MouseUnclickEvent : public Event
 public:
 	MouseUnclickEvent(unsigned int button) : m_Button(button) {}
 	EVENT_SET_TYPE(MouseUnclicked)
-	EVENT_SET_CATEGORY(EventCategory::InputEvent | EventCategory::MouseButtonEvent)
+	EVENT_SET_CATEGORY(InputEvent | MouseButtonEvent)
 
 	std::string ToString() const override
 	{
@@ -134,7 +136,7 @@ class ENGINE_API MousePositionEvent : public Event
 public:
 	MousePositionEvent(float xPosition, float yPosition) : m_PositionX(xPosition), m_PositionY(yPosition) {}
 	EVENT_SET_TYPE(MousePosition)
-	EVENT_SET_CATEGORY(EventCategory::InputEvent | EventCategory::MouseEvent)
+	EVENT_SET_CATEGORY(InputEvent | MouseEvent)
 
 	std::string ToString() const override
 	{
@@ -149,4 +151,26 @@ public:
 private:
 	float m_PositionX;
 	float m_PositionY;
+};
+
+/*---------------------------------------------------------------------------------------------------------*/
+
+class ENGINE_API SceneChangeEvent : public Event 
+{
+public:
+	SceneChangeEvent(const Scene* scene) : m_Scene(scene) {}
+	EVENT_SET_TYPE(SceneChange)
+	EVENT_SET_CATEGORY(LayerEvent)
+
+	std::string ToString() const override 
+	{
+		std::stringstream ss;
+		ss << "SceneChangedEvent: {" << m_Scene->GetName() << "}";
+		return ss.str();
+	}
+
+	inline const Scene* GetScene() { return m_Scene; }
+
+private:
+	const Scene* m_Scene;
 };

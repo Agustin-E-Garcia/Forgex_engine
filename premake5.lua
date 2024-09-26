@@ -46,7 +46,8 @@ workspace "Voxel_Engine"
 		postbuildcommands { 
 			"{COPYFILE} %[Build/Bin/Engine_Core/%{cfg.longname}/Engine_Core.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]", 
 			"{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
-			"{COPYDIR} %[App/Resources] %[Build/Bin/%{prj.name}/%{cfg.longname}/Resources]"
+			"{COPYDIR} %[App/Resources] %[Build/Bin/%{prj.name}/%{cfg.longname}/Resources]",
+			"{COPYFILE} %[App/imgui.ini] %[Build/Bin/%{prj.name}/%{cfg.longname}]"
 		}
 
 	project "ImGui"

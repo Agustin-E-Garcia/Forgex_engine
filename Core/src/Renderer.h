@@ -24,8 +24,8 @@ public:
 	~Renderer();
 
 	void ClearScreen();
-	void Draw(DrawInfo info);
-	void DrawVoxel(DrawInfo info);
+	void Draw(DrawInfo info) const;
+	void DrawVoxel(DrawInfo info) const;
 	void SetActiveCamera(Camera* activeCamera);
 
 	static unsigned int GenerateBuffer(unsigned int target, int size, const void* data);

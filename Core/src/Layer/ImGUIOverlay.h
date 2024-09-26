@@ -7,8 +7,11 @@
 
 class ENGINE_API ImGUIOverlay : public Layer
 {
+	using EventCallbackFn = std::function<void(Event&)>;
+
 public:
-	ImGUIOverlay() : Layer("ImGUI") {}
+	ImGUIOverlay(const Scene* activeScene) : Layer("ImGui") {}
+	ImGUIOverlay(const Scene* activeScene, const EventCallbackFn& callback) : Layer("ImGui", callback) {}
 
 	~ImGUIOverlay()
 	{
@@ -51,11 +54,14 @@ public:
 		}
 	}
 
-	void DisplayStats() 
+	void DisplayStats()
 	{
 		ImGui::SetNextWindowBgAlpha(0.35f);
 		if (ImGui::Begin("Profiler"))
 		{
+			ImGui::Text("Active scene: %s", m_ActiveScene->GetName());
+			ImGui::Separator();
+
 			ImGui::Text("Displaying all profiles");
 			ImGui::Separator();
 
@@ -80,6 +86,7 @@ public:
 		dispatcher.Dispatch<MousePositionEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMousePosition));
 		dispatcher.Dispatch<MouseClickEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMouseClick));
 		dispatcher.Dispatch<MouseUnclickEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMouseUnclicked));
+		dispatcher.Dispatch<SceneChangeEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnSceneChanged));
 	}
 
 	bool OnMousePosition(MousePositionEvent& e) 
@@ -103,6 +110,13 @@ public:
 		return false;
 	}
 
+	bool OnSceneChanged(SceneChangeEvent& e) 
+	{
+		m_ActiveScene = e.GetScene();
+		return true;
+	}
+
 private:
 	bool m_WireframeActive = false;
+	const Scene* m_ActiveScene = nullptr;
 };

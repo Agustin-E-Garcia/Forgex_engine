@@ -12,20 +12,16 @@ class DrawInfo;
 class ENGINE_API ChunkManager : public Object 
 {
 public:
-	ChunkManager(glm::vec3 playerPosition);
+	ChunkManager(const Object* player);
 	~ChunkManager();
 
-	void Update(glm::vec3 playerPosition);
+	void Update(float deltaTime) override;
+	void Render(const Renderer& renderer) override;
 	Chunk* GetChunkAtPosition(glm::vec3 position) const;
 	glm::vec3 GetChunkPositionFromWorld(glm::vec3 worldPosition);
-	std::vector<DrawInfo> GetDrawInfo();
 
 private:
-	unsigned int m_ChunkKeyX;
-	unsigned int m_ChunkKeyZ;
-	unsigned int m_ChunkCountKey;
-	unsigned int m_VoxelCountKey;
-
+	const Object* m_PlayerObject;
 	glm::vec3 m_LastPlayerChunkPosition;
 
 	unsigned int m_LoadDistance = 16;

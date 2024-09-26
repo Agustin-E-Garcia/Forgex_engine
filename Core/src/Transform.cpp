@@ -5,14 +5,14 @@
 Transform::Transform() {}
 Transform::~Transform() {}
 
-glm::mat4 Transform::GetModelMatrix() { return m_ModelMatrix; }
-glm::vec3 Transform::GetPosition() { return m_Position; }
-glm::vec3 Transform::GetRotation() { return m_Rotation; }
-glm::vec3 Transform::GetScale() { return m_Scale; }
+glm::mat4 Transform::GetModelMatrix() const { return m_ModelMatrix; }
+glm::vec3 Transform::GetPosition() const { return m_Position; }
+glm::vec3 Transform::GetRotation() const { return m_Rotation; }
+glm::vec3 Transform::GetScale() const { return m_Scale; }
 
-glm::vec3 Transform::GetForward() { return m_Forward; }
-glm::vec3 Transform::GetRight() { return m_Right; }
-glm::vec3 Transform::GetUp() { return m_Up; }
+glm::vec3 Transform::GetForward() const { return m_Forward; }
+glm::vec3 Transform::GetRight() const { return m_Right; }
+glm::vec3 Transform::GetUp() const { return m_Up; }
 
 void Transform::SetPosition(glm::vec3 newPosition)
 {

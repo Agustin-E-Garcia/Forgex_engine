@@ -9,15 +9,15 @@ public:
 	Transform();
 	~Transform();
 
-	glm::mat4 GetModelMatrix();
+	glm::mat4 GetModelMatrix() const;
 
-	glm::vec3 GetPosition();
-	glm::vec3 GetRotation();
-	glm::vec3 GetScale();
+	glm::vec3 GetPosition() const;
+	glm::vec3 GetRotation() const;
+	glm::vec3 GetScale() const;
 
-	glm::vec3 GetForward();
-	glm::vec3 GetRight();
-	glm::vec3 GetUp();
+	glm::vec3 GetForward() const;
+	glm::vec3 GetRight() const;
+	glm::vec3 GetUp() const;
 
 	void SetPosition(glm::vec3 newPosition);
 	void SetRotationX(float amount);

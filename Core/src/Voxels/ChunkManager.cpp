@@ -3,9 +3,15 @@
 #include "../Profiler.h"
 #include "../Log.h"
 
-ChunkManager::ChunkManager(glm::vec3 playerPosition) : Object("Chunk Manager")
+ChunkManager::ChunkManager(const Object* player) : Object("Chunk Manager"), m_PlayerObject(player), m_LastPlayerChunkPosition(glm::vec3(0))
 {
-	m_LastPlayerChunkPosition = GetChunkPositionFromWorld(playerPosition);
+	if (!m_PlayerObject) 
+	{
+		LOG_CORE_ERROR("ChunkManager::Player is nullptr");
+		return;
+	}
+
+	m_LastPlayerChunkPosition = GetChunkPositionFromWorld(player->GetTransform()->GetPosition());
 	glm::vec3 smallesPos = m_LastPlayerChunkPosition - glm::vec3(m_LoadDistance);
 	glm::vec3 biggestPos = m_LastPlayerChunkPosition + glm::vec3(m_LoadDistance);
 
@@ -20,12 +26,6 @@ ChunkManager::ChunkManager(glm::vec3 playerPosition) : Object("Chunk Manager")
 			m_UpdateQueue.push(position);
 		}
 	}
-
-	m_ChunkCountKey = Profiler::AddProfile("Chunks", 0);
-	m_VoxelCountKey = Profiler::AddProfile("Voxels", 0);
-
-	m_ChunkKeyX = Profiler::AddProfile("Chunk X", 0);
-	m_ChunkKeyZ = Profiler::AddProfile("Chunk Z", 0);
 }
 
 ChunkManager::~ChunkManager()
@@ -37,9 +37,9 @@ ChunkManager::~ChunkManager()
 	}
 }
 
-void ChunkManager::Update(glm::vec3 playerPosition)
+void ChunkManager::Update(float deltaTime) 
 {
-	glm::vec3 newPlayerChunkPos = GetChunkPositionFromWorld(playerPosition);
+	glm::vec3 newPlayerChunkPos = GetChunkPositionFromWorld(m_PlayerObject->GetTransform()->GetPosition());
 
 	if (newPlayerChunkPos != m_LastPlayerChunkPosition)
 	{
@@ -59,12 +59,12 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 		chunksPerFrame--;
 
 		std::vector<const Chunk*> adjacents;
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(-1, 0,  0)));
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 1, 0,  0)));
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 0, 0,  1)));
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3( 0, 0, -1)));
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(-1, 0, 0)));
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(1, 0, 0)));
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(0, 0, 1)));
+		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(0, 0, -1)));
 
-		if (!chunk->IsLoaded()) 
+		if (!chunk->IsLoaded())
 		{
 			chunk->LoadChunk();
 
@@ -79,6 +79,14 @@ void ChunkManager::Update(glm::vec3 playerPosition)
 	}
 
 	m_LastPlayerChunkPosition = newPlayerChunkPos;
+}
+
+void ChunkManager::Render(const Renderer& renderer)
+{
+	for (auto it = m_ChunkGrid.begin(); it != m_ChunkGrid.end(); it++)
+	{
+		renderer.DrawVoxel(it->second->GetDrawInfo());
+	}
 }
 
 void ChunkManager::UnloadChunks(glm::vec3 playerPosition)
@@ -143,24 +151,5 @@ glm::vec3 ChunkManager::GetChunkPositionFromWorld(glm::vec3 worldPosition)
 	int x = worldPosition.x / m_ChunkSize;
 	int z = worldPosition.z / m_ChunkSize;
 
-	Profiler::UpdateProfile(m_ChunkKeyX, x);
-	Profiler::UpdateProfile(m_ChunkKeyZ, z);
-
 	return glm::vec3(x, 0, z);
-}
-
-std::vector<DrawInfo> ChunkManager::GetDrawInfo()
-{
-	std::vector<DrawInfo> drawInfoCollection;
-
-	for (auto it = m_ChunkGrid.begin(); it != m_ChunkGrid.end(); it++)
-	{
-		DrawInfo info = it->second->GetDrawInfo();
-		drawInfoCollection.push_back(info);
-	}
-
-	Profiler::UpdateProfile(m_ChunkCountKey, m_ChunkGrid.size());
-	Profiler::UpdateProfile(m_VoxelCountKey, m_ChunkGrid.size() * (m_ChunkSize * 255 * m_ChunkSize));
-
-	return drawInfoCollection;
 }

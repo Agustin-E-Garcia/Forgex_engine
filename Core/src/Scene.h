@@ -1,13 +1,14 @@
 #pragma once
 #include "Exports.h"
 #include "Object.h"
+#include "Renderer.h"
 #include <vector>
 #include <utility>
 
 class ENGINE_API Scene
 {
 public:
-	Scene() {};
+	Scene(const char* name) : m_Name(name) {};
 	~Scene() 
 	{
 		for (auto it = m_Hierarchy.begin(); it != m_Hierarchy.end();)
@@ -16,6 +17,25 @@ public:
 			it = m_Hierarchy.erase(it);
 		}
 	};
+
+	void Update(float deltaTime)
+	{
+		for (Object* obj : m_Hierarchy)
+		{
+			obj->Update(deltaTime);
+		}
+	}
+
+	void Render(const Renderer& renderer) 
+	{
+		for (Object* obj : m_Hierarchy)
+		{
+			obj->Render(renderer);
+		}
+	}
+
+	inline const char* GetName() const { return m_Name; }
+	inline std::vector<Object*> GetHierarchy() const { return m_Hierarchy; }
 
 	template<class T, class... Args>
 	T* CreateObject(Args&&... args)
@@ -42,7 +62,7 @@ public:
 	}
 
 	template<class T>
-	T* GetObjectOfType()
+	T* GetObjectOfType() const
 	{
 		static_assert(std::is_base_of<Object, T>::value, "T must inherit from Object");
 
@@ -55,7 +75,7 @@ public:
 	}
 
 	template<class T>
-	std::vector<T*> GetObjectCollectionOfType()
+	std::vector<T*> GetObjectCollectionOfType() const
 	{
 		static_assert(std::is_base_of<Object, T>::value, "T must inherit from Object");
 
@@ -69,5 +89,6 @@ public:
 	}
 
 private:
+	const char* m_Name;
 	std::vector<Object*> m_Hierarchy;
 };

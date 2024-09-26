@@ -7,10 +7,7 @@
 
 #include "Renderer.h"
 #include "Layer/ImGUIOverlay.h"
-
-#include "Camera.h"
-#include "Voxels/ChunkManager.h"
-#include "Scene.h"
+#include "Layer/GameLayer.h"
 
 Application* Application::s_Instance = nullptr;
 
@@ -39,7 +36,9 @@ void Application::InitializeSystems()
 	m_Window->SetEventCallback(BIND_EVENT_FUNCTION(Application::HandleEvents));
 	m_Renderer = new Renderer();
 
-	PushOverlay(new ImGUIOverlay());
+	m_GameLayer = new GameLayer(BIND_EVENT_FUNCTION(Application::HandleEvents));
+	PushLayer(m_GameLayer);
+	PushOverlay(new ImGUIOverlay(m_GameLayer->GetActiveScene()));
 }
 
 void Application::HandleEvents(Event& event)
@@ -73,19 +72,12 @@ void Application::PushOverlay(Layer* layer)
 
 void Application::Run()
 {
-	Scene scene;
-	scene.CreateObject<Camera>(glm::vec3(0.0f, 70.0f, 0.0f));
-
-	Camera* camera = scene.GetObjectOfType<Camera>();
-	m_Renderer->SetActiveCamera(camera);
-	
-	ChunkManager* manager = scene.CreateObject<ChunkManager>(camera->GetTransform()->GetPosition());
-
-	glm::vec3 speed = glm::vec3(0.0f);
-
-	int cameraX = Profiler::AddProfile("Camera Pos X", 0);
-	int cameraY = Profiler::AddProfile("Camera Pos Y", 0);
-	int cameraZ = Profiler::AddProfile("Camera Pos Z", 0);
+	Camera* camera = m_GameLayer->GetActiveScene()->GetObjectOfType<Camera>();
+	if(camera) m_Renderer->SetActiveCamera(camera);
+	else 
+	{
+		LOG_CORE_CRITICAL("Scene '{0}' has no camera to render from", m_GameLayer->GetActiveScene()->GetName());
+	}
 
 	do
 	{
@@ -95,34 +87,6 @@ void Application::Run()
 
 		for (Layer* layer : m_LayerStack)
 			layer->OnUpdate(deltaTime);
-
-		{
-			if (InputManager::IsKeyPressed(GLFW_KEY_A))				speed.x = 10.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_D))				speed.x = -10.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_W))				speed.z = 20.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_S))				speed.z = -20.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))	speed.y = -20.0;
-			if (InputManager::IsKeyPressed(GLFW_KEY_SPACE))			speed.y = 20.0;
-
-			camera->GetTransform()->SetPosition (camera->GetTransform()->GetPosition() + camera->GetTransform()->GetForward() * speed.z * deltaTime);
-			camera->GetTransform()->SetPosition (camera->GetTransform()->GetPosition() + camera->GetTransform()->GetUp() * speed.y * deltaTime);
-			camera->GetTransform()->SetRotationY(camera->GetTransform()->GetRotation().y + speed.x * deltaTime);
-			speed = glm::vec3(0);
-
-			Profiler::UpdateProfile(cameraX, camera->GetTransform()->GetPosition().x);
-			Profiler::UpdateProfile(cameraY, camera->GetTransform()->GetPosition().y);
-			Profiler::UpdateProfile(cameraZ, camera->GetTransform()->GetPosition().z);
-		}
-
-		{
-			manager->Update(camera->GetTransform()->GetPosition());
-		
-			auto drawInfos = manager->GetDrawInfo();
-			for (int i = 0; i < drawInfos.size(); i++)
-			{
-				m_Renderer->DrawVoxel(drawInfos[i]);
-			}
-		}
 		
 		for (Layer* layer : m_LayerStack)
 			layer->OnRender(*m_Renderer);
