@@ -1,9 +1,9 @@
 #pragma once
-#include "Exports.h"
+#include "Component.h"
 #include <glm/glm.hpp>
 #include "glm/gtc/quaternion.hpp"
 
-class ENGINE_API Transform
+class ENGINE_API Transform : public Component
 {
 public:
 	Transform();
@@ -24,6 +24,8 @@ public:
 	void SetRotationY(float amount);
 	void SetRotationZ(float amount);
 	void SetScale(glm::vec3 newScale);
+
+	void DrawCustomEditor() override;
 
 private:
 	glm::vec3 m_Position = glm::vec3(0.0f);

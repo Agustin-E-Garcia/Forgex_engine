@@ -5,9 +5,9 @@
 #include "Log.h"
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
-#include "Camera.h"
+#include "SceneGraph/Camera.h"
 
-Renderer::Renderer() 
+Renderer::Renderer() : m_ActiveCamera(nullptr)
 { 
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -108,7 +108,12 @@ void Renderer::DrawVoxel(DrawInfo info) const
 
 void Renderer::SetActiveCamera(Camera* activeCamera)
 {
+	if (activeCamera == m_ActiveCamera) return;
+
+	if(m_ActiveCamera) m_ActiveCamera->FlagAsActiveCamera(false);
+
 	m_ActiveCamera = activeCamera;
+	m_ActiveCamera->FlagAsActiveCamera(true);
 }
 
 unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void* data)

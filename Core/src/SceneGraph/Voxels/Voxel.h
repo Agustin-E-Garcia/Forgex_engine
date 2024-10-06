@@ -1,5 +1,5 @@
 #pragma once
-#include "../Exports.h"
+#include "../../Exports.h"
 #include <stdint.h>
 
 enum VoxelType : uint8_t // range 0 - 255

@@ -2,10 +2,10 @@
 #include "Exports.h"
 #include "Window.h"
 #include "Layer/LayerStack.h"
-#include "Profiler.h"
 
 class Renderer;
-class GameLayer;
+class Scene;
+class Camera;
 
 class ENGINE_API Application 
 {
@@ -19,8 +19,17 @@ public:
 
 	void PushLayer(Layer* layer);
 	void PushOverlay(Layer* layer);
+	template<class T>
+	T* GetLayerOfType() 
+	{
+		static_assert(std::is_base_of<Layer, T>::value, "T must inherit from Layer");
+		return m_LayerStack.GetLayerOfType<T>();
+	}
+
+	Scene* GetActiveScene();
 
 	static inline void* GetWindowPtr() { return s_Instance->m_Window->GetNativeWindow(); }
+	static void SetActiveCamera(Camera* camera);
 
 private:
 	static Application* s_Instance;
@@ -29,7 +38,6 @@ private:
 	Renderer* m_Renderer;
 
 	LayerStack m_LayerStack;
-	GameLayer* m_GameLayer;
 
 	bool m_ShouldClose;
 

@@ -14,6 +14,8 @@ public:
 
 	virtual void OnAttach() {}
 	virtual void OnDetach() {}
+	virtual void OnBegin() {}
+	virtual void OnEnd() {}
 	virtual void OnUpdate(float deltaTime) {}
 	virtual void OnEvent(Event& event) {}
 	virtual void OnRender(const Renderer& renderer) {}

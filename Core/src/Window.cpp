@@ -81,6 +81,13 @@ void Window::SetupEvents()
 			}
 		});
 
+	glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int codepoint) 
+		{
+			EventCallbackFn& callback = *(EventCallbackFn*)glfwGetWindowUserPointer(window);
+			CharInputEvent e(codepoint);
+			callback(e);
+		});
+
 	glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
 		{
 			EventCallbackFn& callback = *(EventCallbackFn*)glfwGetWindowUserPointer(window);
@@ -107,5 +114,13 @@ void Window::SetupEvents()
 					break;
 				}
 			}
+		});
+
+	glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xoffset, double yoffset)
+		{
+			EventCallbackFn& callback = *(EventCallbackFn*)glfwGetWindowUserPointer(window);
+
+			MouseWheelScrollEvent e(xoffset, yoffset);
+			callback(e);
 		});
 }

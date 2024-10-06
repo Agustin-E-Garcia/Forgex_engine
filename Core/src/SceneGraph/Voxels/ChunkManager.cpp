@@ -1,9 +1,30 @@
 #include "ChunkManager.h"
-#include "../Renderer.h"
-#include "../Profiler.h"
-#include "../Log.h"
+#include "../Object.h"
+#include "../Scene.h"
+#include "../Transform.h"
+#include "../../Renderer.h"
+#include "../../Profiler.h"
+#include "../../Log.h"
 
-ChunkManager::ChunkManager(const Object* player) : Object("Chunk Manager"), m_PlayerObject(player), m_LastPlayerChunkPosition(glm::vec3(0))
+ChunkManager::ChunkManager() : Component("Chunk Manager"), m_LastPlayerChunkPosition(glm::vec3(0)), m_PlayerObject(nullptr)
+{
+	glm::vec3 smallesPos = m_LastPlayerChunkPosition - glm::vec3(m_LoadDistance);
+	glm::vec3 biggestPos = m_LastPlayerChunkPosition + glm::vec3(m_LoadDistance);
+
+	for (int z = smallesPos.z; z <= biggestPos.z; z++)
+	{
+		for (int x = smallesPos.x; x <= biggestPos.x; x++)
+		{
+			glm::vec3 position = glm::vec3(x, 0, z);
+			Chunk* newChunk = new Chunk(position);
+
+			m_ChunkGrid.emplace(position, newChunk);
+			m_UpdateQueue.push(position);
+		}
+	}
+}
+
+ChunkManager::ChunkManager(const Object* player) : Component("Chunk Manager"), m_PlayerObject(player), m_LastPlayerChunkPosition(glm::vec3(0))
 {
 	if (!m_PlayerObject) 
 	{
@@ -39,12 +60,17 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::Update(float deltaTime) 
 {
-	glm::vec3 newPlayerChunkPos = GetChunkPositionFromWorld(m_PlayerObject->GetTransform()->GetPosition());
-
-	if (newPlayerChunkPos != m_LastPlayerChunkPosition)
+	if (m_PlayerObject) 
 	{
-		UnloadChunks(newPlayerChunkPos);
-		CheckChunksToLoad(newPlayerChunkPos);
+		glm::vec3 newPlayerChunkPos = GetChunkPositionFromWorld(m_PlayerObject->GetTransform()->GetPosition());
+
+		if (newPlayerChunkPos != m_LastPlayerChunkPosition)
+		{
+			UnloadChunks(newPlayerChunkPos);
+			CheckChunksToLoad(newPlayerChunkPos);
+		}
+
+		m_LastPlayerChunkPosition = newPlayerChunkPos;
 	}
 
 	int chunksPerFrame = 10;
@@ -59,10 +85,10 @@ void ChunkManager::Update(float deltaTime)
 		chunksPerFrame--;
 
 		std::vector<const Chunk*> adjacents;
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(-1, 0, 0)));
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(1, 0, 0)));
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(0, 0, 1)));
-		adjacents.push_back(GetChunkAtPosition(position + glm::vec3(0, 0, -1)));
+		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3(-1, 0,  0)));
+		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 1, 0,  0)));
+		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 0, 0,  1)));
+		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 0, 0, -1)));
 
 		if (!chunk->IsLoaded())
 		{
@@ -77,8 +103,6 @@ void ChunkManager::Update(float deltaTime)
 
 		if (!chunk->TryMeshChunk(adjacents, true)) m_UpdateQueue.push(position);
 	}
-
-	m_LastPlayerChunkPosition = newPlayerChunkPos;
 }
 
 void ChunkManager::Render(const Renderer& renderer)
@@ -101,7 +125,7 @@ void ChunkManager::UnloadChunks(glm::vec3 playerPosition)
 		if (distance > m_LoadDistance)
 		{
 			Chunk* chunk = it->second;
-			m_UnloadedChunks.push_back(chunk);
+			m_UnloadedChunks.emplace_back(chunk);
 			it = m_ChunkGrid.erase(it);
 		}
 
@@ -152,4 +176,33 @@ glm::vec3 ChunkManager::GetChunkPositionFromWorld(glm::vec3 worldPosition)
 	int z = worldPosition.z / m_ChunkSize;
 
 	return glm::vec3(x, 0, z);
+}
+
+void ChunkManager::DrawCustomEditor()
+{
+	ImGui::Text("Chunk size: %u", m_ChunkSize);
+	ImGui::Text("Chunk draw distance: %u", m_LoadDistance);
+	ImGui::Text("Chunk grid size: %u", m_ChunkGrid.size());
+	ImGui::Text("Chunks queued to load: %u", m_UpdateQueue.size());
+	ImGui::Separator();
+	
+	bool exists = m_PlayerObject != nullptr;
+	ImGui::Button(exists ? m_PlayerObject->GetName().c_str() : "Empty");
+	if (ImGui::BeginDragDropTarget()) 
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_OBJECT")) 
+		{
+			IM_ASSERT(payload->DataSize == sizeof(uint32_t));
+			m_PlayerObject = GetOwner()->GetScene()->FindObjectByID(*(uint32_t*)payload->Data);
+		}
+	}
+	if (exists) 
+	{
+		ImGui::SameLine();
+		if (ImGui::Button("Clear")) m_PlayerObject = nullptr;
+	}
+	ImGui::SameLine();
+	ImGui::Text("Player Object");
+
+	ImGui::InputFloat3("player chunk position", &m_LastPlayerChunkPosition.x);
 }

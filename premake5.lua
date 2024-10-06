@@ -43,6 +43,9 @@ workspace "Voxel_Engine"
 		includedirs { "Core" }
 		links { "Engine_Core" }
 
+		libdirs { "ExternalLibraries/ImGUI/imgui/bin" }
+		links { "ImGui.lib" }
+
 		postbuildcommands { 
 			"{COPYFILE} %[Build/Bin/Engine_Core/%{cfg.longname}/Engine_Core.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]", 
 			"{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",

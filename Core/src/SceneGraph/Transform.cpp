@@ -2,7 +2,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
 
-Transform::Transform() {}
+Transform::Transform() : Component("Transform") {}
 Transform::~Transform() {}
 
 glm::mat4 Transform::GetModelMatrix() const { return m_ModelMatrix; }
@@ -58,6 +58,13 @@ void Transform::SetScale(glm::vec3 newScale)
 	m_Scale = newScale;
 	m_ScaleMatrix = glm::scale(glm::mat4(1.0f), m_Scale);
 	UpdateModelMatrix();
+}
+
+void Transform::DrawCustomEditor()
+{
+	ImGui::InputFloat3("Position slider", &m_Position.x);
+	ImGui::InputFloat3("Rotation slider", &m_Rotation.x);
+	ImGui::InputFloat3("Scale slider", &m_Scale.x);
 }
 
 void Transform::UpdateVectors()

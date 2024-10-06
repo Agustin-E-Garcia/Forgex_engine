@@ -1,7 +1,7 @@
 #pragma once
 #include "Event.h"
 /*TEMP*/
-#include "../Scene.h"
+#include "../SceneGraph/Scene.h"
 
 class ENGINE_API WindowResizedEvent : public Event
 {
@@ -61,6 +61,28 @@ public:
 private:
 	unsigned int m_KeyCode;
 	bool m_IsRepeat;
+};
+
+/*---------------------------------------------------------------------------------------------------------*/
+
+class ENGINE_API CharInputEvent : public Event
+{
+public:
+	CharInputEvent(unsigned int key) : m_Key(key) {}
+	EVENT_SET_TYPE(CharInput)
+	EVENT_SET_CATEGORY(InputEvent | KeyboardEvent)
+
+	std::string ToString() const override
+	{
+		std::stringstream ss;
+		ss << "KeyPressedEvent: Key: " << m_Key;
+		return ss.str();
+	}
+
+	inline unsigned int GetKeyCode() { return m_Key; }
+
+private:
+	unsigned int m_Key;
 };
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -131,6 +153,30 @@ private:
 
 /*---------------------------------------------------------------------------------------------------------*/
 
+class ENGINE_API MouseWheelScrollEvent : public Event 
+{
+public:
+	MouseWheelScrollEvent(double x, double y) : m_XOffset(x), m_YOffset(y) {};
+	EVENT_SET_TYPE(mouseWheel)
+	EVENT_SET_CATEGORY(InputEvent | MouseEvent)
+
+	std::string ToString() const override 
+	{
+		std::stringstream ss;
+		ss << "MouseWheelScrollEvent: [" << m_XOffset << "], [" << m_YOffset << "]";
+		return ss.str();
+	}
+
+	inline double GetXOffset() { return m_XOffset; }
+	inline double GetYOffset() { return m_YOffset; }
+
+private:
+	double m_XOffset;
+	double m_YOffset;
+};
+
+/*---------------------------------------------------------------------------------------------------------*/
+
 class ENGINE_API MousePositionEvent : public Event
 {
 public:
@@ -158,7 +204,7 @@ private:
 class ENGINE_API SceneChangeEvent : public Event 
 {
 public:
-	SceneChangeEvent(const Scene* scene) : m_Scene(scene) {}
+	SceneChangeEvent(Scene* scene) : m_Scene(scene) {}
 	EVENT_SET_TYPE(SceneChange)
 	EVENT_SET_CATEGORY(LayerEvent)
 
@@ -169,8 +215,8 @@ public:
 		return ss.str();
 	}
 
-	inline const Scene* GetScene() { return m_Scene; }
+	inline Scene* GetScene() { return m_Scene; }
 
 private:
-	const Scene* m_Scene;
+	Scene* m_Scene;
 };

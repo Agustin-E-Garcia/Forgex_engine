@@ -9,8 +9,8 @@
 enum EventType : uint8_t
 {
 	WindowResized, WindowClose,
-	KeyPressed, KeyReleased,
-	MouseClicked, MouseUnclicked, MousePosition,
+	KeyPressed, KeyReleased, CharInput,
+	MouseClicked, MouseUnclicked, MousePosition, mouseWheel,
 	SceneChange, ItemSelected
 };
 

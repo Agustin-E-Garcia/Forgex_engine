@@ -1,17 +1,39 @@
 #pragma once
 #include "Layer.h"
-#include "../Application.h"
+#include "../Profiler.h"
+#include "../Utils/glfwToImGui.h"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/OpenGL/imgui_impl_opengl3.h>
+
+class ENGINE_API Menu
+{
+public:
+	Menu(const char* name) : m_Name(name) {}
+	~Menu() {}
+
+	inline void Draw()
+	{
+		Begin();
+		OnDraw();
+		End();
+	};
+
+protected:
+	const char* m_Name;
+
+	inline void Begin() { ImGui::Begin(m_Name); }
+	inline void End() { ImGui::End(); }
+	virtual void OnDraw() {};
+};
 
 class ENGINE_API ImGUIOverlay : public Layer
 {
 	using EventCallbackFn = std::function<void(Event&)>;
 
 public:
-	ImGUIOverlay(const Scene* activeScene) : Layer("ImGui") {}
-	ImGUIOverlay(const Scene* activeScene, const EventCallbackFn& callback) : Layer("ImGui", callback) {}
+	ImGUIOverlay() : Layer("ImGui") {}
+	ImGUIOverlay(const EventCallbackFn& callback) : Layer("ImGui", callback) {}
 
 	~ImGUIOverlay()
 	{
@@ -22,7 +44,7 @@ public:
 	void OnAttach() override
 	{
 		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
+		m_ImGuiContext = ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
 		ImGui_ImplOpenGL3_Init();
@@ -33,44 +55,10 @@ public:
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2(1720.0f, 1080.0f);
 
-		Renderer::ToggleWireframe(m_WireframeActive);
-
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
-		DisplayMenu();
-		DisplayStats();
-	}
 
-	void DisplayMenu()
-	{
-		if (ImGui::BeginMainMenuBar())
-		{
-			if (ImGui::BeginMenu("Utils"))
-			{
-				ImGui::Checkbox("Wireframe", &m_WireframeActive);
-				ImGui::EndMenu();
-			}
-			ImGui::EndMainMenuBar();
-		}
-	}
-
-	void DisplayStats()
-	{
-		ImGui::SetNextWindowBgAlpha(0.35f);
-		if (ImGui::Begin("Profiler"))
-		{
-			ImGui::Text("Active scene: %s", m_ActiveScene->GetName());
-			ImGui::Separator();
-
-			ImGui::Text("Displaying all profiles");
-			ImGui::Separator();
-
-			for (auto it = Profiler::begin(); it != Profiler::end(); it++)
-			{
-				ImGui::Text("%s: %.4f", it->second.m_Label, it->second.ReadValue<float>());
-			}
-		}
-		ImGui::End();
+		//ImGui::ShowDemoWindow();
 	}
 
 	void OnRender(const Renderer& renderer) override
@@ -86,10 +74,18 @@ public:
 		dispatcher.Dispatch<MousePositionEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMousePosition));
 		dispatcher.Dispatch<MouseClickEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMouseClick));
 		dispatcher.Dispatch<MouseUnclickEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMouseUnclicked));
-		dispatcher.Dispatch<SceneChangeEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnSceneChanged));
+		dispatcher.Dispatch<MouseWheelScrollEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMouseWheelScroll));
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnKeyPressedEvent));
+		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnKeyReleasedEvent));
+		dispatcher.Dispatch<CharInputEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnCharInputEvent));
 	}
 
-	bool OnMousePosition(MousePositionEvent& e) 
+protected:
+	ImGuiContext* m_ImGuiContext = nullptr;
+
+private:
+	
+	bool OnMousePosition(MousePositionEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		io.MousePos = ImVec2(e.GetPositionX(), e.GetPositionY());
@@ -110,13 +106,31 @@ public:
 		return false;
 	}
 
-	bool OnSceneChanged(SceneChangeEvent& e) 
+	bool OnMouseWheelScroll(MouseWheelScrollEvent& e) 
 	{
-		m_ActiveScene = e.GetScene();
-		return true;
+		ImGuiIO& io = ImGui::GetIO();
+		io.MouseWheel = e.GetYOffset();
+		return false;
 	}
 
-private:
-	bool m_WireframeActive = false;
-	const Scene* m_ActiveScene = nullptr;
+	bool OnKeyPressedEvent(KeyPressedEvent& e) 
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddKeyEvent(glfwKeyToImGuiKey(e.GetKeyCode()), true);
+		return false;
+	}
+
+	bool OnKeyReleasedEvent(KeyReleasedEvent& e) 
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddKeyEvent(glfwKeyToImGuiKey(e.GetKeyCode()), false);
+		return false;
+	}
+
+	bool OnCharInputEvent(CharInputEvent& e) 
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddInputCharacter(e.GetKeyCode());
+		return false;
+	}
 };

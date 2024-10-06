@@ -1,7 +1,7 @@
 #pragma once
-#include "Exports.h"
+#include "../Exports.h"
 #include "Object.h"
-#include "Renderer.h"
+#include "../Renderer.h"
 #include <vector>
 #include <utility>
 
@@ -9,6 +9,7 @@ class ENGINE_API Scene
 {
 public:
 	Scene(const char* name) : m_Name(name) {};
+	
 	~Scene() 
 	{
 		for (auto it = m_Hierarchy.begin(); it != m_Hierarchy.end();)
@@ -37,55 +38,43 @@ public:
 	inline const char* GetName() const { return m_Name; }
 	inline std::vector<Object*> GetHierarchy() const { return m_Hierarchy; }
 
-	template<class T, class... Args>
-	T* CreateObject(Args&&... args)
+	inline Object* CreateObject(std::string name, glm::vec3 position = glm::vec3(0))
 	{
-		static_assert(std::is_base_of<Object, T>::value, "T must inherit from Object");
-
-		T* newObject = new T(std::forward<Args>(args)...);
-		m_Hierarchy.push_back(newObject);
-
-		return newObject;
+		return m_Hierarchy.emplace_back(new Object(name, position, this));
 	}
 
-	template<class T>
-	void DestroyObject(T* object) 
+	inline void DestroyObject(Object* object) 
 	{
-		static_assert(std::is_base_of<Object, T>::value, "T must inherit from Object");
+		if (!object) return;
 
 		auto it = std::find(m_Hierarchy.begin(), m_Hierarchy.end(), object);
 		if (it != m_Hierarchy.end()) 
 		{
+			delete* it;
 			m_Hierarchy.erase(it);
-			delete object;
 		}
 	}
 
 	template<class T>
-	T* GetObjectOfType() const
+	T* GetComponentOfType() 
 	{
-		static_assert(std::is_base_of<Object, T>::value, "T must inherit from Object");
-
-		for (Object* obj : m_Hierarchy)
+		for (Object* obj : m_Hierarchy) 
 		{
-			if (T* castedObject = dynamic_cast<T*>(obj)) return castedObject;
+			T* component = obj->GetComponentOfType<T>();
+			if (component) return component;
 		}
 
 		return nullptr;
 	}
 
-	template<class T>
-	std::vector<T*> GetObjectCollectionOfType() const
+	Object* FindObjectByID(uint32_t id) 
 	{
-		static_assert(std::is_base_of<Object, T>::value, "T must inherit from Object");
-
-		std::vector<T*> collection;
 		for (Object* obj : m_Hierarchy)
 		{
-			if (T* castedObject = dynamic_cast<T*>(obj)) collection.push_back(castedObject);
+			if (obj->GetUID() == id) return obj;
 		}
 
-		return collection;
+		return nullptr;
 	}
 
 private:

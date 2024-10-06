@@ -1,6 +1,7 @@
 #pragma once
-#include "../Object.h"
 #include "Chunk.h"
+#include "../Component.h"
+#include "../ComponentRegistry.h"
 #include <unordered_map>
 #include <queue>
 
@@ -8,10 +9,12 @@
 #include <glm/gtx/hash.hpp>
 
 class DrawInfo;
+class Object;
 
-class ENGINE_API ChunkManager : public Object 
+class ENGINE_API ChunkManager : public Component
 {
 public:
+	ChunkManager();
 	ChunkManager(const Object* player);
 	~ChunkManager();
 
@@ -19,6 +22,9 @@ public:
 	void Render(const Renderer& renderer) override;
 	Chunk* GetChunkAtPosition(glm::vec3 position) const;
 	glm::vec3 GetChunkPositionFromWorld(glm::vec3 worldPosition);
+
+protected:
+	void DrawCustomEditor() override;
 
 private:
 	const Object* m_PlayerObject;
@@ -36,3 +42,5 @@ private:
 	void UnloadChunks(glm::vec3 direction);
 	void CheckChunksToLoad(glm::vec3 playerPosition);
 };
+
+REGISTER_COMPONENT(ChunkManager)

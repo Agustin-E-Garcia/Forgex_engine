@@ -1,8 +1,8 @@
 #include "Chunk.h"
-#include "../Log.h"
+#include "../../Log.h"
 #include "ChunkManager.h"
-#include "../Profiler.h"
-#include "../Utils/NoiseGenerator.h"
+#include "../../Profiler.h"
+#include "../../Utils/NoiseGenerator.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/noise.hpp>
@@ -307,7 +307,7 @@ void Subchunk::PushVertexData(uint8_t x, uint8_t y, uint8_t z, uint8_t blockType
 {
     // First we pack the values into a 32-bit integer
     uint32_t packedValue = (static_cast<uint32_t>(x) << 24) | (static_cast<uint32_t>(y) << 16) | (static_cast<uint32_t>(z) << 8) | (static_cast<uint32_t>(blockType));
-    m_Vertices.push_back(packedValue);
+    m_Vertices.emplace_back(packedValue);
 }
 
 void Subchunk::CopyVertices(std::vector<uint32_t>* vertices) 

@@ -36,9 +36,7 @@ void Application::InitializeSystems()
 	m_Window->SetEventCallback(BIND_EVENT_FUNCTION(Application::HandleEvents));
 	m_Renderer = new Renderer();
 
-	m_GameLayer = new GameLayer(BIND_EVENT_FUNCTION(Application::HandleEvents));
-	PushLayer(m_GameLayer);
-	PushOverlay(new ImGUIOverlay(m_GameLayer->GetActiveScene()));
+	PushLayer(new GameLayer(BIND_EVENT_FUNCTION(Application::HandleEvents)));
 }
 
 void Application::HandleEvents(Event& event)
@@ -70,14 +68,23 @@ void Application::PushOverlay(Layer* layer)
 	m_LayerStack.PushOverlay(layer);
 }
 
+Scene* Application::GetActiveScene()
+{
+	return m_LayerStack.GetLayerOfType<GameLayer>()->GetActiveScene();
+}
+
+void Application::SetActiveCamera(Camera* camera) 
+{
+	if (camera) s_Instance->m_Renderer->SetActiveCamera(camera);
+}
+
 void Application::Run()
 {
-	Camera* camera = m_GameLayer->GetActiveScene()->GetObjectOfType<Camera>();
+	for (Layer* layer : m_LayerStack)
+		layer->OnBegin();
+
+	Camera* camera = GetActiveScene()->GetComponentOfType<Camera>();
 	if(camera) m_Renderer->SetActiveCamera(camera);
-	else 
-	{
-		LOG_CORE_CRITICAL("Scene '{0}' has no camera to render from", m_GameLayer->GetActiveScene()->GetName());
-	}
 
 	do
 	{
@@ -94,4 +101,7 @@ void Application::Run()
 		m_Window->Update();
 
 	} while (!m_ShouldClose);
+
+	for (Layer* layer : m_LayerStack)
+		layer->OnEnd();
 }
