@@ -15,6 +15,7 @@ workspace "Voxel_Engine"
 		"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
 		"ExternalLibraries/GLEW/glew-2.2.0/include",
 		"ExternalLibraries/GLM",
+		"ExternalLibraries/inifile-cpp"
 	}
 
 	project "Engine_Core"
