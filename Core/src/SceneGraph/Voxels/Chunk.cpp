@@ -1,7 +1,6 @@
 #include "Chunk.h"
-#include "../../Log.h"
 #include "ChunkManager.h"
-#include "../../Profiler.h"
+#include "../../Log.h"
 #include "../../Utils/NoiseGenerator.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,8 +23,6 @@ Chunk::~Chunk()
 
 bool Chunk::TryMeshChunk(std::vector<const Chunk*> adjacentChunks, bool forceMeshing)
 {
-    Timer timer("Chunk::Update", &s_ChunkMeshingKey);
-
     if (IsMeshed() && !forceMeshing) return true;
 
     for (int i = 0; i < adjacentChunks.size(); i++)
@@ -191,8 +188,6 @@ void Subchunk::LoadSubchunk(int subChunkIndex, std::vector<uint8_t> chunkHeightM
 
 void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::vector<uint32_t> bottom, std::vector<uint32_t> right, std::vector<uint32_t> left, std::vector<uint32_t> front, std::vector<uint32_t> back)
 {
-    Timer timer("Subchunk::BinaryMeshing", &s_SubchunkMeshingKey);
-
     m_Vertices.clear();
 
     int subchunkPosition = subChunkIndex * s_SubchunkSize;

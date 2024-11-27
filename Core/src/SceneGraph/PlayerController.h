@@ -10,9 +10,15 @@ public:
 	PlayerController() : Component("Player Controller") { };
 	~PlayerController() {};
 
-	void Update(float deltaTime) override 
+protected:
+	void DrawCustomEditor() override 
 	{
-		if(!m_Transform) m_Transform = m_Owner->GetTransform();
+		ImGui::InputFloat3("Speed", &m_Speed.x);
+	}
+
+	void OnUpdate(float deltaTime) override
+	{
+		if (!m_Transform) m_Transform = m_Owner->GetTransform();
 
 		m_Speed = glm::vec3(0);
 
@@ -26,12 +32,6 @@ public:
 		m_Transform->SetPosition(m_Transform->GetPosition() + m_Transform->GetForward() * m_Speed.z * deltaTime);
 		m_Transform->SetPosition(m_Transform->GetPosition() + m_Transform->GetUp() * m_Speed.y * deltaTime);
 		m_Transform->SetRotationY(m_Transform->GetRotation().y + m_Speed.x * deltaTime);
-	}
-
-protected:
-	void DrawCustomEditor() override 
-	{
-		ImGui::InputFloat3("Speed", &m_Speed.x);
 	}
 
 private:

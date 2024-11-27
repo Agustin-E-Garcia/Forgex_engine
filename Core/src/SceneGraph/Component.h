@@ -1,6 +1,7 @@
 #pragma once
 #include "../Exports.h"
 #include "../Renderer.h"
+#include "../Profiler/Profiler.h"
 #include <imgui/imgui.h>
 #include <functional>
 
@@ -19,8 +20,12 @@ public:
 		ImGui::Separator();
 	}
 
-	virtual void Update(float deltaTime) {};
-	virtual void Render(const Renderer& renderer) {};
+	void Update(float deltaTime) 
+	{
+		OnUpdate(deltaTime);
+	}
+
+	virtual void Render(const Renderer& renderer) {}
 
 	inline const char* GetName() { return m_Name; }
 	inline Object* GetOwner() { return m_Owner; }
@@ -31,4 +36,5 @@ protected:
 	Object* m_Owner = nullptr;
 
 	virtual void DrawCustomEditor() {};
+	virtual void OnUpdate(float deltaTime) {}
 };

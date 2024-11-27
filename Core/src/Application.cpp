@@ -6,8 +6,9 @@
 #include "InputManager.h"
 
 #include "Renderer.h"
-#include "Layer/ImGUIOverlay.h"
 #include "Layer/GameLayer.h"
+
+#include "Profiler/Profiler.h"
 
 Application* Application::s_Instance = nullptr;
 
@@ -78,6 +79,10 @@ void Application::SetActiveCamera(Camera* camera)
 	if (camera) s_Instance->m_Renderer->SetActiveCamera(camera);
 }
 
+static int32_t UpdateKey = -1;
+static int32_t RenderKey = -1;
+
+
 void Application::Run()
 {
 	for (Layer* layer : m_LayerStack)
@@ -92,11 +97,17 @@ void Application::Run()
 
 		m_Renderer->ClearScreen();
 
-		for (Layer* layer : m_LayerStack)
-			layer->OnUpdate(deltaTime);
+		{
+			FunctionTimer timer("Update Loop", &UpdateKey);
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate(deltaTime);
+		}
 		
-		for (Layer* layer : m_LayerStack)
-			layer->OnRender(*m_Renderer);
+		{
+			FunctionTimer timer("Render Loop", &RenderKey);
+			for (Layer* layer : m_LayerStack)
+				layer->OnRender(*m_Renderer);
+		}
 
 		m_Window->Update();
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "Layer.h"
-#include "../Profiler.h"
+#include "../Profiler/Profiler.h"
 #include "../Utils/glfwToImGui.h"
 
 #include <imgui/imgui.h>

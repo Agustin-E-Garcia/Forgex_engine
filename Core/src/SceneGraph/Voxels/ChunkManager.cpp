@@ -3,7 +3,6 @@
 #include "../Scene.h"
 #include "../Transform.h"
 #include "../../Renderer.h"
-#include "../../Profiler.h"
 #include "../../Log.h"
 
 ChunkManager::ChunkManager() : Component("Chunk Manager"), m_LastPlayerChunkPosition(glm::vec3(0)), m_PlayerObject(nullptr)
@@ -58,7 +57,7 @@ ChunkManager::~ChunkManager()
 	}
 }
 
-void ChunkManager::Update(float deltaTime) 
+void ChunkManager::OnUpdate(float deltaTime) 
 {
 	if (m_PlayerObject) 
 	{

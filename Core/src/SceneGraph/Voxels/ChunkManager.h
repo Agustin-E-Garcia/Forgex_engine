@@ -18,13 +18,14 @@ public:
 	ChunkManager(const Object* player);
 	~ChunkManager();
 
-	void Update(float deltaTime) override;
 	void Render(const Renderer& renderer) override;
 	Chunk* GetChunkAtPosition(glm::vec3 position) const;
 	glm::vec3 GetChunkPositionFromWorld(glm::vec3 worldPosition);
 
 protected:
 	void DrawCustomEditor() override;
+	void OnUpdate(float deltaTime) override;
+
 
 private:
 	const Object* m_PlayerObject;

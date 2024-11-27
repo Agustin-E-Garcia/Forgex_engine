@@ -1,5 +1,6 @@
 #pragma once
 #include "Menus/SceneInspector.h"
+#include "Menus/ProfilerViewer.h"
 
 class EngineUIOverlay : public ImGUIOverlay
 {
@@ -8,6 +9,7 @@ public:
 	~EngineUIOverlay() 
 	{
 		delete m_SceneInspector;
+		delete m_ProfileViewer;
 	};
 
 	void OnAttach() override
@@ -16,11 +18,13 @@ public:
 		ImGui::SetCurrentContext(m_ImGuiContext);
 		
 		m_SceneInspector = new SceneInspector();
+		m_ProfileViewer = new ProfileViewer();
 	}
 
 	void OnBegin() override
 	{
 		AddMenu(m_SceneInspector);
+		AddMenu(m_ProfileViewer);
 	}
 
 	void OnUpdate(float deltaTime) override 
@@ -62,6 +66,7 @@ private:
 	std::vector<Menu*> m_MenuCollection;
 
 	SceneInspector* m_SceneInspector = nullptr;
+	ProfileViewer* m_ProfileViewer = nullptr;
 
 	void AddMenu(Menu* menu)
 	{

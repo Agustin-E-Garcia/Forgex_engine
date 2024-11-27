@@ -6,6 +6,8 @@
 #include "src/Layer/Layer.h"
 #include "src/Layer/ImGUIOverlay.h"
 
+#include "src/Profiler/Profiler.h"
+
 #include "src/Event/EventList.h"
 
 #include "src/InputManager.h"

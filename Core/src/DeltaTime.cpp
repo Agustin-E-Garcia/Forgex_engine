@@ -1,5 +1,5 @@
 #include "DeltaTime.h"
-#include "Profiler.h"
+#include "Profiler/Profiler.h"
 
 DeltaTime* DeltaTime::s_Instance = nullptr;
 
@@ -18,7 +18,7 @@ float DeltaTime::UpdateImp()
 	m_LastFrame = currentTime;
 
 	m_NbFrames++;
-	if (currentTime - m_LastTime > 1.0f) 
+	if (currentTime - m_LastTime > 1.0f)
 	{
 		Profiler::UpdateProfile(m_FrameDrawKey, 1000.0 / double(m_NbFrames));
 		Profiler::UpdateProfile(m_FPSKey, m_NbFrames);
