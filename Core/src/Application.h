@@ -2,6 +2,7 @@
 #include "Exports.h"
 #include "Window.h"
 #include "Layer/LayerStack.h"
+#include "DeltaTime.h"
 
 class Renderer;
 class Scene;
@@ -42,6 +43,7 @@ private:
 	Renderer* m_Renderer;
 
 	LayerStack m_LayerStack;
+	DeltaTime m_DeltaTime;
 
 	bool m_ShouldClose;
 

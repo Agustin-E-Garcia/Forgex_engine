@@ -43,6 +43,10 @@ public:
 			{
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("Menus"))
+			{
+				ImGui::EndMenu();
+			}
 			ImGui::EndMainMenuBar();
 		}
 

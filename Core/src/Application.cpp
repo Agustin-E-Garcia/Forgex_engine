@@ -2,7 +2,6 @@
 #include "Application.h"
 
 #include "Log.h"
-#include "DeltaTime.h"
 
 #include "InputManager.h"
 
@@ -14,7 +13,7 @@
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application() : m_ShouldClose(false)
+Application::Application() : m_ShouldClose(false), m_Window(nullptr), m_Renderer(nullptr)
 {
 	if (s_Instance != nullptr) return;
 
@@ -31,7 +30,6 @@ Application::~Application()
 void Application::InitializeSystems()
 {
 	Log::Init();
-	DeltaTime::Init();
 	m_Window = new Window(1720, 1080, "Voxel_Engine");
 	m_Window->SetEventCallback(BIND_EVENT_FUNCTION(Application::HandleEvents));
 	m_Renderer = new Renderer();
@@ -92,14 +90,14 @@ void Application::Run()
 
 	do
 	{
-		float deltaTime = DeltaTime::Update();
+		m_DeltaTime.Update();
 
 		m_Renderer->ClearScreen();
 
 		{
 			FunctionTimer timer("Update Loop", &UpdateKey);
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(deltaTime);
+				layer->OnUpdate(m_DeltaTime.GetDeltaTime());
 		}
 		
 		{

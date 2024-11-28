@@ -46,12 +46,13 @@ public:
 	{
 		IMGUI_CHECKVERSION();
 		m_ImGuiContext = ImGui::CreateContext();
-		ImGui::StyleColorsDark();
-
-		ImGui_ImplOpenGL3_Init();
-
 		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.DisplaySize = ImVec2(Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight());
+		io.KeyRepeatRate = 0.5f;
+
+		ImGui::StyleColorsDark();
+		ImGui_ImplOpenGL3_Init();
 	}
 
 	void OnUpdate(float deltaTime) override
@@ -59,7 +60,7 @@ public:
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
 
-		//ImGui::ShowDemoWindow();
+		ImGui::DockSpaceOverViewport(0U, 0, ImGuiDockNodeFlags_PassthruCentralNode);
 	}
 
 	void OnRender(const Renderer& renderer) override
@@ -118,7 +119,7 @@ private:
 		return false;
 	}
 
-	bool OnKeyPressedEvent(KeyPressedEvent& e) 
+	bool OnKeyPressedEvent(KeyPressedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		io.AddKeyEvent(glfwKeyToImGuiKey(e.GetKeyCode()), true);
@@ -136,7 +137,7 @@ private:
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		io.AddInputCharacter(e.GetKeyCode());
-		return false;
+		return true;
 	}
 
 	bool OnWindowResized(WindowResizedEvent& e) 

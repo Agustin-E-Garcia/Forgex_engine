@@ -2,8 +2,6 @@
 #include "DeltaTime.h"
 #include "Profiler/Profiler.h"
 
-DeltaTime* DeltaTime::s_Instance = nullptr;
-
 DeltaTime::DeltaTime() : m_DeltaTime(0.0f), m_LastFrame(glfwGetTime()), m_NbFrames(0), m_LastTime(glfwGetTime()) 
 {
 	m_FPSKey = Profiler::AddProfile("FPS", m_NbFrames);
@@ -12,7 +10,7 @@ DeltaTime::DeltaTime() : m_DeltaTime(0.0f), m_LastFrame(glfwGetTime()), m_NbFram
 
 DeltaTime::~DeltaTime() {}
 
-float DeltaTime::UpdateImp()
+void DeltaTime::Update()
 {
 	float currentTime = glfwGetTime();
 	m_DeltaTime = currentTime - m_LastFrame;
@@ -26,6 +24,4 @@ float DeltaTime::UpdateImp()
 		m_NbFrames = 0;
 		m_LastTime += 1.0f;
 	}
-
-	return m_DeltaTime;
 }
