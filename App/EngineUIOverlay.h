@@ -29,6 +29,8 @@ public:
 
 	void OnUpdate(float deltaTime) override 
 	{
+		if (!m_WindowActive) return;
+
 		ImGUIOverlay::OnUpdate(deltaTime);
 
 		if (ImGui::BeginMainMenuBar())

@@ -64,6 +64,8 @@ public:
 
 	void OnRender(const Renderer& renderer) override
 	{
+		if (!m_WindowActive) return;
+
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
@@ -84,6 +86,7 @@ public:
 
 protected:
 	ImGuiContext* m_ImGuiContext = nullptr;
+	bool m_WindowActive = true;
 
 private:
 
@@ -138,6 +141,13 @@ private:
 
 	bool OnWindowResized(WindowResizedEvent& e) 
 	{
+		int width = e.GetWidth();
+		int height = e.GetHeight();
+
+		m_WindowActive = width > 0 && height > 0;
+
+		if (!m_WindowActive) return false;
+
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
 		return false;
