@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "DeltaTime.h"
 #include "Profiler/Profiler.h"
 

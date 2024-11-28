@@ -1,9 +1,10 @@
+#include "pch.h"
 #include "ChunkManager.h"
-#include "../Object.h"
-#include "../Scene.h"
-#include "../Transform.h"
-#include "../../Renderer.h"
-#include "../../Log.h"
+#include "SceneGraph/Object.h"
+#include "SceneGraph/Scene.h"
+#include "SceneGraph/Transform.h"
+#include "Renderer.h"
+#include "Log.h"
 
 ChunkManager::ChunkManager() : Component("Chunk Manager"), m_LastPlayerChunkPosition(glm::vec3(0)), m_PlayerObject(nullptr)
 {

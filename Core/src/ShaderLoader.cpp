@@ -1,6 +1,5 @@
+#include "pch.h"
 #include "ShaderLoader.h"
-#include <fstream>
-#include <sstream>
 #include <GL/glew.h>
 #include "Log.h"
 

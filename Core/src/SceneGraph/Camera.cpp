@@ -1,9 +1,9 @@
+#include "pch.h"
 #include "Camera.h"
 #include "Transform.h"
 #include "Object.h"
-#include "glm/gtc/matrix_transform.hpp"
-#include "../Log.h"
-#include "../Application.h"
+#include "Log.h"
+#include "Application.h"
 
 Camera::Camera() : Component("Camera")
 {

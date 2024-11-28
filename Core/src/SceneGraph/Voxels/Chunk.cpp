@@ -1,11 +1,8 @@
+#include "pch.h"
 #include "Chunk.h"
 #include "ChunkManager.h"
-#include "../../Log.h"
-#include "../../Utils/NoiseGenerator.h"
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/noise.hpp>
-#include <algorithm>
+#include "Log.h"
+#include "Utils/NoiseGenerator.h"
 
 static int s_SubchunkSize = 32;
 

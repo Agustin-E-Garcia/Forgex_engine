@@ -17,6 +17,9 @@ public:
 		return ss.str();
 	}
 
+	unsigned int GetWidth() { return m_Width; }
+	unsigned int GetHeight() { return m_Height; }
+
 private:
 	unsigned int m_Width;
 	unsigned int m_Height;
@@ -37,6 +40,28 @@ public:
 		ss << "WindowCloseEvent called";
 		return ss.str();
 	}
+};
+
+/*---------------------------------------------------------------------------------------------------------*/
+
+class ENGINE_API WindowFocusChangedEvent : public Event
+{
+public:
+	WindowFocusChangedEvent(bool isFocused) : m_Focus(isFocused) {}
+	EVENT_SET_TYPE(WindowFocusChanged)
+	EVENT_SET_CATEGORY(ApplicationEvent)
+
+	std::string ToString() const override
+	{
+		std::stringstream ss;
+		ss << "WindowFocusChangedEvent called";
+		return ss.str();
+	}
+
+	inline bool IsFocused() { return m_Focus; }
+
+private:
+	bool m_Focus;
 };
 
 /*---------------------------------------------------------------------------------------------------------*/

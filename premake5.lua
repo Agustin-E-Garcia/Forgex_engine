@@ -9,6 +9,7 @@ workspace "Voxel_Engine"
 	targetdir ("Build/Bin/%{prj.name}/%{cfg.longname}")
 
 	includedirs {
+		"Core/src",
 		"ExternalLibraries/Spdlog/spdlog-1.14.1/include",
 		"ExternalLibraries/STB_Image",
 		"ExternalLibraries/ImGUI",
@@ -24,6 +25,9 @@ workspace "Voxel_Engine"
 		files { "Core/**.cpp", "Core/**.h" }
 		links { "ImGui" }
 		defines { "ENGINE_DLL" }
+
+		pchheader "pch.h"
+		pchsource "Core/src/pch.cpp"
 
 		libdirs {
 			"ExternalLibraries/GLEW/glew-2.2.0/lib/Release/x64",

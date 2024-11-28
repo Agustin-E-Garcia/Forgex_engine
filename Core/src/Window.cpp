@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Window.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -11,9 +12,12 @@ Window::Window(int width, int height, char* title) : m_Width(width), m_Height(he
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-	m_Window = glfwCreateWindow(width, height, title, NULL, NULL);
+	m_Window = glfwCreateWindow(m_Width, m_Height, title, NULL, NULL);
 	if (m_Window == NULL) LOG_CORE_CRITICAL("Failed to open GLFW window");
+
+	glfwGetWindowSize(m_Window, &m_Width, &m_Height);
 
 	glfwMakeContextCurrent(m_Window);
 	glewExperimental = true;
@@ -44,6 +48,13 @@ void Window::SetupEvents()
 {
 	glfwSetWindowUserPointer(m_Window, &m_EventCallback);
 	glfwSetInputMode(m_Window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+	glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
+		{
+			EventCallbackFn& callback = *(EventCallbackFn*)glfwGetWindowUserPointer(window);
+			WindowFocusChangedEvent e(focused);
+			callback(e);
+		});
 
 	glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 		{

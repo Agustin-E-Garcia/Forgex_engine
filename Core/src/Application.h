@@ -19,6 +19,7 @@ public:
 
 	void PushLayer(Layer* layer);
 	void PushOverlay(Layer* layer);
+
 	template<class T>
 	T* GetLayerOfType() 
 	{
@@ -28,8 +29,11 @@ public:
 
 	Scene* GetActiveScene();
 
-	static inline void* GetWindowPtr() { return s_Instance->m_Window->GetNativeWindow(); }
+	static inline void* GetNativeWindowPtr() { return s_Instance->m_Window->GetNativeWindow(); }
 	static void SetActiveCamera(Camera* camera);
+
+	static inline const Window* GetWindow() { return s_Instance->m_Window; }
+	static inline const Renderer* GetRenderer() { return s_Instance->m_Renderer; }
 
 private:
 	static Application* s_Instance;

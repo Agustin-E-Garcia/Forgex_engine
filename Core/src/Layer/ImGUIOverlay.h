@@ -1,7 +1,8 @@
 #pragma once
 #include "Layer.h"
-#include "../Profiler/Profiler.h"
-#include "../Utils/glfwToImGui.h"
+#include "Window.h"
+#include "Profiler/Profiler.h"
+#include "Utils/glfwToImGui.h"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/OpenGL/imgui_impl_opengl3.h>
@@ -48,13 +49,13 @@ public:
 		ImGui::StyleColorsDark();
 
 		ImGui_ImplOpenGL3_Init();
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.DisplaySize = ImVec2(Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight());
 	}
 
 	void OnUpdate(float deltaTime) override
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(1720.0f, 1080.0f);
-
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
 
@@ -77,14 +78,15 @@ public:
 		dispatcher.Dispatch<MouseWheelScrollEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnMouseWheelScroll));
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnKeyPressedEvent));
 		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnKeyReleasedEvent));
-		dispatcher.Dispatch<CharInputEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnCharInputEvent));
+		dispatcher.Dispatch<CharInputEvent>	(BIND_EVENT_FUNCTION(ImGUIOverlay::OnCharInputEvent));
+		dispatcher.Dispatch<WindowResizedEvent>(BIND_EVENT_FUNCTION(ImGUIOverlay::OnWindowResized));
 	}
 
 protected:
 	ImGuiContext* m_ImGuiContext = nullptr;
 
 private:
-	
+
 	bool OnMousePosition(MousePositionEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -131,6 +133,13 @@ private:
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		io.AddInputCharacter(e.GetKeyCode());
+		return false;
+	}
+
+	bool OnWindowResized(WindowResizedEvent& e) 
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
 		return false;
 	}
 };

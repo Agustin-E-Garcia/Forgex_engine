@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Application.h"
 
 #include "Log.h"
@@ -7,19 +8,17 @@
 
 #include "Renderer.h"
 #include "Layer/GameLayer.h"
+#include "Layer/ImGUIOverlay.h"
 
 #include "Profiler/Profiler.h"
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application() 
+Application::Application() : m_ShouldClose(false)
 {
-	if (s_Instance == nullptr)
-		s_Instance = this;
-	else
-		delete this;
+	if (s_Instance != nullptr) return;
 
-	m_ShouldClose = false;
+	s_Instance = this;
 	InitializeSystems();
 }
 

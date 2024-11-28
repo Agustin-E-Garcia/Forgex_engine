@@ -1,7 +1,8 @@
+#include "pch.h"
 #include "TextureLoader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include "GL/glew.h"
+#include <GL/glew.h>
 #include "Log.h"
 
 unsigned int TextureLoader::LoadTexture(const char* filePath)

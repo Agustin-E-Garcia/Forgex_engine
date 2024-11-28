@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Object.h"
 #include "Transform.h"
 #include "Scene.h"

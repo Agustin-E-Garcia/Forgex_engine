@@ -1,6 +1,6 @@
 #pragma once
-#include "imgui/imgui.h"
-#include "GLFW/glfw3.h"
+#include <imgui/imgui.h>
+#include <GLFW/glfw3.h>
 
 static ImGuiKey glfwKeyToImGuiKey(int key)
 {

@@ -15,8 +15,8 @@ public:
 	void Update();
 	bool ShouldClose();
 
-	inline unsigned int GetWidth() const { return m_Width; }
-	inline unsigned int GetHeight() const { return m_Height; }
+	inline int GetWidth() const { return m_Width; }
+	inline int GetHeight() const { return m_Height; }
 
 	inline GLFWwindow* GetNativeWindow() { return m_Window; }
 
@@ -24,8 +24,8 @@ public:
 private:
 	GLFWwindow* m_Window;
 	
-	unsigned int m_Width;
-	unsigned int m_Height;
+	int m_Width;
+	int m_Height;
 
 	EventCallbackFn m_EventCallback;
 	void SetupEvents();
