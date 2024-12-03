@@ -9,29 +9,29 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Set up Visual Studio
+        uses: microsoft/setup-msbuild@v1.0.2  # Set up MSBuild for building C++ projects
+        with:
+          vs-version: "latest"
+
       - name: Install Dependencies
         run: |
-          sudo apt update
-          sudo apt install build-essential -y
+          choco install mingw
+          choco install premake5
 
       - name: Install Premake5
         run: |
-          wget https://github.com/premake/premake-core/releases/download/v5.0.0-beta3/premake-5.0.0-beta3-linux.tar.gz
-          tar -xzf premake-5.0.0-beta3-linux.tar.gz
-          chmod +x premake5
-          sudo mv premake5 /usr/local/bin/
-
-      - name: Verify Premake5 Installation
-        run: premake5 --version
+          premake5 --version  # Verify that premake5 is installed
 
       - name: Generate Project Files
-        run: premake5 gmake2
+        run: premake5 vs2022  # Generates Visual Studio project files for VS 2022
 
       - name: Build the Project
-        run: make VERVOSE=1
+        run: |
+          msbuild /p:Configuration=Release
