@@ -143,3 +143,9 @@ void Renderer::ToggleWireframe(bool wireframe)
 	if(wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
+
+void Renderer::ToggleFaceCulling(bool faceCulling)
+{
+	if (faceCulling) glEnable(GL_CULL_FACE);
+	else glDisable(GL_CULL_FACE);
+}

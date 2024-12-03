@@ -39,8 +39,10 @@ public:
 			{
 				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("Edit"))
+			if (ImGui::BeginMenu("Debug"))
 			{
+				if (ImGui::Checkbox("Toggle Wireframe", &m_Wireframe)) { Renderer::ToggleWireframe(m_Wireframe); }
+				if (ImGui::Checkbox("Toggle OpenGL face culling", &m_FaceCulling)) { Renderer::ToggleFaceCulling(m_FaceCulling); }
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Menus"))
@@ -73,6 +75,9 @@ private:
 
 	SceneInspector* m_SceneInspector = nullptr;
 	ProfileViewer* m_ProfileViewer = nullptr;
+
+	bool m_Wireframe = false;
+	bool m_FaceCulling = true;
 
 	void AddMenu(Menu* menu)
 	{

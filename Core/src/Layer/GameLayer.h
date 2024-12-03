@@ -21,12 +21,12 @@ public:
 	void OnAttach() override
 	{
 		m_ActiveScene = new Scene("Default Scene");
-		//Object* cameraObj = m_ActiveScene->CreateObject("Camera", glm::vec3(0.0f, 70.0f, 0.0f));
-		//cameraObj->AddComponent<Camera>();
-		//cameraObj->AddComponent<PlayerController>();
+		Object* cameraObj = m_ActiveScene->CreateObject("Camera", glm::vec3(0.0f, 70.0f, 0.0f));
+		cameraObj->AddComponent<Camera>();
+		cameraObj->AddComponent<PlayerController>();
 		
-		//Object* chunkObj = m_ActiveScene->CreateObject("Chunk Manager");
-		//chunkObj->AddComponent<ChunkManager>(cameraObj);
+		Object* chunkObj = m_ActiveScene->CreateObject("Chunk Manager");
+		chunkObj->AddComponent<ChunkManager>(cameraObj);
 	}
 
 	void OnBegin() override 

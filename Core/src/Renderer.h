@@ -32,6 +32,7 @@ public:
 	static unsigned int GenerateVertexBuffer(int size, const void* data);
 	static void DeleteBuffer(unsigned int bufferID);
 	static void ToggleWireframe(bool wireframe);
+	static void ToggleFaceCulling(bool faceCulling);
 
 private:
 	unsigned int vertexArrayID;

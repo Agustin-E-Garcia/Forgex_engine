@@ -1,4 +1,4 @@
-workspace "Voxel_Engine"
+workspace "Forgex_Engine"
 	architecture "x64"
 	configurations { "Debug", "Release" }
 	buildoptions "/MDd"
@@ -19,7 +19,7 @@ workspace "Voxel_Engine"
 		"ExternalLibraries/inifile-cpp"
 	}
 
-	project "Engine_Core"
+	project "Forgex_Core"
 		location "Core"
 		kind "SharedLib"
 		files { "Core/**.cpp", "Core/**.h" }
@@ -41,18 +41,18 @@ workspace "Voxel_Engine"
 			"opengl32.lib"
 		}
 	
-	project "Engine_Application"
+	project "Forgex_Application"
 		location "App"
 		kind "ConsoleApp"
 		files { "App/**.cpp", "App/**.h" }
 		includedirs { "Core" }
-		links { "Engine_Core" }
+		links { "Forgex_Core" }
 
 		libdirs { "ExternalLibraries/ImGUI/imgui/bin" }
 		links { "ImGui.lib" }
 
 		postbuildcommands { 
-			"{COPYFILE} %[Build/Bin/Engine_Core/%{cfg.longname}/Engine_Core.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]", 
+			"{COPYFILE} %[Build/Bin/Forgex_Core/%{cfg.longname}/Forgex_Core.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]", 
 			"{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
 			"{COPYDIR} %[App/Resources] %[Build/Bin/%{prj.name}/%{cfg.longname}/Resources]",
 			"{COPYFILE} %[App/imgui.ini] %[Build/Bin/%{prj.name}/%{cfg.longname}]"
