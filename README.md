@@ -1,6 +1,5 @@
 # Forgex Engine
 [![Latest release -  v0.4](https://img.shields.io/static/v1?label=Latest+release&message=+v0.4&color=2ea44f)](https://)
-[![Board - Trello](https://img.shields.io/badge/Board-Trello-2ea44f)](https://trello.com/b/KGXtF4xQ/simple-voxel-engine)
 
 A personal learning project exploring the creation of a voxel engine. This project demonstrates technical problem-solving, optimization techniques, and passion for game development. 
 
@@ -35,9 +34,13 @@ A personal learning project exploring the creation of a voxel engine. This proje
 - **GLFW/GLEW:** Windowing and OpenGL extensions
 - **STBImage:** Image loading
 
+## Downloading the project
+When enough features or changes have been added to the development branch, they will be merged to main and the release will be updated with a stable build
+
 ## How to Build
 1. **Clone the Repository** Pull the latest version of the project
-2. **Generate Project Files with Premake5** Use Premake5 to generate the project files:
+> **Note:** "Main" branch is a stable version of the engine that will compile and run, "Development" is an unstable branch where changes are being made often
+2. **Generate Project Files** Use Premake5 to generate the project files
 3. **Build the Project** Open the generated solution or Makefile and build it using your preferred IDE or build tool.
  > **Note:** A CMake option for generating project files may be added in the future.
 
