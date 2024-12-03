@@ -1,0 +1,26 @@
+name: Build Status
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Dependencies
+        run: |
+          sudo apt update
+          sudo apt install premake4 premake5 build-essential -y
+
+      - name: Generate Project Files
+        run: premake5 gmake2
+
+      - name: Build the Project
+        run: make
