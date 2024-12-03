@@ -1,8 +1,13 @@
 # Forgex Engine
+[![Latest release](https://badgen.net/github/release/Naereen/Strapdown.js)](https://github.com/Agustin-E-Garcia/Forgex_engine/releases)
+[![GitHub latest commit](https://badgen.net/github/last-commit/Naereen/Strapdown.js)](https://github.com/Agustin-E-Garcia/Forgex_engine/commit/)
 
 A personal learning project exploring the creation of a voxel engine. This project demonstrates technical problem-solving, optimization techniques, and passion for game development. 
 
 **Forgex Engine is an ongoing project, with new features and improvements being actively developed.**
+
+
+
 
 ## Features
 - **Dynamic Chunk System:** Infinite world generation with 32x224x32 chunks, subdivided into 32x32x32 sub-chunks for optimal performance and memory management.
@@ -17,6 +22,13 @@ A personal learning project exploring the creation of a voxel engine. This proje
 - **SPDlog:** Console logging
 - **GLFW/GLEW:** Windowing and OpenGL extensions
 - **STBImage:** Image loading and texture handling
+
+## How to Build
+1. **Clone the Repository** Pull the latest version of the project
+2. **Generate Project Files with Premake5** Use Premake5 to generate the project files:
+3. **Build the Project** Open the generated solution or Makefile and build it using your preferred IDE or build tool.
+ > **Note:** A CMake option for generating project files may be added in the future.
+
 
 ## Goals
 ### Short-Term Goals
