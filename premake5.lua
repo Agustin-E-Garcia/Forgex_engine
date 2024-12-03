@@ -19,6 +19,14 @@ workspace "Forgex_Engine"
 		"ExternalLibraries/inifile-cpp"
 	}
 
+	filter "system:windows"
+	systemversion "latest"
+	defines { "PLATFORM_WINDOWS" }
+
+	filter "system:linux"
+	defines { "PLATFORM_LINUX" }
+	links { "Xrandr", "Xi", "Xxf86vm" }
+
 	project "Forgex_Core"
 		location "Core"
 		kind "SharedLib"
