@@ -22,12 +22,11 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          choco install mingw
-          choco install premake5
+          choco install premake5 --pre 
 
-      - name: Install Premake5
+      - name: Verify Premake5 Installation
         run: |
-          premake5 --version  # Verify that premake5 is installed
+          premake5 --version
 
       - name: Generate Project Files
         run: premake5 vs2022  # Generates Visual Studio project files for VS 2022
