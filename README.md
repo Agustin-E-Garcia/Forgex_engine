@@ -1,5 +1,6 @@
 # Forgex Engine
-[![Latest release -  v0.4](https://img.shields.io/static/v1?label=Latest+release&message=+v0.4&color=2ea44f)](https://)
+![Latest Release](https://img.shields.io/github/v/release/Agustin-E-Garcia/Forgex_engine?include_prereleases&label=release&link=)
+
 
 A personal learning project exploring the creation of a voxel engine. This project demonstrates technical problem-solving, optimization techniques, and passion for game development. 
 
