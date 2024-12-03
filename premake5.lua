@@ -23,10 +23,6 @@ workspace "Forgex_Engine"
 	systemversion "latest"
 	defines { "PLATFORM_WINDOWS" }
 
-	filter "system:linux"
-	defines { "PLATFORM_LINUX" }
-	links { "Xrandr", "Xi", "Xxf86vm" }
-
 	project "Forgex_Core"
 		location "Core"
 		kind "SharedLib"
