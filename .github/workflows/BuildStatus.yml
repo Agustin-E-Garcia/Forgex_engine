@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - Development
 
 jobs:
   build:
@@ -33,4 +34,4 @@ jobs:
         run: premake5 gmake2
 
       - name: Build the Project
-        run: make
+        run: make VERVOSE=1
