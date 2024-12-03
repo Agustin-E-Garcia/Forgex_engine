@@ -1,5 +1,6 @@
 # Forgex Engine
 ![Latest Release](https://img.shields.io/github/v/release/Agustin-E-Garcia/Forgex_engine?include_prereleases&label=release&link=)
+[![Build Status](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus.yml/badge.svg)](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus.yml)
 
 
 A personal learning project exploring the creation of a voxel engine. This project demonstrates technical problem-solving, optimization techniques, and passion for game development. 
@@ -64,5 +65,6 @@ When enough features or changes have been added to the development branch, they 
 
 ## Status
 Forgex Engine is currently **a work in progress**, designed as a personal learning project and a showcase of technical skills. Contributions or forks are not expected, but feedback is always welcome!
+For more details about what I'm planning next for the engine you can visit the project's [Trello board](https://trello.com/b/KGXtF4xQ/simple-voxel-engine)
 
 ---
