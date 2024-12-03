@@ -1,11 +1,14 @@
 # Forgex Engine
+[![Latest release -  v0.4](https://img.shields.io/static/v1?label=Latest+release&message=+v0.4&color=2ea44f)](https://)
+[![Board - Trello](https://img.shields.io/badge/Board-Trello-2ea44f)](https://trello.com/b/KGXtF4xQ/simple-voxel-engine)
 
 A personal learning project exploring the creation of a voxel engine. This project demonstrates technical problem-solving, optimization techniques, and passion for game development. 
 
 **Forgex Engine is an ongoing project, with new features and improvements being actively developed.**
 
 ## Table of Contents
-2. [Features](#features)
+1. [Features](#features)
+2. [Performance](#performance)
 3. [Libraries Used](#libraries-used)
 4. [How to Build](#how-to-build)
 5. [Goals](#goals)
@@ -21,13 +24,16 @@ A personal learning project exploring the creation of a voxel engine. This proje
 - **Vertex Caching & Face Culling:** Minimizes computation by regenerating only modified chunks and skipping unseen faces for rendering.
 - **Compact Memory Management:** Data stored efficiently using `uint32_t` for voxel grids and `uint8_t` for voxel types, ensuring minimal overhead.
 
+## Performance
+> Still gathering some data in terms of performance as I test in multiple computers when I have the chance. Will update soon with some example systems and the performance values for each
+
 ## Libraries Used
 - **OpenGL:** Rendering
 - **ImGui (Docking branch):** Engine UI and tools
 - **GLM:** Math calculations
 - **SPDlog:** Console logging
 - **GLFW/GLEW:** Windowing and OpenGL extensions
-- **STBImage:** Image loading and texture handling
+- **STBImage:** Image loading
 
 ## How to Build
 1. **Clone the Repository** Pull the latest version of the project
