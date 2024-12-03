@@ -25,7 +25,7 @@ jobs:
       - name: Install Premake5
         run: |
           wget https://github.com/premake/premake-core/releases/download/v5.0.0-beta3/premake-5.0.0-beta3-linux.tar.gz
-          tar -xzf premake5-linux.tar.gz
+          tar -xzf premake-5.0.0-beta3-linux.tar.gz
           sudo mv premake5 /usr/local/bin/
 
       - name: Verify Premake5 Installation
