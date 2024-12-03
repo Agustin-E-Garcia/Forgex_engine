@@ -1,12 +1,18 @@
 # Forgex Engine
-[![Latest release](https://badgen.net/github/release/Naereen/Strapdown.js)](https://github.com/Agustin-E-Garcia/Forgex_engine/releases)
-[![GitHub latest commit](https://badgen.net/github/last-commit/Naereen/Strapdown.js)](https://github.com/Agustin-E-Garcia/Forgex_engine/commit/)
 
 A personal learning project exploring the creation of a voxel engine. This project demonstrates technical problem-solving, optimization techniques, and passion for game development. 
 
 **Forgex Engine is an ongoing project, with new features and improvements being actively developed.**
 
-
+## Table of Contents
+2. [Features](#features)
+3. [Libraries Used](#libraries-used)
+4. [How to Build](#how-to-build)
+5. [Goals](#goals)
+   - [Short-Term Goals](#short-term-goals)
+   - [Long-Term Goals](#long-term-goals)
+6. [Images](#images)
+7. [Status](#status)
 
 
 ## Features
@@ -29,7 +35,6 @@ A personal learning project exploring the creation of a voxel engine. This proje
 3. **Build the Project** Open the generated solution or Makefile and build it using your preferred IDE or build tool.
  > **Note:** A CMake option for generating project files may be added in the future.
 
-
 ## Goals
 ### Short-Term Goals
 - Add a skybox with ambient light to enhance the world environment.
@@ -42,6 +47,9 @@ A personal learning project exploring the creation of a voxel engine. This proje
 - Add advanced lighting and shadowing techniques to improve visuals.
 - Introduce multiplayer support with synced voxel interactions.
 - Create a demo scene showcasing infinite world generation and voxel editing.
+
+## Images
+Here are some images showcasing the current state of the Forgex Engine:
 
 ## Status
 Forgex Engine is currently **a work in progress**, designed as a personal learning project and a showcase of technical skills. Contributions or forks are not expected, but feedback is always welcome!
