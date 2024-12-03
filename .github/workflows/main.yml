@@ -1,8 +1,11 @@
 name: Build Status
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -14,10 +17,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Dependencies
+      - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install premake4 premake5 build-essential -y
+          sudo apt install build-essential -y
+
+      - name: Install Premake5
+        run: |
+          wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha16/premake5-linux.tar.gz
+          tar -xzf premake5-linux.tar.gz
+          sudo mv premake5 /usr/local/bin/
+
+      - name: Verify Premake5 Installation
+        run: premake5 --version
 
       - name: Generate Project Files
         run: premake5 gmake2
