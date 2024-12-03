@@ -59,7 +59,8 @@ When enough features or changes have been added to the development branch, they 
 - Create a demo scene showcasing infinite world generation and voxel editing.
 
 ## Images
-Here are some images showcasing the current state of the Forgex Engine:
+![image](https://github.com/user-attachments/assets/88f2dc54-4418-4157-80f2-4367626892b6)
+
 
 ## Status
 Forgex Engine is currently **a work in progress**, designed as a personal learning project and a showcase of technical skills. Contributions or forks are not expected, but feedback is always welcome!
