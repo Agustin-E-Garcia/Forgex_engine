@@ -5,7 +5,7 @@
 
 #include "InputManager.h"
 
-#include "Renderer.h"
+#include "Renderer/Renderer.h"
 #include "Layer/GameLayer.h"
 #include "Layer/ImGUIOverlay.h"
 
@@ -30,9 +30,9 @@ Application::~Application()
 void Application::InitializeSystems()
 {
 	Log::Init();
-	m_Window = new Window(1720, 1080, "Voxel_Engine");
+	m_Window = new Window(1720, 1080, "Forgex Engine");
 	m_Window->SetEventCallback(BIND_EVENT_FUNCTION(Application::HandleEvents));
-	m_Renderer = new Renderer();
+	m_Renderer = new Renderer(1720, 1080);
 
 	PushLayer(new GameLayer(BIND_EVENT_FUNCTION(Application::HandleEvents)));
 }
@@ -50,7 +50,7 @@ void Application::HandleEvents(Event& event)
 	}
 }
 
-bool Application::OnWindowClose(WindowCloseEvent& e) 
+bool Application::OnWindowClose(WindowCloseEvent& e)
 {
 	m_ShouldClose = true;
 	return true;
@@ -92,14 +92,12 @@ void Application::Run()
 	{
 		m_DeltaTime.Update();
 
-		m_Renderer->ClearScreen();
-
 		{
 			FunctionTimer timer("Update Loop", &UpdateKey);
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate(m_DeltaTime.GetDeltaTime());
 		}
-		
+
 		{
 			FunctionTimer timer("Render Loop", &RenderKey);
 			for (Layer* layer : m_LayerStack)

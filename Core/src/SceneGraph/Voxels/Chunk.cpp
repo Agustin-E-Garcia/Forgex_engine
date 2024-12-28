@@ -66,7 +66,7 @@ void Chunk::BuildMesh(std::vector<const Chunk*> adjacentChunks)
         if (m_SubChunks[i].m_IsMeshed) continue;
 
         std::vector<uint32_t> top = (i + 1) < m_SubChunks.size() ? m_SubChunks[i + 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
-        std::vector<uint32_t> bottom = (i - 1) >= 0 ? m_SubChunks[i - 1].m_BinaryMap : std::vector<uint32_t>(std::pow(s_SubchunkSize, 2));
+        std::vector<uint32_t> bottom = (i - 1) >= 0 ? m_SubChunks[i - 1].m_BinaryMap : std::vector<uint32_t>();
         std::vector<uint32_t> right = adjacentChunks[0] ? adjacentChunks.at(0)->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
         std::vector<uint32_t> left  = adjacentChunks[1] ? adjacentChunks.at(1)->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
         std::vector<uint32_t> front = adjacentChunks[2] ? adjacentChunks.at(2)->GetSubchunk(i)->m_BinaryMap : std::vector<uint32_t>();
@@ -198,7 +198,7 @@ void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::
             if (column == 0) continue;
 
             uint32_t topMask = ((~(column >> 1)) & column) & ~((top[FlattenIndex(x, z)] & 1) << 31);
-            uint32_t bottomMask = ((~(column << 1)) & column) & ~(bottom[FlattenIndex(x, z)] >> 31);
+            uint32_t bottomMask = bottom.empty() ? 0 : ((~(column << 1)) & column) & ~(bottom[FlattenIndex(x, z)] >> 31);
             uint32_t rightMask = ~GetBinaryMap(x - 1, z) & column;
             uint32_t leftMask = ~GetBinaryMap(x + 1, z) & column;
             uint32_t frontMask = ~GetBinaryMap(x, z + 1) & column;
@@ -232,18 +232,10 @@ void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::
                     PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(0 + x, 1 + y + subchunkPosition, 1 + z, voxelType);
-                }
 
-                if ((bottomMask << y) & 1)
-                {
-                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
-                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
-
-                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
-                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    voxelType = 4;
                 }
+                else {voxelType = 3;}
 
                 if ((rightMask >> y) & 1) 
                 {
@@ -287,6 +279,19 @@ void Subchunk::BinaryMeshing(int subChunkIndex, std::vector<uint32_t> top, std::
                     PushVertexData(0 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(1 + x, 1 + y + subchunkPosition, 0 + z, voxelType);
                     PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                }
+
+                if ((bottomMask << y) & 1)
+                {
+                    voxelType = 3;
+
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+
+                    PushVertexData(1 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 1 + z, voxelType);
+                    PushVertexData(0 + x, 0 + y + subchunkPosition, 0 + z, voxelType);
                 }
             }
         }

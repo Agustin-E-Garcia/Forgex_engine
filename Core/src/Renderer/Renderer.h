@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 class Camera;
+class Framebuffer;
 
 struct DrawInfo
 {
@@ -17,16 +18,27 @@ struct DrawInfo
 	unsigned int indexCount;
 };
 
+struct ENGINE_API RenderTarget
+{
+	unsigned int m_RenderTextureID;
+
+	int m_TargetWidth;
+	int m_TargetHeight;
+};
+
 class ENGINE_API Renderer
 {
 public:
-	Renderer();
+	Renderer(int width, int height);
 	~Renderer();
 
-	void ClearScreen();
 	void Draw(DrawInfo info) const;
 	void DrawVoxel(DrawInfo info) const;
 	void SetActiveCamera(Camera* activeCamera);
+	void SetRenderTarget(RenderTarget& renderTarget) const;
+
+	void PreSceneRender() const;
+	void PostSceneRender() const;
 
 	static unsigned int GenerateBuffer(unsigned int target, int size, const void* data);
 	static unsigned int GenerateVertexBuffer(int size, const void* data);
@@ -35,6 +47,8 @@ public:
 	static void ToggleFaceCulling(bool faceCulling);
 
 private:
+	Framebuffer* m_SceneFramebuffer;
+
 	unsigned int vertexArrayID;
 	unsigned int colorShaderID;
 	unsigned int textureShaderID;

@@ -1,6 +1,7 @@
 #pragma once
 #include "src/Application.h"
-#include "src/Renderer.h"
+#include "src/Renderer/Renderer.h"
+#include "src/Renderer/Framebuffer.h"
 #include "src/Log.h"
 
 #include "src/Layer/Layer.h"

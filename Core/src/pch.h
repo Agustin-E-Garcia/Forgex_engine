@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <queue>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

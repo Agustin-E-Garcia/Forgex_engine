@@ -1,6 +1,7 @@
 #pragma once
 #include "Menus/SceneInspector.h"
 #include "Menus/ProfilerViewer.h"
+#include "Menus/Viewport.h"
 
 class EngineUIOverlay : public ImGUIOverlay
 {
@@ -10,6 +11,7 @@ public:
 	{
 		delete m_SceneInspector;
 		delete m_ProfileViewer;
+		delete m_Viewport;
 	};
 
 	void OnAttach() override
@@ -19,12 +21,14 @@ public:
 		
 		m_SceneInspector = new SceneInspector();
 		m_ProfileViewer = new ProfileViewer();
+		m_Viewport = new Viewport();
 	}
 
 	void OnBegin() override
 	{
 		AddMenu(m_SceneInspector);
 		AddMenu(m_ProfileViewer);
+		AddMenu(m_Viewport);
 	}
 
 	void OnUpdate(float deltaTime) override 
@@ -56,6 +60,12 @@ public:
 			menu->Draw();
 	}
 
+	void OnRender(const Renderer& rend) override
+	{
+		ImGUIOverlay::OnRender(rend);
+		rend.SetRenderTarget(m_Viewport->GetRenderTarget());
+	}
+
 	void OnEvent(Event& e) override
 	{
 		ImGUIOverlay::OnEvent(e);
@@ -75,6 +85,7 @@ private:
 
 	SceneInspector* m_SceneInspector = nullptr;
 	ProfileViewer* m_ProfileViewer = nullptr;
+	Viewport* m_Viewport = nullptr;
 
 	bool m_Wireframe = false;
 	bool m_FaceCulling = true;

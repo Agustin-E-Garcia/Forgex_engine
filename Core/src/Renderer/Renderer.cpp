@@ -5,10 +5,11 @@
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
 #include "SceneGraph/Camera.h"
+#include "Framebuffer.h"
 
-Renderer::Renderer() : m_ActiveCamera(nullptr)
-{ 
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+Renderer::Renderer(int width, int height) : m_ActiveCamera(nullptr)
+{
+	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -16,6 +17,8 @@ Renderer::Renderer() : m_ActiveCamera(nullptr)
 
 	glGenVertexArrays(1, &vertexArrayID);
 	glBindVertexArray(vertexArrayID);
+
+	m_SceneFramebuffer = new Framebuffer(width, height);
 
 	LOG_CORE_INFO("Renderer initialized successfully");
 
@@ -30,11 +33,6 @@ Renderer::~Renderer()
 	glDeleteProgram(textureShaderID);
 	glDeleteProgram(colorShaderID);
 	glDeleteVertexArrays(1, &vertexArrayID);
-}
-
-void Renderer::ClearScreen() 
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Renderer::Draw(DrawInfo info) const
@@ -103,6 +101,7 @@ void Renderer::DrawVoxel(DrawInfo info) const
 
 	glDrawArrays(GL_TRIANGLES, 0, info.indexCount);
 	glDisableVertexAttribArray(0);
+	glUseProgram(0);
 }
 
 void Renderer::SetActiveCamera(Camera* activeCamera)
@@ -113,6 +112,23 @@ void Renderer::SetActiveCamera(Camera* activeCamera)
 
 	m_ActiveCamera = activeCamera;
 	m_ActiveCamera->FlagAsActiveCamera(true);
+}
+
+void Renderer::SetRenderTarget(RenderTarget& renderTarget) const
+{
+	m_SceneFramebuffer->TryUpdate(renderTarget.m_TargetWidth, renderTarget.m_TargetHeight);
+	renderTarget.m_RenderTextureID = m_SceneFramebuffer->GetTextureID();
+}
+
+void Renderer::PreSceneRender() const
+{
+	m_SceneFramebuffer->BindBuffer();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Renderer::PostSceneRender() const
+{
+	m_SceneFramebuffer->UnbindBuffer();
 }
 
 unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void* data)

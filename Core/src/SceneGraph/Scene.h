@@ -1,7 +1,7 @@
 #pragma once
-#include "../Exports.h"
+#include "Exports.h"
 #include "Object.h"
-#include "../Renderer.h"
+#include "Renderer/Renderer.h"
 #include <vector>
 #include <utility>
 

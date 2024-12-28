@@ -48,6 +48,7 @@ public:
 		m_ImGuiContext = ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		io.DisplaySize = ImVec2(Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight());
 		io.KeyRepeatRate = 0.5f;
 
@@ -60,7 +61,7 @@ public:
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::DockSpaceOverViewport(0U, 0, ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::DockSpaceOverViewport(0U, 0);
 	}
 
 	void OnRender(const Renderer& renderer) override
@@ -90,6 +91,7 @@ protected:
 	bool m_WindowActive = true;
 
 private:
+	unsigned int m_ScreenShader;
 
 	bool OnMousePosition(MousePositionEvent& e)
 	{

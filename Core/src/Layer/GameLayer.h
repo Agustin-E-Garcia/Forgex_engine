@@ -26,7 +26,8 @@ public:
 		cameraObj->AddComponent<PlayerController>();
 		
 		Object* chunkObj = m_ActiveScene->CreateObject("Chunk Manager");
-		chunkObj->AddComponent<ChunkManager>(cameraObj);
+		chunkObj->AddComponent<ChunkManager>();
+
 	}
 
 	void OnBegin() override 
@@ -42,7 +43,9 @@ public:
 
 	void OnRender(const Renderer& renderer) 
 	{
+		renderer.PreSceneRender();
 		m_ActiveScene->Render(renderer);
+		renderer.PostSceneRender();
 	}
 
 	void OnEvent(Event& event) override

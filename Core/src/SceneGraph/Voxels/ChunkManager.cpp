@@ -3,7 +3,7 @@
 #include "SceneGraph/Object.h"
 #include "SceneGraph/Scene.h"
 #include "SceneGraph/Transform.h"
-#include "Renderer.h"
+#include "Renderer/Renderer.h"
 #include "Log.h"
 
 ChunkManager::ChunkManager() : Component("Chunk Manager"), m_LastPlayerChunkPosition(glm::vec3(0)), m_PlayerObject(nullptr)
@@ -19,7 +19,7 @@ ChunkManager::ChunkManager() : Component("Chunk Manager"), m_LastPlayerChunkPosi
 			Chunk* newChunk = new Chunk(position);
 
 			m_ChunkGrid.emplace(position, newChunk);
-			m_UpdateQueue.push(position);
+			m_ChunkLoadQueue.push(position);
 		}
 	}
 }
@@ -44,7 +44,7 @@ ChunkManager::ChunkManager(const Object* player) : Component("Chunk Manager"), m
 			Chunk* newChunk = new Chunk(position);
 			
 			m_ChunkGrid.emplace(position, newChunk);
-			m_UpdateQueue.push(position);
+			m_ChunkMeshQueue.push(position);
 		}
 	}
 }
@@ -60,48 +60,92 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::OnUpdate(float deltaTime) 
 {
+	// Check if the player has moved to another chunk, if true we need to check which chunks to unload, and where to reuse them
 	if (m_PlayerObject) 
 	{
 		glm::vec3 newPlayerChunkPos = GetChunkPositionFromWorld(m_PlayerObject->GetTransform()->GetPosition());
 
 		if (newPlayerChunkPos != m_LastPlayerChunkPosition)
 		{
-			UnloadChunks(newPlayerChunkPos);
-			CheckChunksToLoad(newPlayerChunkPos);
+			UnloadChunks(newPlayerChunkPos); // We check and unload the chunks that are farther than the draw distance to the player
+			CheckChunksToLoad(newPlayerChunkPos); // We populate the updatequeue with the unloaded chunks giving them the new positions
 		}
 
 		m_LastPlayerChunkPosition = newPlayerChunkPos;
 	}
 
-	int chunksPerFrame = 10;
-	while (!m_UpdateQueue.empty() && chunksPerFrame > 0)
+	// We try to lower the impact of chunk loading/meshing by allowing only 10 chunks to be done per frame
+	// This needs to be reworked into a multithreded system.
+	// For now we can have the thread exist here, in the future we'll want a thread manager so we can deploy jobs to them with priorities
+	//int chunksPerFrame = 10; 
+	//while (!m_UpdateQueue.empty() && chunksPerFrame > 0)
+	//{
+	//	glm::vec3 position = m_UpdateQueue.front();
+	//	Chunk* chunk = GetChunkAtPosition(position);
+	//	m_UpdateQueue.pop();
+	//
+	//	if (!chunk) continue;
+	//
+	//	chunksPerFrame--;
+	//
+	//	std::vector<const Chunk*> adjacents;
+	//	adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3(-1, 0,  0)));
+	//	adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 1, 0,  0)));
+	//	adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 0, 0,  1)));
+	//	adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 0, 0, -1)));
+	//
+	//	if (!chunk->IsLoaded())
+	//	{
+	//		chunk->LoadChunk();
+	//
+	//		for (int i = 0; i < adjacents.size(); i++)
+	//		{
+	//			if (!adjacents[i]) continue;
+	//			m_UpdateQueue.push(adjacents.at(i)->GetPosition());
+	//		}
+	//	}
+	//
+	//	if (!chunk->TryMeshChunk(adjacents, true)) m_UpdateQueue.push(position);
+	//}
+
+	// Trying new aproach where we'll be making two passes through all the chunks:
+	// 1st Pass -> We load the subchunks and do face-culling locally in the chunk generating all the binary masks
+	// 2nd Pass -> We request from neighbor chunks the required masks and do boundary checks for face-culling
 	{
-		glm::vec3 position = m_UpdateQueue.front();
-		Chunk* chunk = GetChunkAtPosition(position);
-		m_UpdateQueue.pop();
-
-		if (!chunk) continue;
-
-		chunksPerFrame--;
-
-		std::vector<const Chunk*> adjacents;
-		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3(-1, 0,  0)));
-		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 1, 0,  0)));
-		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 0, 0,  1)));
-		adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3( 0, 0, -1)));
-
-		if (!chunk->IsLoaded())
+		int chunksPerFrame = 10;
+		while (!m_ChunkLoadQueue.empty() && chunksPerFrame > 0)
 		{
-			chunk->LoadChunk();
+			glm::vec3 position = m_ChunkLoadQueue.front();
+			Chunk* chunk = GetChunkAtPosition(position);
+			m_ChunkLoadQueue.pop();
+			
+			if (!chunk) continue;
 
-			for (int i = 0; i < adjacents.size(); i++)
-			{
-				if (!adjacents[i]) continue;
-				m_UpdateQueue.push(adjacents.at(i)->GetPosition());
-			}
+			chunk->LoadChunk();
+			m_ChunkMeshQueue.push(position);
+
+			chunksPerFrame--;
 		}
 
-		if (!chunk->TryMeshChunk(adjacents, true)) m_UpdateQueue.push(position);
+		while (!m_ChunkMeshQueue.empty() && chunksPerFrame > 0)
+		{
+			glm::vec3 position = m_ChunkMeshQueue.front();
+			Chunk* chunk = GetChunkAtPosition(position);
+
+			if (chunk) 
+			{
+				std::vector<const Chunk*> adjacents;
+				adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3(-1, 0, 0)));
+				adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3(1, 0, 0)));
+				adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3(0, 0, 1)));
+				adjacents.emplace_back(GetChunkAtPosition(position + glm::vec3(0, 0, -1)));
+
+				if (!chunk->TryMeshChunk(adjacents, true)) break;
+			}
+
+			m_ChunkMeshQueue.pop();
+			chunksPerFrame--;
+		}
 	}
 }
 
@@ -153,11 +197,12 @@ void ChunkManager::CheckChunksToLoad(glm::vec3 playerPosition)
 
 			chunk->ChangePosition(position);
 
-			m_UpdateQueue.push(position);
-			m_UpdateQueue.push(position + glm::vec3(-1, 0,  0));
-			m_UpdateQueue.push(position + glm::vec3( 1, 0,  0));
-			m_UpdateQueue.push(position + glm::vec3( 0, 0,  1));
-			m_UpdateQueue.push(position + glm::vec3( 0, 0, -1));
+			m_ChunkLoadQueue.push(position);
+			//m_ChunkMeshQueue.push(position);
+			//m_ChunkMeshQueue.push(position + glm::vec3(-1, 0,  0));
+			//m_ChunkMeshQueue.push(position + glm::vec3( 1, 0,  0));
+			//m_ChunkMeshQueue.push(position + glm::vec3( 0, 0,  1));
+			//m_ChunkMeshQueue.push(position + glm::vec3( 0, 0, -1));
 
 			m_ChunkGrid.emplace(position, chunk);
 		}
@@ -183,7 +228,7 @@ void ChunkManager::DrawCustomEditor()
 	ImGui::Text("Chunk size: %u", m_ChunkSize);
 	ImGui::Text("Chunk draw distance: %u", m_LoadDistance);
 	ImGui::Text("Chunk grid size: %u", m_ChunkGrid.size());
-	ImGui::Text("Chunks queued to load: %u", m_UpdateQueue.size());
+	ImGui::Text("Chunks queued to load: %u", m_ChunkMeshQueue.size());
 	ImGui::Separator();
 	
 	bool exists = m_PlayerObject != nullptr;

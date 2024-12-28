@@ -2,8 +2,6 @@
 #include "Chunk.h"
 #include "../Component.h"
 #include "../ComponentRegistry.h"
-#include <unordered_map>
-#include <queue>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -37,8 +35,9 @@ private:
 	std::unordered_map<glm::vec3, Chunk*> m_ChunkGrid;
 
 	std::vector<Chunk*> m_UnloadedChunks;
-	std::vector<glm::vec3> m_ChunksToLoad;
-	std::queue<glm::vec3> m_UpdateQueue;
+
+	std::queue<glm::vec3> m_ChunkLoadQueue; // Chunks waiting for loading and local face-culling
+	std::queue<glm::vec3> m_ChunkMeshQueue; // Chunks waiting for boundary face-culling and meshing
 
 	void UnloadChunks(glm::vec3 direction);
 	void CheckChunksToLoad(glm::vec3 playerPosition);

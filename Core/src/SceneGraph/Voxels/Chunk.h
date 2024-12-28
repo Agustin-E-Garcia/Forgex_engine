@@ -1,6 +1,6 @@
 #pragma once
 #include "Voxel.h"
-#include "../../Renderer.h"
+#include "Renderer/Renderer.h"
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -20,6 +20,8 @@ private:
 	std::vector<Voxel> m_Voxels;
 	std::vector<uint32_t> m_Vertices;
 	std::vector<uint32_t> m_BinaryMap;
+
+
 
 	bool m_IsLoaded;
 	bool m_IsMeshed;
