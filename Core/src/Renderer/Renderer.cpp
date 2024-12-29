@@ -24,6 +24,7 @@ Renderer::Renderer(int width, int height) : m_ActiveCamera(nullptr)
 
 	colorShaderID = ShaderLoader::LoadShader("Resources/Shaders/VoxelVertexShader.vertexshader", "Resources/Shaders/VoxelFragmentShader.fragmentshader");
 	textureShaderID = ShaderLoader::LoadShader("Resources/Shaders/TextureVertexShader.vertexshader", "Resources/Shaders/TextureFragmentShader.fragmentshader");
+	
 	textureID = TextureLoader::LoadTexture("Resources/Textures/0.png");
 }
 
@@ -129,6 +130,29 @@ void Renderer::PreSceneRender() const
 void Renderer::PostSceneRender() const
 {
 	m_SceneFramebuffer->UnbindBuffer();
+}
+
+void Renderer::DrawSkybox(DrawInfo info) const
+{
+	glDepthMask(GL_FALSE);
+	glUseProgram(info.shaderID);
+
+	glm::mat4 Projection = m_ActiveCamera->GetProjectionMatrix();
+	glm::mat4 View = glm::mat4(glm::mat3(m_ActiveCamera->GetViewMatrix()));
+
+	unsigned int projectionID = glGetUniformLocation(info.shaderID, "projection");
+	glUniformMatrix4fv(projectionID, 1, GL_FALSE, &Projection[0][0]);
+
+	unsigned int viewID = glGetUniformLocation(info.shaderID, "view");
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, &View[0][0]);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, info.vertexBufferID);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, info.textureID);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDepthMask(GL_TRUE);
 }
 
 unsigned int Renderer::GenerateBuffer(unsigned int target, int size, const void* data)

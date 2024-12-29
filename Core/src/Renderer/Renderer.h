@@ -12,7 +12,7 @@ struct DrawInfo
 	unsigned int indexBufferID;
 	unsigned int uvBufferID;
 	unsigned int shaderID;
-	std::optional<unsigned int> textureID;
+	unsigned int textureID;
 
 	glm::mat4 modelMatrix;
 	unsigned int indexCount;
@@ -39,6 +39,7 @@ public:
 
 	void PreSceneRender() const;
 	void PostSceneRender() const;
+	void DrawSkybox(DrawInfo info) const;
 
 	static unsigned int GenerateBuffer(unsigned int target, int size, const void* data);
 	static unsigned int GenerateVertexBuffer(int size, const void* data);
@@ -50,8 +51,10 @@ private:
 	Framebuffer* m_SceneFramebuffer;
 
 	unsigned int vertexArrayID;
+
 	unsigned int colorShaderID;
 	unsigned int textureShaderID;
+
 	unsigned int textureID;
 
 	Camera* m_ActiveCamera;
