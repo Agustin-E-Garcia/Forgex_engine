@@ -1,0 +1,4 @@
+[submodule "ExternalLibraries/GLM"]
+	path = ExternalLibraries/GLM
+	url = https://github.com/g-truc/glm
+	branch = master

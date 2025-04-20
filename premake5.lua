@@ -33,12 +33,12 @@ workspace "Forgex_Engine"
     	defines { "GRAPHICS_DLL" }
     	includedirs {
     	    "Modules/Math/Include",
-    	    "ExternalLibraries/GLEW/glew-2.2.0/include", 
+    	    "ExternalLibraries/GLEW/glew-2.1.0/include", 
     	    "ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
     	    "ExternalLibraries/STB_Image"
     	}
     	libdirs {
-        	"ExternalLibraries/GLEW/glew-2.2.0/lib/Release/x64",
+        	"ExternalLibraries/GLEW/glew-2.1.0/lib/Release/x64",
     	    "ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/lib-vc2017" 
     	}
     	links { "glew32.lib", "glfw3.lib", "opengl32.lib" }
@@ -88,6 +88,6 @@ workspace "Forgex_Engine"
         "{COPYFILE} %[Build/Bin/Graphics_Module/%{cfg.longname}/Graphics_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
         "{COPYFILE} %[Build/Bin/Math_Module/%{cfg.longname}/Math_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
         "{COPYFILE} %[Build/Bin/Scene_Module/%{cfg.longname}/Scene_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
-        "{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYFILE} %[ExternalLibraries/GLEW/glew-2.1.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
         "{COPYDIR} %[Editor/Resources] %[Build/Bin/%{prj.name}/%{cfg.longname}/Resources]"
         }
