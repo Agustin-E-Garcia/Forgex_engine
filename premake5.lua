@@ -5,13 +5,14 @@ workspace "Forgex_Engine"
 	cppdialect "C++20"
 	targetdir ("Build/Bin/%{prj.name}/%{cfg.longname}")
 	includedirs { "Modules/Debug/Include" }
+	buildoptions { "/utf-8" }
 
     project "Debug_Module"
         location "Modules/Debug"
         kind "SharedLib"
         files { "Modules/Debug/**.cpp", "Modules/Debug/**.h" }
         defines { "DEBUG_DLL" }
-        includedirs { "ExternalLibraries/Spdlog/spdlog-1.14.1/include" }
+        includedirs { "ExternalLibraries/Spdlog/include" }
 
 	project "Core_Module"
 		location "Modules/Core"
