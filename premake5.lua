@@ -1,81 +1,93 @@
 workspace "Forgex_Engine"
 	architecture "x64"
 	configurations { "Debug", "Release" }
-	buildoptions "/MDd"
-
 	language "C++"
-	cppdialect "C++17"
-
+	cppdialect "C++20"
 	targetdir ("Build/Bin/%{prj.name}/%{cfg.longname}")
+	includedirs { "Modules/Debug/Include" }
 
-	includedirs {
-		"Core/src",
-		"ExternalLibraries/Spdlog/spdlog-1.14.1/include",
-		"ExternalLibraries/STB_Image",
-		"ExternalLibraries/ImGUI",
-		"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
-		"ExternalLibraries/GLEW/glew-2.2.0/include",
-		"ExternalLibraries/GLM",
-		"ExternalLibraries/inifile-cpp"
-	}
+    project "Debug_Module"
+        location "Modules/Debug"
+        kind "SharedLib"
+        files { "Modules/Debug/**.cpp", "Modules/Debug/**.h" }
+        defines { "DEBUG_DLL" }
+        includedirs { "ExternalLibraries/Spdlog/spdlog-1.14.1/include" }
 
-	filter "system:windows"
-	systemversion "latest"
-	defines { "PLATFORM_WINDOWS" }
-
-	project "Forgex_Core"
-		location "Core"
+	project "Core_Module"
+		location "Modules/Core"
 		kind "SharedLib"
-		files { "Core/**.cpp", "Core/**.h" }
-		links { "ImGui" }
-		defines { "ENGINE_DLL" }
-
-		pchheader "pch.h"
-		pchsource "Core/src/pch.cpp"
-
-		libdirs {
-			"ExternalLibraries/GLEW/glew-2.2.0/lib/Release/x64",
-			"ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/lib-vc2017",
-			"ExternalLibraries/ImGUI/imgui/bin"
-		}
-
-		links {
-			"glew32.lib",
-			"glfw3.lib",
-			"opengl32.lib"
+		files { "Modules/Core/**.cpp", "Modules/Core/**.h" }
+		links { "Graphics_Module", "Scene_Module", "Math_Module", "Debug_Module" }
+		defines { "CORE_DLL" }
+		includedirs{
+		    "Modules/Graphics/Include",
+		    "Modules/Scene/Include",
+		    "Modules/Math/Include"
 		}
 	
-	project "Forgex_Application"
-		location "App"
-		kind "ConsoleApp"
-		files { "App/**.cpp", "App/**.h" }
-		includedirs { "Core" }
-		links { "Forgex_Core" }
-
-		libdirs { "ExternalLibraries/ImGUI/imgui/bin" }
-		links { "ImGui.lib" }
-
-		postbuildcommands { 
-			"{COPYFILE} %[Build/Bin/Forgex_Core/%{cfg.longname}/Forgex_Core.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]", 
-			"{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
-			"{COPYDIR} %[App/Resources] %[Build/Bin/%{prj.name}/%{cfg.longname}/Resources]",
-			"{COPYFILE} %[App/imgui.ini] %[Build/Bin/%{prj.name}/%{cfg.longname}]"
-		}
-
-	project "ImGui"
-		location "ExternalLibraries/ImGUI/imgui"
-		kind "StaticLib"
-		language "C++"
-
-		links {
-			"opengl32.lib"
-		}
-
-		targetdir("ExternalLibraries/ImGUI/imgui/bin")
-
-		files { 
-			"ExternalLibraries/ImGUI/imgui/*.cpp", "ExternalLibraries/ImGUI/imgui/*.h",
-			"ExternalLibraries/ImGUI/imgui/backends/OpenGL/*.h", "ExternalLibraries/ImGUI/imgui/backends/OpenGL/*.cpp",
-			"ExternalLibraries/ImGUI/imgui/misc/cpp/imgui_stdlib.cpp",
-			"ExternalLibraries/ImGUI/imgui/misc/cpp/imgui_stdlib.h"
-		}
+	project "Graphics_Module"
+    	location "Modules/Graphics"
+    	kind "SharedLib"
+    	files { "Modules/Graphics/**.cpp", "Modules/Graphics/**.h" }
+    	links { "Math_Module", "Debug_Module" }
+    	defines { "GRAPHICS_DLL" }
+    	includedirs {
+    	    "Modules/Math/Include",
+    	    "ExternalLibraries/GLEW/glew-2.2.0/include", 
+    	    "ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include",
+    	    "ExternalLibraries/STB_Image"
+    	}
+    	libdirs {
+        	"ExternalLibraries/GLEW/glew-2.2.0/lib/Release/x64",
+    	    "ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/lib-vc2017" 
+    	}
+    	links { "glew32.lib", "glfw3.lib", "opengl32.lib" }
+    	
+    project "Scene_Module"
+       	location "Modules/Scene"
+       	kind "SharedLib"
+       	files { "Modules/Scene/**.cpp", "Modules/Scene/**.h" }
+       	links { "Math_Module", "Debug_Module" }
+       	defines { "SCENE_DLL" }
+       	includedirs{ "Modules/Math/Include" }
+	
+    project "Math_Module"
+       	location "Modules/Math"
+       	kind "SharedLib"
+       	files { "Modules/Math/**.cpp", "Modules/Math/**.h" }
+       	defines { "MATH_DLL" }
+       	includedirs { "ExternalLibraries/GLM" }
+    
+    project "UI_Module"
+       	location "Modules/UI"
+       	kind "SharedLib"
+       	files { "Modules/UI/**.cpp", "Modules/UI/**.h" }
+       	links { "Debug_Module" }
+       	defines { "UI_DLL" }
+       	libdirs { }
+       	links {	}
+	
+    project "Assets_Module"
+       	location "Modules/Assets"
+       	kind "SharedLib"
+       	files { "Modules/Assets/**.cpp", "Modules/Assets/**.h" }
+       	links { "Debug_Module" }
+       	defines { "ASSETS_DLL" }
+       	libdirs { }
+       	links {	}
+       	
+    project "Forgex_Editor"
+        location "Editor"
+        kind "ConsoleApp"
+        files { "Editor/**.cpp", "Editor/**.h" }
+        links { "Core_Module", "Debug_Module" }
+        includedirs { "Modules/Core/Include" }
+        postbuildcommands { 
+        "{COPYFILE} %[Build/Bin/Core_Module/%{cfg.longname}/Core_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYFILE} %[Build/Bin/Debug_Module/%{cfg.longname}/Debug_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYFILE} %[Build/Bin/Graphics_Module/%{cfg.longname}/Graphics_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYFILE} %[Build/Bin/Math_Module/%{cfg.longname}/Math_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYFILE} %[Build/Bin/Scene_Module/%{cfg.longname}/Scene_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYFILE} %[ExternalLibraries/GLEW/glew-2.2.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYDIR} %[Editor/Resources] %[Build/Bin/%{prj.name}/%{cfg.longname}/Resources]"
+        }

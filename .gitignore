@@ -1,10 +1,11 @@
 .vs/
+.idea/
 *.vcxproj
 *.vcxproj.user
 *.vcxproj.filters
 *.sln
+*.sln.DotSettings.user
 Build/
-App/obj/
-Core/Obj/
+obj
 ExternalLibraries/ImGUI/imgui/bin/
 ExternalLibraries/ImGUI/imgui/obj/
