@@ -58,25 +58,21 @@ public:
 
 		m_EditorCameraObject->GetTransform()->SetPosition(Math::Vec3(0, 0, 2));
 		
-		Scene::Object* meshObj = m_ActiveScene->CreateObject("Cube");
-		Scene::MeshComponent* meshComponent = meshObj->AddComponent<Scene::MeshComponent>();
-		meshComponent->SetMesh
-		(
-			cubeVertices,
-			cubeIndices,
-			cubeUVs,
-			Graphics::Utils::ShaderLoader::LoadShader("Resources/Shaders/Texture.vertex", "Resources/Shaders/Texture.fragment"),
-			Graphics::Utils::TextureLoader::LoadDefaultTexture(Graphics::Utils::Default, "Resources/Textures/edge2.png")
-		);
+		//Scene::Object* meshObj = m_ActiveScene->CreateObject("Cube");
+		//Scene::MeshComponent* meshComponent = meshObj->AddComponent<Scene::MeshComponent>();
+		//meshComponent->SetMesh
+		//(
+		//	cubeVertices,
+		//	cubeIndices,
+		//	cubeUVs,
+		//	Graphics::Utils::ShaderLoader::LoadShader("Resources/Shaders/Texture.vertex", "Resources/Shaders/Texture.fragment"),
+		//	Graphics::Utils::TextureLoader::LoadDefaultTexture(Graphics::Utils::Default, "Resources/Textures/edge2.png")
+		//);
 	}
 
 	void OnUpdate(float deltaTime) override
 	{
-		m_ActiveScene->Update(deltaTime);
-
-		//m_EditorCameraObject->GetTransform()->SetRotationY(m_EditorCameraObject->GetTransform()->GetRotation().y + 0.2f * deltaTime);
-		//m_EditorCameraObject->GetTransform()->SetPosition(m_EditorCameraObject->GetTransform()->GetPosition() + Math::Vec3(1.0f, 0.0f, 0.0f) * deltaTime);
-		
+		m_ActiveScene->Update(deltaTime);		
 		SyncRenderProxy();
 	}
 

@@ -18,12 +18,13 @@ workspace "Forgex_Engine"
 		location "Modules/Core"
 		kind "SharedLib"
 		files { "Modules/Core/**.cpp", "Modules/Core/**.h" }
-		links { "Graphics_Module", "Scene_Module", "Math_Module", "Debug_Module" }
+		links { "Graphics_Module", "Scene_Module", "Math_Module", "Debug_Module", "UI_Module" }
 		defines { "CORE_DLL" }
 		includedirs{
 		    "Modules/Graphics/Include",
 		    "Modules/Scene/Include",
-		    "Modules/Math/Include"
+		    "Modules/Math/Include",
+		    "Modules/UI/Include"
 		}
 	
 	project "Graphics_Module"
@@ -63,10 +64,11 @@ workspace "Forgex_Engine"
        	location "Modules/UI"
        	kind "SharedLib"
        	files { "Modules/UI/**.cpp", "Modules/UI/**.h" }
-       	links { "Debug_Module" }
+       	links { "Debug_Module", "ImGui" }
        	defines { "UI_DLL" }
-       	libdirs { }
-       	links {	}
+       	includedirs { "ExternalLibraries/ImGui" }
+        libdirs { "ExternalLibraries/ImGui/bin" }
+
 	
     project "Assets_Module"
        	location "Modules/Assets"
@@ -89,6 +91,27 @@ workspace "Forgex_Engine"
         "{COPYFILE} %[Build/Bin/Graphics_Module/%{cfg.longname}/Graphics_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
         "{COPYFILE} %[Build/Bin/Math_Module/%{cfg.longname}/Math_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
         "{COPYFILE} %[Build/Bin/Scene_Module/%{cfg.longname}/Scene_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
+        "{COPYFILE} %[Build/Bin/UI_Module/%{cfg.longname}/UI_Module.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
         "{COPYFILE} %[ExternalLibraries/GLEW/glew-2.1.0/bin/Release/x64/glew32.dll] %[Build/Bin/%{prj.name}/%{cfg.longname}]",
         "{COPYDIR} %[Editor/Resources] %[Build/Bin/%{prj.name}/%{cfg.longname}/Resources]"
         }
+
+    project "ImGui"
+		location "ExternalLibraries/ImGui"
+		kind "StaticLib"
+		language "C++"
+
+        includedirs { "ExternalLibraries/ImGui" }
+
+		links {
+			"opengl32.lib"
+		}
+
+		targetdir("ExternalLibraries/ImGui/bin")
+
+		files { 
+			"ExternalLibraries/ImGui/*.cpp", "ExternalLibraries/ImGui/*.h",
+			"ExternalLibraries/ImGui/backends/imgui_impl_opengl3.h", "ExternalLibraries/ImGui/backends/imgui_impl_opengl3.cpp",
+			"ExternalLibraries/ImGui/misc/cpp/imgui_stdlib.cpp",
+			"ExternalLibraries/ImGui/misc/cpp/imgui_stdlib.h"
+		}

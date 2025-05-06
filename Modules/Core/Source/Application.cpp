@@ -1,7 +1,7 @@
 #include "Application.h"
 #include "Layer/GameLayer.h"
+#include "Layer/UILayer.h"
 
-#include <ForgexGraphics.h>
 #include <ForgexDebugTools.h>
 
 #include <chrono>
@@ -36,6 +36,9 @@ void Application::InitializeSystems()
 	
 	GameLayer* gameLayer = new GameLayer();
 	m_LayerStack.PushLayer(gameLayer);
+
+	UILayer* uiLayer = new UILayer();
+	m_LayerStack.PushOverlay(uiLayer);
 }
 
 void Application::Run()
