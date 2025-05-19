@@ -51,10 +51,22 @@ namespace Forgex::Graphics
 		glfwSetWindowUserPointer(m_Window, this);
 		glfwSetInputMode(m_Window, GLFW_STICKY_KEYS, GLFW_TRUE);
 
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+			{
+				Window* wind = (Window*)glfwGetWindowUserPointer(window);
+				wind->m_WindowResizeCallback(width, height);
+			});
+
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int keyCode, int scancode, int action, int mods)
 			{
 				Window* wind = (Window*)glfwGetWindowUserPointer(window);
 				wind->m_KeyPressedCallback(keyCode, action == GLFW_REPEAT, action != GLFW_RELEASE);
+			});
+
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int codepoint)
+			{
+				Window* wind = (Window*)glfwGetWindowUserPointer(window);
+				wind->m_CharInputCallback(codepoint);
 			});
 
 		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
@@ -67,6 +79,12 @@ namespace Forgex::Graphics
 			{
 				Window* wind = (Window*)glfwGetWindowUserPointer(window);
 				wind->m_MouseClickedCallback(button, action == GLFW_PRESS);
+			});
+
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xoffset, double yoffset)
+			{
+				Window* wind = (Window*)glfwGetWindowUserPointer(window);
+				wind->m_MouseWheelCallback(xoffset, yoffset);
 			});
 	}
 }

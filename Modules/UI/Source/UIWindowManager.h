@@ -12,9 +12,16 @@ namespace Forgex::UI
         void SetContext();
         void Update(float deltaTime);
         void Render();
-        
+
+        void UpdateMousePosition(double xPos, double yPos);
+        void OnMouseClick(unsigned int button, bool clicked);
+        void OnMouseWheelScroll(double xOffset, double yOffset);
+        void OnCharInput(unsigned int keycode);
+        void OnKeyPressed(unsigned int keycode, bool repeat, bool pressed);
+        void OnWindowResized(int width, int height);
+
     private:
-        void* m_ImGuiContext = nullptr;
+        void* m_ActiveContext = nullptr;
         bool m_WindowActive = true;
     };
 
