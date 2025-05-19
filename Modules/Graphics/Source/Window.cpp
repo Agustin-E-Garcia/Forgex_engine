@@ -13,7 +13,7 @@ namespace Forgex::Graphics
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
+		//glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 		//glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 		m_Window = glfwCreateWindow(m_Width, m_Height, title, NULL, NULL);
@@ -25,6 +25,8 @@ namespace Forgex::Graphics
 		glewExperimental = true;
 		if (glewInit() != GLEW_OK) LOG_CORE(Debug::LogLevel::Critical, "Failed to initialize GLEW");
 		
+		SetupEvents();
+
 		LOG_CORE(Debug::LogLevel::Info, "Window '{0}' created successfully", title);
 	}
 
@@ -42,5 +44,29 @@ namespace Forgex::Graphics
 	bool Window::ShouldClose()
 	{
 		return glfwWindowShouldClose(m_Window);
+	}
+
+	void Window::SetupEvents()
+	{
+		glfwSetWindowUserPointer(m_Window, this);
+		glfwSetInputMode(m_Window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int keyCode, int scancode, int action, int mods)
+			{
+				Window* wind = (Window*)glfwGetWindowUserPointer(window);
+				wind->m_KeyPressedCallback(keyCode, action == GLFW_REPEAT, action != GLFW_RELEASE);
+			});
+
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
+			{
+				Window* wind = (Window*)glfwGetWindowUserPointer(window);
+				wind->m_MouseMoveCallback(xPos, yPos);
+			});
+
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
+			{
+				Window* wind = (Window*)glfwGetWindowUserPointer(window);
+				wind->m_MouseClickedCallback(button, action == GLFW_PRESS);
+			});
 	}
 }

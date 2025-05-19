@@ -1,14 +1,14 @@
 #pragma once
 #include <ForgexCore.h>
 
-class EngineInstance : public Application
+class EngineInstance : public Forgex::Core::Application
 {
 public:
     EngineInstance();
     ~EngineInstance();
 };
 
-inline Application* CreateApplication()
+inline Forgex::Core::Application* CreateApplication()
 {
     return new EngineInstance();
 }

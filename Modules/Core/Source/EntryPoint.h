@@ -2,9 +2,9 @@
 #include <ForgexDebugTools.h>
 #include <exception>
 
-extern Application* CreateApplication();
+extern Forgex::Core::Application* CreateApplication();
 
-inline int main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	try
 	{

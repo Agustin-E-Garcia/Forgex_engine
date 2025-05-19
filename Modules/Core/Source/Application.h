@@ -1,20 +1,25 @@
 #pragma once
 #include "CoreExports.h"
 #include "Layer/LayerStack.h"
+#include "InputManager.h"
 
-namespace Forgex::Graphics{ class Window; }
+namespace Forgex::Graphics { class Window; }
 
-class CORE_API Application
+namespace Forgex::Core
 {
-public:
-	Application();
-	~Application();
+	class CORE_API Application
+	{
+	public:
+		Application();
+		~Application();
 
-	void InitializeSystems();
-	void Run();
-private:
-	bool m_ShouldClose;
-	LayerStack m_LayerStack;
+		void InitializeSystems();
+		void Run();
+	private:
+		bool m_ShouldClose;
+		LayerStack m_LayerStack;
+		InputManager m_InputManager;
 
-	Forgex::Graphics::Window* m_Window;
-};
+		Graphics::Window* m_Window;
+	};
+}

@@ -2,35 +2,39 @@
 #include "Layer.h"
 #include <ForgexUI.h>
 
-using namespace Forgex;
-
-class UILayer : public Layer
+namespace Forgex::Core 
 {
-public:
-    UILayer() : Layer("UI") {}
-
-    ~UILayer() override
+    class UILayer : public Layer
     {
-        delete m_WindowManager;
-    }
-    
-    void OnAttach() override
-    {
-        m_WindowManager = UI::CreateWindowManager();
-    }
+    public:
+        UILayer() : Layer("UI") {}
 
-    void OnDetach() override {}
+        ~UILayer() override { delete m_WindowManager; }
 
-    void OnBegin() override {}
+        void OnAttach() override { m_WindowManager = UI::CreateWindowManager(); }
 
-    void OnEnd() override {}
+        void OnDetach() override {}
 
-    void OnUpdate(float deltaTime) override { m_WindowManager->Update(deltaTime); }
+        void OnBegin() override {}
 
-    void OnEvent(Event& event) override {}
+        void OnEnd() override {}
 
-    void OnRender() override { m_WindowManager->Render(); }
+        void OnUpdate(float deltaTime) override { m_WindowManager->Update(deltaTime); }
 
-private:
-    UI::UIWindowManager* m_WindowManager = nullptr;
-};
+        void OnEvent(Event* event) override
+        {
+            EventDispatcher dispatcher(*event);
+
+            dispatcher.Dispatch<MousePositionEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMousePositionEvent));
+            dispatcher.Dispatch<MouseClickEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMouseClickedEvent));
+        }
+
+        void OnRender() override { m_WindowManager->Render(); }
+
+    private:
+        UI::UIWindowManager* m_WindowManager = nullptr;
+
+        bool HandleMousePositionEvent(MousePositionEvent& event) {}
+        bool HandleMouseClickedEvent(MouseClickEvent& event) {}
+    };
+}
