@@ -1,5 +1,5 @@
 #include "BufferManager.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace Forgex::Graphics::Utils
 {

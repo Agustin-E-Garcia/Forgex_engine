@@ -1,8 +1,9 @@
 #pragma once
-#include "..\CoreExports.h"
+#include "../CoreExports.h"
 #include <functional>
 #include <map>
 #include <sstream>
+#include <cstdint>
 
 #define BIND_EVENT_FUNCTION(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -28,7 +29,7 @@ namespace Forgex::Core
 		LayerEvent = (1 << 5),
 	};
 
-#define EVENT_SET_TYPE(x) 	static EventType GetStaticType() { return EventType::##x; }\
+#define EVENT_SET_TYPE(x) 	static EventType GetStaticType() { return EventType::x; }\
 							inline EventType GetEventType() const override { return GetStaticType(); }\
 							inline bool IsEventType(EventType type) const override { return type == GetStaticType(); }
 

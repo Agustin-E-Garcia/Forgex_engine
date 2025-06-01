@@ -1,5 +1,6 @@
 #include "SceneRenderProxy.h"
 #include "Utils/BufferManager.h"
+#include <algorithm>
 
 namespace Forgex::Graphics
 {

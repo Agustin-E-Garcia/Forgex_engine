@@ -1,5 +1,5 @@
 #include "TextureLoader.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <ForgexDebugTools.h>
@@ -59,7 +59,6 @@ namespace Forgex::Graphics::Utils
         int width, height, nrChannels;
         for (unsigned int i = 0; i < filePaths.size(); i++)
         {
-            LOG_CORE(Debug::Info, "Loading Cubemap texture '{0}' - {1}/{2}", filePaths[i], i + 1, filePaths.size());
             unsigned char* data = stbi_load(filePaths[i], &width, &height, &nrChannels, 0);
             if (data)
             {

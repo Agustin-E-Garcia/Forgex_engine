@@ -1,6 +1,11 @@
 #pragma once
-#if UI_DLL
-#define UI_DLL __declspec(dllexport)
+#if _WIN32
+	#if UI_DLL
+		#define UI_API __declspec(dllexport)
+	#else
+		#define UI_API __declspec(dllimport)
+	#endif
 #else
-#define UI_DLL __declspec(dllimport)
+	#define UI_API
 #endif
+

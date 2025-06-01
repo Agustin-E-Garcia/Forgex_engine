@@ -3,8 +3,8 @@
 #include "Resources/RenderView.h"
 #include "Resources/RenderConstants.h"
 
-#include <gl/glew.h>
 #include <ForgexDebugTools.h>
+#include <GL/glew.h>
 
 namespace Forgex::Graphics
 {

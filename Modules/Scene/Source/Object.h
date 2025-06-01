@@ -2,6 +2,8 @@
 #include "Components/Component.h"
 #include <string>
 #include <vector>
+#include <cstdint>
+#include <algorithm>
 
 namespace Forgex::Math { struct Vec3; }
 

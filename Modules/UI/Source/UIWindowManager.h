@@ -3,7 +3,7 @@
 
 namespace Forgex::UI
 {
-    class UI_DLL UIWindowManager
+    class UI_API UIWindowManager
     {
     public:
         UIWindowManager();

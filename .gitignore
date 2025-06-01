@@ -5,7 +5,13 @@
 *.vcxproj.filters
 *.sln
 *.sln.DotSettings.user
+*.json
+*.cmake
+CMakeCache.txt
+Makefile
+.cache/
+CMakeFiles/
 Build/
-obj
+obj/
 ExternalLibraries/ImGUI/imgui/bin/
 ExternalLibraries/ImGUI/imgui/obj/

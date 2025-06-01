@@ -1,5 +1,5 @@
 #pragma once
-#include "..\DebugExports.h"
+#include "../DebugExports.h"
 #include <string>
 #include <format>
 

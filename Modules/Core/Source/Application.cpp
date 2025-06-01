@@ -10,11 +10,11 @@ namespace Forgex::Core
 {
 	struct DeltaTimeHandler
 	{
-		std::chrono::steady_clock::time_point lastFrame = std::chrono::high_resolution_clock::now();
+		std::chrono::steady_clock::time_point lastFrame = std::chrono::steady_clock::now();
 
 		float Update()
 		{
-			const auto currentFrame = std::chrono::high_resolution_clock::now();
+			const auto currentFrame = std::chrono::steady_clock::now();
 			const std::chrono::duration<float> delta = currentFrame - lastFrame;
 			lastFrame = currentFrame;
 			return delta.count();
