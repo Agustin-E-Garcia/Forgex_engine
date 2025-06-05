@@ -2,7 +2,7 @@
 #include "Layer.h"
 #include <ForgexUI.h>
 
-namespace Forgex::Core 
+namespace Forgex::Core
 {
     class UILayer : public Layer
     {

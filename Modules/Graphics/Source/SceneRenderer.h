@@ -3,7 +3,7 @@
 
 namespace Forgex::Graphics
 {
-    namespace Resources { struct RenderView; }
+    namespace Resources { struct RenderView; struct Framebuffer; }
     class SceneRenderProxy;
     
     class GRAPHICS_API SceneRenderer
@@ -12,7 +12,7 @@ namespace Forgex::Graphics
         SceneRenderer() = default;
         ~SceneRenderer() = default;
 
-        void RenderVoxelTerrain(const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy);
-        void Render(const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy);
+        void RenderVoxelTerrain(const Resources::Framebuffer* framebuffer, const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy);
+        void Render(const Resources::Framebuffer* framebuffer, const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy);
     };
 }

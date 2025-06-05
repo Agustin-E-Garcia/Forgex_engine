@@ -38,6 +38,9 @@ namespace Forgex::UI
 
         ImGui::DockSpaceOverViewport(0U, 0, ImGuiDockNodeFlags_PassthruCentralNode);
 
+	for(GUIWindow window : m_WindowCollection)
+		window.Draw();
+
         ImGui::ShowDemoWindow();
     }
 

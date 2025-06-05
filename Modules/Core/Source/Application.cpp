@@ -28,13 +28,14 @@ namespace Forgex::Core
 
 	Application::~Application()
 	{
+		delete m_Window;
 	}
 
 	void Application::InitializeSystems()
 	{
 		Debug::Log::Init();
 
-		m_Window = new Graphics::Window(800, 600, "Forgex Engine");
+		m_Window = new Graphics::Window(1920, 1080, "Forgex Engine");
 		m_InputManager.SetWindow(m_Window);
 
 		GameLayer* gameLayer = new GameLayer();

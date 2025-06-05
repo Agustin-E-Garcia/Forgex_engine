@@ -1,6 +1,5 @@
 #pragma once
 #include "Layer.h"
-#include "../Event/EventList.h"
 
 #include <ForgexScene.h>
 #include <ForgexGraphics.h>
@@ -48,7 +47,7 @@ namespace Forgex::Core
 			renderView.m_ProjectionMatrix = m_EditorCamera->GetProjectionMatrix();
 
 			Graphics::SceneRenderer renderer;
-			renderer.Render(&renderView, m_SceneRenderProxy);
+			renderer.Render(nullptr, &renderView, m_SceneRenderProxy);
 		}
 
 		void OnEvent(Event* event) override {}

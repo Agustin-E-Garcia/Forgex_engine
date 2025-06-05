@@ -2,6 +2,7 @@
 #include "SceneRenderProxy.h"
 #include "Resources/RenderView.h"
 #include "Resources/RenderConstants.h"
+#include "Resources/Framebuffer.h"
 
 #include <ForgexDebugTools.h>
 #include <GL/glew.h>
@@ -39,12 +40,16 @@ namespace Forgex::Graphics
         glDepthMask(GL_TRUE);
     }
     
-    void SceneRenderer::Render(const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy)
+    void SceneRenderer::Render(const Resources::Framebuffer* framebuffer, const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy)
     {
-        glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-        glEnable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetTextureID());
+	Math::UVec2 viewportSize = framebuffer->GetFramebufferSize();
+	glViewport(0, 0, viewportSize.x, viewportSize.y);
+
+	glEnable(GL_DEPTH_TEST);
         //glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
+        glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         RenderObjects::InitResources();
@@ -115,5 +120,7 @@ namespace Forgex::Graphics
                 LOG_CORE(Debug::Error, "Error after drawing: ", error);
             }
         }
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 }
