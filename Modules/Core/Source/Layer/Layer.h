@@ -3,6 +3,8 @@
 #include "../Event/EventList.h"
 #include <string>
 
+namespace Forgex::Graphics::Resources { struct Framebuffer; }
+
 namespace Forgex::Core
 {
 	class CORE_API Layer
@@ -20,7 +22,7 @@ namespace Forgex::Core
 		virtual void OnEnd() = 0;
 		virtual void OnUpdate(float deltaTime) = 0;
 		virtual void OnEvent(Event* event) = 0;
-		virtual void OnRender() = 0;
+		virtual void OnRender(const Graphics::Resources::Framebuffer* framebufferID) = 0;
 
 		std::string GetName() const { return m_Name; }
 		void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }

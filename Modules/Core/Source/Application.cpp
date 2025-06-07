@@ -60,7 +60,7 @@ namespace Forgex::Core
 				layer->OnUpdate(deltaTime.Update());
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnRender();
+				layer->OnRender(m_SessionContext.GetViewportFramebuffer());
 
 			m_Window->Update();
 

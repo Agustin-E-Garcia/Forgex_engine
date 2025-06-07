@@ -31,6 +31,8 @@ namespace Forgex::Graphics::Resources
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}
+	
+	Framebuffer::~Framebuffer() {}
 
 	void Framebuffer::UpdateSize(Math::UVec2 newSize)
 	{

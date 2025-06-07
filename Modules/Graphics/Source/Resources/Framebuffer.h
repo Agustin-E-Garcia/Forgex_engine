@@ -7,7 +7,7 @@ namespace Forgex::Graphics::Resources
 	struct GRAPHICS_API Framebuffer
 	{
 	public:
-		Framebuffer(Math::UVec2 size);
+		Framebuffer(Math::UVec2 size = Math::UVec2(800, 600));
 		~Framebuffer();
 
 		void UpdateSize(Math::UVec2 newSize);

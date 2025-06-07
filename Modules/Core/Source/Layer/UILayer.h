@@ -33,7 +33,7 @@ namespace Forgex::Core
             dispatcher.Dispatch<WindowResizedEvent>(BIND_EVENT_FUNCTION(UILayer::HandleWindowResizedEvent));
         }
 
-        void OnRender() override { m_WindowManager->Render(); }
+        void OnRender(const Graphics::Resources::Framebuffer* framebuffer) override { m_WindowManager->Render(); }
 
     private:
         UI::UIWindowManager* m_WindowManager = nullptr;

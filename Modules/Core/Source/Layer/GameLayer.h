@@ -40,14 +40,14 @@ namespace Forgex::Core
 			SyncRenderProxy();
 		}
 
-		void OnRender() override
+		void OnRender(const Graphics::Resources::Framebuffer* framebuffer) override
 		{
 			Graphics::Resources::RenderView renderView{};
 			renderView.m_ViewMatrix = m_EditorCamera->GetViewMatrix();
 			renderView.m_ProjectionMatrix = m_EditorCamera->GetProjectionMatrix();
 
 			Graphics::SceneRenderer renderer;
-			renderer.Render(nullptr, &renderView, m_SceneRenderProxy);
+			renderer.Render(framebuffer, &renderView, m_SceneRenderProxy);
 		}
 
 		void OnEvent(Event* event) override {}
