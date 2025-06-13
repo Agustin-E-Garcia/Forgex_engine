@@ -1,6 +1,6 @@
 #include "UIWindowManager.h"
-#include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
 
 #include <ForgexDebugTools.h>
 
@@ -38,10 +38,8 @@ namespace Forgex::UI
 
         ImGui::DockSpaceOverViewport(0U, 0, ImGuiDockNodeFlags_PassthruCentralNode);
 
-	for(GUIWindow window : m_WindowCollection)
-		window.Draw();
-
-        ImGui::ShowDemoWindow();
+	for(GUIWindow* window : m_WindowCollection)
+		window->Draw();
     }
 
     void UIWindowManager::Render()

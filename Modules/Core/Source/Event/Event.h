@@ -15,7 +15,7 @@ namespace Forgex::Core
 		WindowResized, WindowClose, WindowFocusChanged,
 		KeyPressed, KeyReleased, CharInput,
 		MouseClicked, MouseUnclicked, MousePosition, mouseWheel,
-		SceneChange, ItemSelected
+		SceneChange, ItemSelected, ViewportResize
 	};
 
 	enum EventCategory

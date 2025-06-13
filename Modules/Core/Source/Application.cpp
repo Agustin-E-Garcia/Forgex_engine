@@ -50,7 +50,7 @@ namespace Forgex::Core
 		DeltaTimeHandler deltaTime;
 
 		for (Layer* layer : m_LayerStack)
-			layer->OnBegin();
+			layer->OnBegin(m_SessionContext);
 
 		do
 		{
@@ -60,7 +60,7 @@ namespace Forgex::Core
 				layer->OnUpdate(deltaTime.Update());
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnRender(m_SessionContext.GetViewportFramebuffer());
+				layer->OnRender(m_SessionContext);
 
 			m_Window->Update();
 

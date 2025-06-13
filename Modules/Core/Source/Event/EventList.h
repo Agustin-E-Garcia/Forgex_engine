@@ -227,4 +227,28 @@ namespace Forgex::Core
 		double m_PositionX;
 		double m_PositionY;
 	};
+
+	/*---------------------------------------------------------------------------------------------------------*/
+
+	class CORE_API ViewportResizeEvent : public Event
+	{
+	public:
+		ViewportResizeEvent(float width, float height) : m_width(width), m_height(height) {}
+		EVENT_SET_TYPE(ViewportResize)
+		EVENT_SET_CATEGORY(LayerEvent)
+
+		std::string ToString() const override 
+		{
+			std::stringstream ss;
+			ss << "ViewportResizeEvent: [" << m_width << "], [" << m_height << "]";
+			return ss.str();
+		}
+
+		inline float GetWidth() { return m_width; }
+		inline float GetHeight() { return m_height; }
+
+	private:
+		float m_width;
+		float m_height;
+	};
 }

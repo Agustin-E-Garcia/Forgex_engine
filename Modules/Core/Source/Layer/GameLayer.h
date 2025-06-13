@@ -24,7 +24,7 @@ namespace Forgex::Core
 
 		void OnAttach() override {}
 
-		void OnBegin() override
+		void OnBegin(SessionContext& sessionContext) override
 		{
 			m_ActiveScene = new Scene::Scene("Default Scene");
 			m_SceneRenderProxy = new Graphics::SceneRenderProxy();
@@ -40,14 +40,14 @@ namespace Forgex::Core
 			SyncRenderProxy();
 		}
 
-		void OnRender(const Graphics::Resources::Framebuffer* framebuffer) override
+		void OnRender(SessionContext& sessionContext) override
 		{
 			Graphics::Resources::RenderView renderView{};
 			renderView.m_ViewMatrix = m_EditorCamera->GetViewMatrix();
 			renderView.m_ProjectionMatrix = m_EditorCamera->GetProjectionMatrix();
 
 			Graphics::SceneRenderer renderer;
-			renderer.Render(framebuffer, &renderView, m_SceneRenderProxy);
+			renderer.Render(sessionContext.GetViewportFramebuffer() , &renderView, m_SceneRenderProxy);
 		}
 
 		void OnEvent(Event* event) override {}

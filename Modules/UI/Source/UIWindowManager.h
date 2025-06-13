@@ -20,7 +20,7 @@ namespace Forgex::UI
 	{
 		static_assert(std::is_base_of<GUIWindow, T>::value, "T must inherit from GUIWindow");		
 		unsigned int index = m_WindowCollection.size();
-		m_WindowCollection.emplace_back(T(std::forward<Args>(args)...));
+		m_WindowCollection.emplace_back(new T(std::forward<Args>(args)...));
 		return index;
 	}
 
@@ -34,7 +34,7 @@ namespace Forgex::UI
     private:
         void* m_ActiveContext = nullptr;
         bool m_WindowActive = true;
-	std::vector<GUIWindow> m_WindowCollection;
+	std::vector<GUIWindow*> m_WindowCollection;
     };
 
     static UIWindowManager* CreateWindowManager() { return new UIWindowManager(); }

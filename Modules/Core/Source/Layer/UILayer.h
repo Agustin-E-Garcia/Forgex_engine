@@ -2,8 +2,31 @@
 #include "Layer.h"
 #include <ForgexUI.h>
 
+#include <ForgexDebugTools.h>
+
 namespace Forgex::Core
 {
+	class CORE_API Viewport : public UI::GUIWindow
+	{
+		using ViewportResizeCallbackFn = std::function<void(float width, float height)>;
+	public:
+		Viewport(unsigned int viewportFramebufferID, ViewportResizeCallbackFn callback) : UI::GUIWindow("Viewport", true),
+			m_ViewportFramebuffer(viewportFramebufferID), m_Callback(callback) {}
+		~Viewport() {}
+	protected:
+		virtual void OnDraw() override 
+		{
+			float w, h;
+			UI::Elements::GetAvailableContentSize(w, h);
+			m_Callback(w, h);
+
+			UI::Elements::Image(m_ViewportFramebuffer, w, h); 
+		}
+	private:
+		unsigned int m_ViewportFramebuffer;
+		ViewportResizeCallbackFn m_Callback;
+	};
+
     class UILayer : public Layer
     {
     public:
@@ -15,7 +38,14 @@ namespace Forgex::Core
 
         void OnDetach() override {}
 
-        void OnBegin() override {}
+        void OnBegin(SessionContext& sessionContext) override 
+	{
+		m_WindowManager->AddWindow<Viewport>(sessionContext.GetViewportID(),
+				[&sessionContext](float width, float height)
+				{ 
+					sessionContext.ResizeViewportFramebuffer(width, height); 
+				});
+	}
 
         void OnEnd() override {}
 
@@ -33,7 +63,7 @@ namespace Forgex::Core
             dispatcher.Dispatch<WindowResizedEvent>(BIND_EVENT_FUNCTION(UILayer::HandleWindowResizedEvent));
         }
 
-        void OnRender(const Graphics::Resources::Framebuffer* framebuffer) override { m_WindowManager->Render(); }
+        void OnRender(SessionContext& sessionContext) override { m_WindowManager->Render(); }
 
     private:
         UI::UIWindowManager* m_WindowManager = nullptr;

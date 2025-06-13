@@ -10,9 +10,13 @@ namespace Forgex::Core
 	public:
 		SessionContext();
 		~SessionContext();
-
+		
 		const Graphics::Resources::Framebuffer* GetViewportFramebuffer(); 
+		unsigned int GetViewportID();
+		void ResizeViewportFramebuffer(float width, float height);
 	private:
 		Graphics::Resources::Framebuffer* m_ViewportFramebuffer;
+
+		Graphics::Resources::Framebuffer* Internal_GetViewportFramebuffer();
 	};
 }

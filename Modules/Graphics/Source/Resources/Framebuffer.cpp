@@ -38,6 +38,8 @@ namespace Forgex::Graphics::Resources
 	{
 	 	if(newSize == m_Size) return;
 
+		LOG_CORE(Debug::LogLevel::Info, "Resizing Viewport Framebuffer to [{0},{1}]", newSize.x, newSize.y);
+
 		m_Size = newSize;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_TextureBufferID);

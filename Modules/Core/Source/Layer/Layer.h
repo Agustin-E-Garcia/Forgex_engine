@@ -2,6 +2,7 @@
 #include "../CoreExports.h"
 #include "../Event/EventList.h"
 #include <string>
+#include "../SessionContext.h"
 
 namespace Forgex::Graphics::Resources { struct Framebuffer; }
 
@@ -18,11 +19,11 @@ namespace Forgex::Core
 
 		virtual void OnAttach() = 0;
 		virtual void OnDetach() = 0;
-		virtual void OnBegin() = 0;
+		virtual void OnBegin(SessionContext& sessionContext) = 0;
 		virtual void OnEnd() = 0;
 		virtual void OnUpdate(float deltaTime) = 0;
 		virtual void OnEvent(Event* event) = 0;
-		virtual void OnRender(const Graphics::Resources::Framebuffer* framebufferID) = 0;
+		virtual void OnRender(SessionContext& sessionContext) = 0;
 
 		std::string GetName() const { return m_Name; }
 		void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }

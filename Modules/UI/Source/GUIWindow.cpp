@@ -1,5 +1,6 @@
 #include "GUIWindow.h"
 #include <imgui.h>
+#include <ForgexDebugTools.h>
 
 namespace Forgex::UI 
 {
@@ -11,7 +12,6 @@ namespace Forgex::UI
 		if(!m_IsActive) return;
 
 		ImGui::Begin(m_Name);
-		ImGui::Button("Click Me!");
 		OnDraw();
 		ImGui::End();
 	}
