@@ -16,9 +16,10 @@ namespace Forgex::Core
 
 		void InitializeSystems();
 		void Run();
+	protected:
+		LayerStack m_LayerStack;
 	private:
 		bool m_ShouldClose;
-		LayerStack m_LayerStack;
 		InputManager m_InputManager;
 		SessionContext m_SessionContext;	
 

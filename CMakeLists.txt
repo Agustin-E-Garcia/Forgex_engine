@@ -36,10 +36,9 @@ target_include_directories(Core_Module PRIVATE
     Modules/Graphics/Include
     Modules/Scene/Include
     Modules/Math/Include
-    Modules/UI/Include
 )
 target_compile_definitions(Core_Module PRIVATE CORE_DLL)
-target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Math_Module Debug_Module UI_Module)
+target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Math_Module Debug_Module)
 set_module_properties(Core_Module)
 
 # Graphics_Module
@@ -79,14 +78,6 @@ target_include_directories(Math_Module PRIVATE ExternalLibraries/GLM)
 target_compile_definitions(Math_Module PRIVATE MATH_DLL)
 set_module_properties(Math_Module)
 
-# UI_Module
-file(GLOB_RECURSE UI_SRC Modules/UI/*.cpp Modules/UI/*.h)
-add_library(UI_Module SHARED ${UI_SRC})
-target_include_directories(UI_Module PRIVATE ExternalLibraries/ImGui)
-target_compile_definitions(UI_Module PRIVATE UI_DLL)
-target_link_libraries(UI_Module PRIVATE Debug_Module ImGui)
-set_module_properties(UI_Module)
-
 # Assets_Module
 file(GLOB_RECURSE ASSETS_SRC Modules/Assets/*.cpp Modules/Assets/*.h)
 if(ASSETS_SRC)
@@ -99,8 +90,8 @@ endif()
 # Forgex_Editor
 file(GLOB_RECURSE EDITOR_SRC Editor/*.cpp Editor/*.h)
 add_executable(Forgex_Editor ${EDITOR_SRC})
-target_include_directories(Forgex_Editor PRIVATE Modules/Core/Include)
-target_link_libraries(Forgex_Editor PRIVATE Core_Module Debug_Module)
+target_include_directories(Forgex_Editor PRIVATE Modules/Core/Include ExternalLibraries/ImGui)
+target_link_libraries(Forgex_Editor PRIVATE Core_Module Debug_Module ImGui)
 set_target_properties(Forgex_Editor PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
 )

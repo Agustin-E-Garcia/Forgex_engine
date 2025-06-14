@@ -1,6 +1,5 @@
 #include "Application.h"
 #include "Layer/GameLayer.h"
-#include "Layer/UILayer.h"
 
 #include <ForgexDebugTools.h>
 
@@ -40,9 +39,6 @@ namespace Forgex::Core
 
 		GameLayer* gameLayer = new GameLayer();
 		m_LayerStack.PushLayer(gameLayer);
-
-		UILayer* uiLayer = new UILayer();
-		m_LayerStack.PushOverlay(uiLayer);
 	}
 
 	void Application::Run()

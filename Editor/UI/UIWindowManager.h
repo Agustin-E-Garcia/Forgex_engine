@@ -1,11 +1,10 @@
 #pragma once
-#include "UIExport.h"
 #include "GUIWindow.h"
 #include <vector>
 
 namespace Forgex::UI
 {
-    class UI_API UIWindowManager
+    class UIWindowManager
     {
     public:
         UIWindowManager();
