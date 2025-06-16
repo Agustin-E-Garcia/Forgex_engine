@@ -53,7 +53,7 @@ namespace Forgex::Core
 			m_InputManager.ConsumeEvents(m_LayerStack);
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(deltaTime.Update());
+				layer->OnUpdate(m_SessionContext, deltaTime.Update());
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnRender(m_SessionContext);

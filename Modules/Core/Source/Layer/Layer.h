@@ -21,7 +21,7 @@ namespace Forgex::Core
 		virtual void OnDetach() = 0;
 		virtual void OnBegin(SessionContext& sessionContext) = 0;
 		virtual void OnEnd() = 0;
-		virtual void OnUpdate(float deltaTime) = 0;
+		virtual void OnUpdate(SessionContext& sessionContext, float deltaTime) = 0;
 		virtual void OnEvent(Event* event) = 0;
 		virtual void OnRender(SessionContext& sessionContext) = 0;
 

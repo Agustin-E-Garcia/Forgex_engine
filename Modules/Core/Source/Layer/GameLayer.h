@@ -32,11 +32,15 @@ namespace Forgex::Core
 			m_EditorCamera = m_EditorCameraObject->AddComponent<Scene::CameraComponent>();
 
 			m_EditorCameraObject->GetTransform()->SetPosition(Math::Vec3(0, 0, 2));
+
+			m_ActiveScene->CreateObject("Game Camera");
+			m_ActiveScene->CreateObject("Terrain");
 		}
 
-		void OnUpdate(float deltaTime) override
+		void OnUpdate(SessionContext& sessionContext, float deltaTime) override
 		{
 			m_ActiveScene->Update(deltaTime);
+			sessionContext.SyncUIProxy(m_ActiveScene);
 			SyncRenderProxy();
 		}
 
@@ -62,21 +66,21 @@ namespace Forgex::Core
 
 		void SyncRenderProxy()
 		{
-			for (const Scene::Object* obj : *m_ActiveScene)
+			for (const Scene::Object& obj : *m_ActiveScene)
 			{
-				for (const Scene::Component* component : *obj)
+				for (const Scene::Component* component : obj)
 				{
 					if (const Scene::IRenderObject* renderComponent = dynamic_cast<const Scene::IRenderObject*>(component))
 					{
 						m_SceneRenderProxy->SyncRenderObject
 						(
-							obj->GetUID(),
+							obj.GetUID(),
 							renderComponent->GetVertices(),
 							renderComponent->GetIndices(),
 							renderComponent->GetUVs(),
 							renderComponent->GetShaderID(),
 							renderComponent->GetTextureID(),
-							obj->GetTransform()->GetModelMatrix()
+							obj.GetTransform()->GetModelMatrix()
 						);
 					}
 				}

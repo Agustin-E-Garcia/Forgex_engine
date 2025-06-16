@@ -2,6 +2,7 @@
 #include <ForgexCore.h>
 #include "UI/UIWindowManager.h"
 #include "Panels/Viewport.h"
+#include "Panels/SceneViewer.h"
 
 #include <ForgexDebugTools.h>
 
@@ -20,6 +21,7 @@ namespace Forgex::UI
 
         void OnBegin(Core::SessionContext& sessionContext) override 
 	{
+		m_WindowManager->AddWindow<Panels::SceneViewer>(sessionContext.GetUISceneProxy());
 		m_WindowManager->AddWindow<Panels::Viewport>(sessionContext.GetViewportID(),
 				[&sessionContext](float width, float height)
 				{ 
@@ -29,7 +31,10 @@ namespace Forgex::UI
 
         void OnEnd() override {}
 
-        void OnUpdate(float deltaTime) override { m_WindowManager->Update(deltaTime); }
+        void OnUpdate(Core::SessionContext& sessionContext, float deltaTime) override 
+	{ 
+		m_WindowManager->Update(deltaTime); 
+	}
 
         void OnEvent(Core::Event* event) override
         {

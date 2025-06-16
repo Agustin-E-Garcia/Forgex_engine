@@ -3,3 +3,5 @@
 #include "../Source/EntryPoint.h"
 
 #include "../Source/Layer/Layer.h"
+#include "../Source/SessionContext.h"
+#include "../Source/UISceneProxy.h"
