@@ -3,6 +3,15 @@
 
 namespace Forgex::Core
 {
+	ObjectEntry GenerateObjectEntry(const Scene::Object* obj)
+	{
+		ObjectEntry newEntry(obj->GetName(), obj->GetUID());
+
+		//TODO: Need to make a proxy of all the components this object has as to know how to draw them in the inspector without exposing Scene_Module to Forgex_Editor
+
+		return newEntry;
+	}
+	
 	UISceneProxy::UISceneProxy() : m_Initialized(false) {}
 	UISceneProxy::~UISceneProxy() {}
 
@@ -12,8 +21,7 @@ namespace Forgex::Core
 		{
 			while(!m_CreateObjectQueue.empty())
 			{
-				Scene::Object* obj = scene.CreateObject(m_CreateObjectQueue.front());
-				m_ObjectCollection.emplace_back(obj->GetName(), obj->GetUID());
+				m_ObjectCollection.emplace_back(GenerateObjectEntry(scene.CreateObject(m_CreateObjectQueue.front())));
 				m_CreateObjectQueue.pop();
 			}
 

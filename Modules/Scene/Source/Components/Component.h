@@ -19,7 +19,6 @@ namespace Forgex::Scene
 		void SetOwner(const Object* owner) { m_Owner = owner; OnAttach(); }
 
 		virtual void OnAttach() {}
-		
 	protected:
 		const char* m_Name;
 		const Object* m_Owner = nullptr;
