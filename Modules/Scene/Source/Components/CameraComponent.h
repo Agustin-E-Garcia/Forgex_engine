@@ -23,10 +23,10 @@ namespace Forgex::Scene
 		void OnAttach() override;
 		
 	private:
-		bool m_IsActiveCamera = false;
-	
+        CREATE_UI_VARIABLE(m_IsActiveCamera, bool, false)
+        CREATE_UI_VARIABLE(m_FieldOfView, float)
+
 		AspectRatio m_AspectRatio;
-		int m_FieldOfView;
 		float m_NearPlane;
 		float m_FarPlane;
 	

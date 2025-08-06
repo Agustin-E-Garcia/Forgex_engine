@@ -3,6 +3,7 @@
 #include "UI/UIWindowManager.h"
 #include "Panels/Viewport.h"
 #include "Panels/SceneViewer.h"
+#include "Panels/ObjectInspector.h"
 
 #include <ForgexDebugTools.h>
 
@@ -20,32 +21,33 @@ namespace Forgex::UI
         void OnDetach() override {}
 
         void OnBegin(Core::SessionContext& sessionContext) override 
-	{
-		m_WindowManager->AddWindow<Panels::SceneViewer>(sessionContext.GetUISceneProxy());
-		m_WindowManager->AddWindow<Panels::Viewport>(sessionContext.GetViewportID(),
+	    {
+		    unsigned int index = m_WindowManager->AddWindow<Panels::SceneViewer>(sessionContext.GetUISceneProxy());
+            m_WindowManager->AddWindow<Panels::ObjectInspector>(m_WindowManager->GetWindow<Panels::SceneViewer>(index));
+            m_WindowManager->AddWindow<Panels::Viewport>(sessionContext.GetViewportID(),
 				[&sessionContext](float width, float height)
 				{ 
 					sessionContext.ResizeViewportFramebuffer(width, height); 
 				});
-	}
+	    }
 
         void OnEnd() override {}
 
         void OnUpdate(Core::SessionContext& sessionContext, float deltaTime) override 
-	{ 
-		m_WindowManager->Update(deltaTime); 
-	}
+	    {
+		    m_WindowManager->Update(deltaTime); 
+	    }
 
         void OnEvent(Core::Event* event) override
         {
-		Core::EventDispatcher dispatcher(*event);
+		    Core::EventDispatcher dispatcher(*event);
 
-		dispatcher.Dispatch<Core::CharInputEvent>(BIND_EVENT_FUNCTION(UILayer::HandleCharInputEvent));
-		dispatcher.Dispatch<Core::KeyPressedEvent>(BIND_EVENT_FUNCTION(UILayer::HandleKeyPressedEvent));
-		dispatcher.Dispatch<Core::MousePositionEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMousePositionEvent));
-		dispatcher.Dispatch<Core::MouseWheelScrollEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMouseWheelScrollEvent));
-		dispatcher.Dispatch<Core::MouseClickEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMouseClickedEvent));
-		dispatcher.Dispatch<Core::WindowResizedEvent>(BIND_EVENT_FUNCTION(UILayer::HandleWindowResizedEvent));
+		    dispatcher.Dispatch<Core::CharInputEvent>(BIND_EVENT_FUNCTION(UILayer::HandleCharInputEvent));
+		    dispatcher.Dispatch<Core::KeyPressedEvent>(BIND_EVENT_FUNCTION(UILayer::HandleKeyPressedEvent));
+		    dispatcher.Dispatch<Core::MousePositionEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMousePositionEvent));
+		    dispatcher.Dispatch<Core::MouseWheelScrollEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMouseWheelScrollEvent));
+		    dispatcher.Dispatch<Core::MouseClickEvent>(BIND_EVENT_FUNCTION(UILayer::HandleMouseClickedEvent));
+		    dispatcher.Dispatch<Core::WindowResizedEvent>(BIND_EVENT_FUNCTION(UILayer::HandleWindowResizedEvent));
         }
 
         void OnRender(Core::SessionContext& sessionContext) override { m_WindowManager->Render(); }

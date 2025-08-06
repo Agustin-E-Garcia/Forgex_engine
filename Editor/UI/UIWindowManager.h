@@ -1,5 +1,6 @@
 #pragma once
 #include "GUIWindow.h"
+#include <type_traits>
 #include <vector>
 
 namespace Forgex::UI
@@ -23,6 +24,13 @@ namespace Forgex::UI
 		return index;
 	}
 
+    template<class T>
+    T* GetWindow(unsigned int index)
+    {
+        static_assert(std::is_base_of<GUIWindow, T>::value, "T must inherit from GUIWindow");
+        return dynamic_cast<T*>(m_WindowCollection.at(index));
+    }
+
         void UpdateMousePosition(double xPos, double yPos);
         void OnMouseClick(unsigned int button, bool clicked);
         void OnMouseWheelScroll(double xOffset, double yOffset);
@@ -33,7 +41,7 @@ namespace Forgex::UI
     private:
         void* m_ActiveContext = nullptr;
         bool m_WindowActive = true;
-	std::vector<GUIWindow*> m_WindowCollection;
+	    std::vector<GUIWindow*> m_WindowCollection;
     };
 
     static UIWindowManager* CreateWindowManager() { return new UIWindowManager(); }

@@ -1,5 +1,5 @@
 #include "SessionContext.h"
-#include "UISceneProxy.h"
+#include "HeaderSystem/UISceneProxy.h"
 #include <ForgexGraphics.h>
 #include <ForgexScene.h>
 #include <ForgexMath.h>

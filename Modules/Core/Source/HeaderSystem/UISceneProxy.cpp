@@ -1,5 +1,7 @@
 #include "UISceneProxy.h"
 #include <ForgexScene.h>
+#include <cstdint>
+#include <ForgexMath.h>
 
 namespace Forgex::Core
 {
@@ -8,12 +10,41 @@ namespace Forgex::Core
 		ObjectEntry newEntry(obj->GetName(), obj->GetUID());
 
 		//TODO: Need to make a proxy of all the components this object has as to know how to draw them in the inspector without exposing Scene_Module to Forgex_Editor
+        for(Scene::Component* component : *obj)
+        {
+            ComponentData data;
+            data.m_Name = component->GetName();
+
+            if(Scene::TransformComponent* transform = dynamic_cast<Scene::TransformComponent*>(component))
+            {
+                data.m_Variables.emplace_back("Position", VariableType::Vector3, transform->m_PositionPtr());
+                data.m_Variables.emplace_back("Rotation", VariableType::Vector3, transform->m_RotationPtr());
+                data.m_Variables.emplace_back("Scale", VariableType::Vector3, transform->m_ScalePtr());
+            }
+            else if(Scene::CameraComponent* camera = dynamic_cast<Scene::CameraComponent*>(component))
+            {
+                data.m_Variables.emplace_back("Active Camera", VariableType::Bool, camera->m_IsActiveCameraPtr());
+                data.m_Variables.emplace_back("Field of View", VariableType::Float, camera->m_FieldOfViewPtr());
+            }
+            newEntry.m_ComponentData.push_back(data);
+        }
 
 		return newEntry;
 	}
 	
 	UISceneProxy::UISceneProxy() : m_Initialized(false) {}
 	UISceneProxy::~UISceneProxy() {}
+
+    ObjectEntry UISceneProxy::GetObjectByID(uint32_t uid) const
+    {
+		for (int i = 0; i < m_ObjectCollection.size(); i++)
+		{
+			if (uid == m_ObjectCollection[i].m_ObjectID)
+                return m_ObjectCollection[i];
+		}
+
+        return ObjectEntry("default", 0);
+    }
 
 	void UISceneProxy::SyncScene(Scene::Scene& scene)
 	{
@@ -45,7 +76,7 @@ namespace Forgex::Core
 			m_ObjectCollection.clear();
 			for (const Scene::Object& obj : scene)
 			{
-				m_ObjectCollection.emplace_back(obj.GetName(), obj.GetUID());
+				m_ObjectCollection.emplace_back(GenerateObjectEntry(&obj));
 			}
 			m_Initialized = true;
 		}

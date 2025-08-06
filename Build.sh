@@ -1,2 +1,3 @@
 cd Build
-cmake --build ..
+cmake ..
+cmake --build .

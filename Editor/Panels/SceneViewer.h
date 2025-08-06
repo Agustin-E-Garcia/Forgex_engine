@@ -2,7 +2,6 @@
 #include "../UI/GUIWindow.h"
 #include <cstring>
 #include <ForgexCore.h>
-#include <imgui.h>
 
 namespace Forgex::UI::Panels
 {
@@ -11,6 +10,9 @@ namespace Forgex::UI::Panels
 	public:
 		SceneViewer(Core::UISceneProxy* sceneProxy) : GUIWindow("SceneViewer", true), m_SceneProxy(sceneProxy) {}	
 		~SceneViewer() {}
+
+        Core::ObjectEntry GetSelectedObject() const { return m_SceneProxy->GetObjectByID(m_SelectedObject); }
+        bool HasObjectSelected() const { return m_SelectedObject != 0; }
 	protected:
 		void OnDraw() override 
 		{

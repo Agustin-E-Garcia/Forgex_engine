@@ -1,2 +1,2 @@
-cd Build/Bin/Forgex_Editor/Debug
+cd Build/Build/Bin/Forgex_Editor
 ./Forgex_Editor

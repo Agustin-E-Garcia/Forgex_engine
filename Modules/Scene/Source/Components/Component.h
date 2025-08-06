@@ -23,4 +23,10 @@ namespace Forgex::Scene
 		const char* m_Name;
 		const Object* m_Owner = nullptr;
 	};
+
+#define CREATE_UI_VARIABLE(name, type, ...)         \
+private:                                            \
+    type name{__VA_ARGS__};                         \
+public:                                             \
+    type* name##Ptr() { return &name; }
 }

@@ -8,13 +8,15 @@ namespace Forgex::Math
     Vec3::Vec3(float _scalar) : x(_scalar), y(_scalar), z(_scalar) {}
 
     Vec3 Vec3::Zero() { return {}; }
-    
+
+    const float* Vec3::Ptr() { return &x; }
+
     Vec3 Vec3::operator+(const Vec3& other) const
     {
         glm::vec3 a(x, y ,z);
         glm::vec3 b(other.x, other.y, other.z);
         glm::vec3 result = a + b;
-        
+
         return {result.x, result.y, result.z};
     }
 
@@ -32,7 +34,7 @@ namespace Forgex::Math
         glm::vec3 a(x, y ,z);
         glm::vec3 b(other.x, other.y, other.z);
         glm::vec3 result = a * b;
-        
+
         return {result.x, result.y, result.z};
     }
 

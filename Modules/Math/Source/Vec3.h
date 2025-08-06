@@ -13,7 +13,9 @@ namespace Forgex::Math
         Vec3(float _scalar);
 
         static Vec3 Zero();
-        
+
+        const float* Ptr();
+
         Vec3 operator+ (const Vec3& other) const;
         Vec3 operator- (const Vec3& other) const;
         Vec3 operator* (const Vec3& other) const;

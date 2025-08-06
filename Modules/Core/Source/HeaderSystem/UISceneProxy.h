@@ -1,34 +1,40 @@
 #pragma once
-#include "CoreExports.h"
+#include "../CoreExports.h"
+#include <cstdint>
 #include <stdint.h>
 #include <string>
 #include <queue>
 #include <vector>
-#include <map>
 
 namespace Forgex::Scene { class Scene; }
 
 namespace Forgex::Core
 {
-	enum CORE_API VariableType
-	{
-		Text, Float, Int, Vector3, Vector2
-	};
+    enum CORE_API VariableType 
+    {
+        Text, Bool, Float, Vector3, UVector2
+    };
 
-	struct CORE_API VariableData
-	{
-		const char* m_Name;
-		const void* m_DataPtr;
-		const VariableType m_Type;
+    struct CORE_API VariableData 
+    {
+        std::string m_Name;
+        VariableType m_Type;
+        void* m_Ptr;
 
-		VariableData(const char* name, void* ptr, VariableType type) : m_Name(name), m_DataPtr(ptr), m_Type(type) {}
-	};
+        VariableData(std::string name, VariableType type, void* ptr) : m_Name(name), m_Type(type), m_Ptr(ptr) {}
+    };
+
+    struct CORE_API ComponentData
+    {
+        std::string m_Name;
+        std::vector<VariableData> m_Variables;
+    };
 
 	struct CORE_API ObjectEntry
 	{
 		std::string m_ObjectName;
 		unsigned int m_ObjectID;
-		std::map<const char*, std::vector<VariableData>> m_ComponentData;
+		std::vector<ComponentData> m_ComponentData;
 
 		ObjectEntry(std::string name, unsigned int UID)
 		{ 
@@ -48,6 +54,7 @@ namespace Forgex::Core
 		void QueueCreateOrder(std::string objectName);
 
 		const char* GetName() const { return m_SceneName; }
+        ObjectEntry GetObjectByID(uint32_t uid) const; 
 
 		std::vector<ObjectEntry>::const_iterator begin() const { return m_ObjectCollection.cbegin(); }
 		std::vector<ObjectEntry>::const_iterator end() const { return m_ObjectCollection.cend(); }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include <ForgexMath.h>
+#include <cstddef>
 
 namespace Forgex::Scene
 {
@@ -27,10 +28,10 @@ namespace Forgex::Scene
 		void SetScale(Math::Vec3 newScale);
 
 	private:
-		Math::Vec3 m_Position = Math::Vec3(0.0f);
-		Math::Vec3 m_Rotation = Math::Vec3(0.0f);
-		Math::Vec3 m_Scale = Math::Vec3(1.0f);
-	
+	    CREATE_UI_VARIABLE(m_Position, Math::Vec3, 0.0f)
+        CREATE_UI_VARIABLE(m_Rotation, Math::Vec3, 0.0f)
+        CREATE_UI_VARIABLE(m_Scale, Math::Vec3, 1.0f)
+
 		Math::Vec3 m_Forward = Math::Vec3(0.0f, 0.0f, -1.0f);
 		Math::Vec3 m_Right = Math::Vec3(1.0f, 0.0f, 0.0f);
 		Math::Vec3 m_Up = Math::Vec3(0.0f, 1.0f, 0.0f);
