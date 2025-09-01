@@ -14,6 +14,11 @@ namespace Forgex::Scene
 	Math::Vec3 TransformComponent::GetRight() const { return m_Right; }
 	Math::Vec3 TransformComponent::GetUp() const { return m_Up; }
 
+    void TransformComponent::Update(float deltaTime)
+    {
+        UpdateRotation();
+    }
+
 	void TransformComponent::SetPosition(Math::Vec3 newPosition)
 	{
 		m_Position = newPosition;

@@ -26,6 +26,8 @@ namespace Forgex::Scene
 		void SetRotationY(float amount);
 		void SetRotationZ(float amount);
 		void SetScale(Math::Vec3 newScale);
+    
+        void Update(float deltaTime) override;
 
 	private:
 	    CREATE_UI_VARIABLE(m_Position, Math::Vec3, 0.0f)

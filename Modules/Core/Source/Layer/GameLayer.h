@@ -28,7 +28,7 @@ namespace Forgex::Core
 		{
 			m_ActiveScene = new Scene::Scene("Default Scene");
 			m_SceneRenderProxy = new Graphics::SceneRenderProxy();
-			m_EditorCameraObject = new Scene::Object("Camera Object");
+			m_EditorCameraObject = m_ActiveScene->CreateObject("Editor Camera"); //new Scene::Object("Camera Object");
 			m_EditorCamera = m_EditorCameraObject->AddComponent<Scene::CameraComponent>();
 
 			m_EditorCameraObject->GetTransform()->SetPosition(Math::Vec3(0, 0, 2));
