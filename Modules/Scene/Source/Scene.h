@@ -1,7 +1,7 @@
 #pragma once
 #include "Object.h"
 #include <vector>
-#include <ForgexMath.h>
+#include <glm/glm.hpp>
 
 namespace Forgex::Scene
 {
@@ -21,7 +21,7 @@ namespace Forgex::Scene
 
 		const char* GetName() const { return m_Name; }
 
-		Object* CreateObject(std::string name, Math::Vec3 position = Math::Vec3::Zero(),  Object* parent = nullptr)
+		Object* CreateObject(std::string name, glm::vec3 position = glm::vec3(0),  Object* parent = nullptr)
 		{
 			Object& obj = m_Hierarchy.emplace_back(name, position, this);
 

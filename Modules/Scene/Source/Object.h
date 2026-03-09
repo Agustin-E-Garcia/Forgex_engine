@@ -4,8 +4,7 @@
 #include <vector>
 #include <cstdint>
 #include <algorithm>
-
-namespace Forgex::Math { struct Vec3; }
+#include <glm/glm.hpp>
 
 namespace Forgex::Scene
 {
@@ -16,7 +15,7 @@ namespace Forgex::Scene
 	{
 	public:
 		Object(std::string name);
-		Object(std::string name, Math::Vec3 position, Scene* ownerScene);
+		Object(std::string name, glm::vec3 position, Scene* ownerScene);
 		~Object();
 
 		uint32_t GetUID() const { return m_UniqueIdentifier; }

@@ -29,7 +29,7 @@ namespace Forgex::Core
 			m_EditorCameraObject = m_ActiveScene->CreateObject("Editor Camera"); //new Scene::Object("Camera Object");
 			m_EditorCamera = m_EditorCameraObject->AddComponent<Scene::CameraComponent>();
 
-			m_EditorCameraObject->GetTransform()->SetPosition(Math::Vec3(0, 0, 2));
+			m_EditorCameraObject->GetTransform()->SetPosition(glm::vec3(0, 0, 2));
 
 			m_ActiveScene->CreateObject("Game Camera");
 			m_ActiveScene->CreateObject("Terrain");

@@ -1,11 +1,11 @@
 #pragma once
-#include <ForgexMath.h>
+#include <glm/glm.hpp>
 
 namespace Forgex::Graphics::Resources
 {
     struct RenderView
     {
-        Math::Mat4 m_ProjectionMatrix = Math::Mat4(1.0f);
-        Math::Mat4 m_ViewMatrix = Math::Mat4(1.0f);
+        glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+        glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
     };
 }

@@ -1,7 +1,6 @@
 #include "CameraComponent.h"
 #include "TransformComponent.h"
 #include "../Object.h"
-#include <ForgexMath.h>
 
 namespace Forgex::Scene
 {
@@ -15,21 +14,21 @@ namespace Forgex::Scene
 	
 	CameraComponent::~CameraComponent() {}
 	
-	Math::Mat4 CameraComponent::GetProjectionMatrix() const
+	glm::mat4 CameraComponent::GetProjectionMatrix() const
 	{
-		return Math::Perspective(Math::Radians(m_FieldOfView), (m_AspectRatio.x / m_AspectRatio.y), m_NearPlane, m_FarPlane);
+		return glm::perspective(glm::radians(m_FieldOfView), (m_AspectRatio.x / m_AspectRatio.y), m_NearPlane, m_FarPlane);
 	}
 	
-	Math::Mat4 CameraComponent::GetViewMatrix() const
+	glm::mat4 CameraComponent::GetViewMatrix() const
 	{
-		return Math::LookAt(m_ObjectTransform->GetPosition(),
+		return glm::lookAt(m_ObjectTransform->GetPosition(),
 							m_ObjectTransform->GetPosition() + m_ObjectTransform->GetForward(),
-							Math::Vec3(0, 1, 0));
+							glm::vec3(0, 1, 0));
 	}
 
 	void CameraComponent::OnAttach()
 	{
 		m_ObjectTransform = m_Owner->GetTransform();
-		m_ObjectTransform->SetPosition(Math::Vec3(0.0f, 0.0f, -2.0f));
+		m_ObjectTransform->SetPosition(glm::vec3(0.0f, 0.0f, -2.0f));
 	}
 }

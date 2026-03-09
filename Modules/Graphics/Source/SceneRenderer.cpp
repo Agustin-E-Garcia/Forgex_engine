@@ -1,11 +1,11 @@
 #include "SceneRenderer.h"
 #include "Resources/RenderView.h"
 #include "Resources/RenderConstants.h"
-#include "Resources/Framebuffer.h"
 
 #include <ForgexDebugTools.h>
 #include <GL/glew.h>
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 namespace Forgex::Graphics
 {
@@ -20,12 +20,12 @@ namespace Forgex::Graphics
         
         const int ProjectionLoc = glGetUniformLocation(Skybox::g_ShaderID, "projection");
         if(ProjectionLoc != -1)
-            glUniformMatrix4fv(ProjectionLoc, 1, GL_FALSE, renderView->m_ProjectionMatrix.Ptr());
+            glUniformMatrix4fv(ProjectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
         else LOG_CORE(Debug::Error, "Failed to find uniform location 'Projection'");
 
         const int ViewLoc = glGetUniformLocation(Skybox::g_ShaderID, "view");
         if(ViewLoc != -1)
-            glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, Math::GetRotationOnly(renderView->m_ViewMatrix).Ptr());
+            glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
         else LOG_CORE(Debug::Error, "Failed to find uniform location 'View'");
         
         glEnableVertexAttribArray(0);

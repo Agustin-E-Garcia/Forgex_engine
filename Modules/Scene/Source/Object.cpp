@@ -1,13 +1,12 @@
 #include "Object.h"
 #include "Components/TransformComponent.h"
 #include "Scene.h"
-#include <ForgexMath.h>
 
 namespace Forgex::Scene
 {
-	Object::Object(std::string name) : Object(name, Math::Vec3::Zero(), nullptr) {}
+	Object::Object(std::string name) : Object(name, glm::vec3(0), nullptr) {}
 
-	Object::Object(std::string name, Math::Vec3 position, Scene* ownerScene)
+	Object::Object(std::string name, glm::vec3 position, Scene* ownerScene)
 	: m_Name(name), m_UniqueIdentifier(std::rand()), m_OwnerScene(ownerScene)
 	{
 		m_Components.reserve(5);

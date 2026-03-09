@@ -1,35 +1,36 @@
 #include "TransformComponent.h"
+#include "glm/ext/matrix_transform.hpp"
 
 namespace Forgex::Scene
 {
 	TransformComponent::TransformComponent() : Component("Transform") {}
 	TransformComponent::~TransformComponent() = default;
 
-	Math::Mat4 TransformComponent::GetModelMatrix() const { return m_ModelMatrix; }
-	Math::Vec3 TransformComponent::GetPosition() const { return m_Position; }
-	Math::Vec3 TransformComponent::GetRotation() const { return m_Rotation; }
-	Math::Vec3 TransformComponent::GetScale() const { return m_Scale; }
+	glm::mat4 TransformComponent::GetModelMatrix() const { return m_ModelMatrix; }
+	glm::vec3 TransformComponent::GetPosition() const { return m_Position; }
+	glm::vec3 TransformComponent::GetRotation() const { return m_Rotation; }
+	glm::vec3 TransformComponent::GetScale() const { return m_Scale; }
 
-	Math::Vec3 TransformComponent::GetForward() const { return m_Forward; }
-	Math::Vec3 TransformComponent::GetRight() const { return m_Right; }
-	Math::Vec3 TransformComponent::GetUp() const { return m_Up; }
+	glm::vec3 TransformComponent::GetForward() const { return m_Forward; }
+	glm::vec3 TransformComponent::GetRight() const { return m_Right; }
+	glm::vec3 TransformComponent::GetUp() const { return m_Up; }
 
     void TransformComponent::Update(float deltaTime)
     {
         UpdateRotation();
     }
 
-	void TransformComponent::SetPosition(Math::Vec3 newPosition)
+	void TransformComponent::SetPosition(glm::vec3 newPosition)
 	{
 		m_Position = newPosition;
-		m_LocationMatrix = Math::Translate(Math::Mat4(1.0f), newPosition);
+		m_LocationMatrix = glm::translate(glm::mat4(1.0f), newPosition);
 		UpdateModelMatrix();
 	}
 
 	void TransformComponent::SetRotationX(float amount)
 	{
 		// Limit pitch to prevent flipping
-		m_Rotation.x = Math::Clamp(amount, -Math::Pi() / 2.0f, Math::Pi() / 2.0f);
+		m_Rotation.x = glm::clamp(amount, -glm::pi<float>() / 2.0f, glm::pi<float>() / 2.0f);
 		UpdateRotation();
 	}
 
@@ -47,30 +48,30 @@ namespace Forgex::Scene
 
 	void TransformComponent::UpdateRotation() 
 	{
-		Math::Quat qX = Math::AngleAxis(m_Rotation.x, Math::Vec3(1.0f, 0.0f, 0.0f));
-		Math::Quat qY = Math::AngleAxis(m_Rotation.y, Math::Vec3(0.0f, 1.0f, 0.0f));
-		Math::Quat qZ = Math::AngleAxis(m_Rotation.z, Math::Vec3(0.0f, 0.0f, 1.0f));
+		glm::quat qX = glm::angleAxis(m_Rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat qY = glm::angleAxis(m_Rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat qZ = glm::angleAxis(m_Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
 		m_RotationQuat = qZ * qY * qX;
 
-		m_RotationMatrix = Mat4_Cast(m_RotationQuat);
+		m_RotationMatrix = glm::mat4_cast(m_RotationQuat);
 
 		UpdateVectors();
 		UpdateModelMatrix();
 	}
 
-	void TransformComponent::SetScale(Math::Vec3 newScale)
+	void TransformComponent::SetScale(glm::vec3 newScale)
 	{
 		m_Scale = newScale;
-		m_ScaleMatrix = Scale(Math::Mat4(1.0f), m_Scale);
+		m_ScaleMatrix =  glm::scale(glm::mat4(1.0f), m_Scale);
 		UpdateModelMatrix();
 	}
 
 	void TransformComponent::UpdateVectors()
 	{
-		m_Forward = Math::Vec3(m_RotationMatrix[2]);
-		m_Up = Math::Vec3(m_RotationMatrix[1]);
-		m_Right = Math::Vec3(m_RotationMatrix[0]);
+		m_Forward = glm::vec3(m_RotationMatrix[2]);
+		m_Up = glm::vec3(m_RotationMatrix[1]);
+		m_Right = glm::vec3(m_RotationMatrix[0]);
 	}
 
 	void TransformComponent::UpdateModelMatrix()

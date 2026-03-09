@@ -1,7 +1,6 @@
 #pragma once
 #include "Component.h"
-
-namespace Forgex::Math { struct UVec2; struct Mat4; }
+#include <glm/glm.hpp>
 
 namespace Forgex::Scene
 {
@@ -17,14 +16,14 @@ namespace Forgex::Scene
 	
 		void FlagAsActiveCamera(bool isActiveCamera) { m_IsActiveCamera = isActiveCamera; }
 	
-		Math::Mat4 GetProjectionMatrix() const;
-		Math::Mat4 GetViewMatrix() const;
+		glm::mat4 GetProjectionMatrix() const;
+		glm::mat4 GetViewMatrix() const;
 
 		void OnAttach() override;
 		
 	private:
-        CREATE_UI_VARIABLE(m_IsActiveCamera, bool, false)
-        CREATE_UI_VARIABLE(m_FieldOfView, float)
+        bool m_IsActiveCamera = false;
+        float m_FieldOfView = 90.0f;
 
 		AspectRatio m_AspectRatio;
 		float m_NearPlane;
