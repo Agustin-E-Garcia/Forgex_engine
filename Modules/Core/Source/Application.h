@@ -2,7 +2,6 @@
 #include "CoreExports.h"
 #include "Layer/LayerStack.h"
 #include "InputManager.h"
-#include "SessionContext.h"
 
 namespace Forgex::Graphics { class Window; }
 
@@ -21,7 +20,6 @@ namespace Forgex::Core
 	private:
 		bool m_ShouldClose;
 		InputManager m_InputManager;
-		SessionContext m_SessionContext;	
 
 		Graphics::Window* m_Window;
 	};

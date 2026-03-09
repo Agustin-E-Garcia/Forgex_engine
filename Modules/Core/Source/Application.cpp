@@ -46,17 +46,17 @@ namespace Forgex::Core
 		DeltaTimeHandler deltaTime;
 
 		for (Layer* layer : m_LayerStack)
-			layer->OnBegin(m_SessionContext);
+			layer->OnBegin();
 
 		do
 		{
 			m_InputManager.ConsumeEvents(m_LayerStack);
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(m_SessionContext, deltaTime.Update());
+				layer->OnUpdate(deltaTime.Update());
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnRender(m_SessionContext);
+				layer->OnRender();
 
 			m_Window->Update();
 

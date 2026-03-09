@@ -23,9 +23,15 @@ namespace Forgex::Graphics
 
 		glfwMakeContextCurrent(m_Window);
 		glewExperimental = true;
-		if (glewInit() != GLEW_OK) LOG_CORE(Debug::LogLevel::Critical, "Failed to initialize GLEW");
-		
-		SetupEvents();
+
+        GLenum result = glewInit();
+		if (result != GLEW_OK)
+        {
+            const char* error = (const char*)glewGetErrorString(result);
+            LOG_CORE(Debug::LogLevel::Critical, "Failed to initialize GLEW: {0}", error);
+        }
+
+        SetupEvents();
 
 		LOG_CORE(Debug::LogLevel::Info, "Window '{0}' created successfully", title);
 	}

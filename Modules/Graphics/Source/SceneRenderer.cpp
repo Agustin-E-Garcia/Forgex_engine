@@ -1,11 +1,11 @@
 #include "SceneRenderer.h"
-#include "SceneRenderProxy.h"
 #include "Resources/RenderView.h"
 #include "Resources/RenderConstants.h"
 #include "Resources/Framebuffer.h"
 
 #include <ForgexDebugTools.h>
 #include <GL/glew.h>
+#include "GLFW/glfw3.h"
 
 namespace Forgex::Graphics
 {
@@ -39,24 +39,24 @@ namespace Forgex::Graphics
         glUseProgram(0);
         glDepthMask(GL_TRUE);
     }
-    
-    void SceneRenderer::Render(const Resources::Framebuffer* framebuffer, const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy)
-    {
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetTextureID());
-	Math::UVec2 viewportSize = framebuffer->GetFramebufferSize();
-	glViewport(0, 0, viewportSize.x, viewportSize.y);
 
-	glEnable(GL_DEPTH_TEST);
+    void SceneRenderer::Render(const Resources::RenderView* renderView)
+    {
+        int width, height;
+        glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
+        glViewport(0, 0, width, height);
+
+        glEnable(GL_DEPTH_TEST);
         //glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
         glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         RenderObjects::InitResources();
-        
+
         RenderSkybox(renderView);
-        
-        for (const RenderObjectInfo& info : *renderProxy->GetRenderObjectCollection())
+
+        /*for (const RenderObjectInfo& info : *renderProxy->GetRenderObjectCollection())
         {
             glUseProgram(info.m_ShaderID);
 
@@ -64,7 +64,7 @@ namespace Forgex::Graphics
             const int viewLoc = glGetUniformLocation(info.m_ShaderID, "view");
             const int projectionLoc = glGetUniformLocation(info.m_ShaderID, "projection");
             const int TextureLoc = glGetUniformLocation(info.m_ShaderID, "textureSampler");
-            
+
             if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, info.m_ModelMatrix.Ptr());
             if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, renderView->m_ViewMatrix.Ptr());
             if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, renderView->m_ProjectionMatrix.Ptr());
@@ -73,7 +73,7 @@ namespace Forgex::Graphics
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after binding uniforms: ", error);
             }
-            
+
             if(TextureLoc != -1)
             {
                 glActiveTexture(GL_TEXTURE0);
@@ -85,7 +85,7 @@ namespace Forgex::Graphics
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after binding texture: ", error);
             }
-            
+
             glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, renderProxy->GetVertexBufferID());
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -94,14 +94,14 @@ namespace Forgex::Graphics
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after binding vertex buffer: ", error);
             }
-            
+
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderProxy->GetIndexBufferID());
 
             error = glGetError();
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after binding index buffer: ", error);
             }
-            
+
             glEnableVertexAttribArray(1);
             glBindBuffer(GL_ARRAY_BUFFER, renderProxy->GetUVBufferID());
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -110,7 +110,7 @@ namespace Forgex::Graphics
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after binding uv buffer: ", error);
             }
-            
+
             glDrawElements(GL_TRIANGLES, info.m_IndexCount, GL_UNSIGNED_INT, (void*)0);
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);
@@ -119,8 +119,6 @@ namespace Forgex::Graphics
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after drawing: ", error);
             }
-        }
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }*/
     }
 }

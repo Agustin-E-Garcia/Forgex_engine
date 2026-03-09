@@ -12,7 +12,6 @@ namespace Forgex::Graphics
         SceneRenderer() = default;
         ~SceneRenderer() = default;
 
-        void RenderVoxelTerrain(const Resources::Framebuffer* framebuffer, const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy);
-        void Render(const Resources::Framebuffer* framebuffer, const Resources::RenderView* renderView, const SceneRenderProxy* renderProxy);
+        void Render(const Resources::RenderView* renderView);
     };
 }

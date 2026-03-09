@@ -18,16 +18,14 @@ namespace Forgex::Core
 		~GameLayer() override
 		{
 			delete m_ActiveScene;
-			delete m_SceneRenderProxy;
 			delete m_EditorCameraObject;
 		}
 
 		void OnAttach() override {}
 
-		void OnBegin(SessionContext& sessionContext) override
+		void OnBegin() override
 		{
 			m_ActiveScene = new Scene::Scene("Default Scene");
-			m_SceneRenderProxy = new Graphics::SceneRenderProxy();
 			m_EditorCameraObject = m_ActiveScene->CreateObject("Editor Camera"); //new Scene::Object("Camera Object");
 			m_EditorCamera = m_EditorCameraObject->AddComponent<Scene::CameraComponent>();
 
@@ -37,21 +35,19 @@ namespace Forgex::Core
 			m_ActiveScene->CreateObject("Terrain");
 		}
 
-		void OnUpdate(SessionContext& sessionContext, float deltaTime) override
+		void OnUpdate(float deltaTime) override
 		{
 			m_ActiveScene->Update(deltaTime);
-			sessionContext.SyncUIProxy(m_ActiveScene);
-			SyncRenderProxy();
 		}
 
-		void OnRender(SessionContext& sessionContext) override
+		void OnRender() override
 		{
 			Graphics::Resources::RenderView renderView{};
 			renderView.m_ViewMatrix = m_EditorCamera->GetViewMatrix();
 			renderView.m_ProjectionMatrix = m_EditorCamera->GetProjectionMatrix();
 
 			Graphics::SceneRenderer renderer;
-			renderer.Render(sessionContext.GetViewportFramebuffer() , &renderView, m_SceneRenderProxy);
+			renderer.Render(&renderView);
 		}
 
 		void OnEvent(Event* event) override {}
@@ -60,33 +56,8 @@ namespace Forgex::Core
 
 	private:
 		Scene::Scene* m_ActiveScene = nullptr;
-		Graphics::SceneRenderProxy* m_SceneRenderProxy = nullptr;
 		Scene::Object* m_EditorCameraObject = nullptr;
 		Scene::CameraComponent* m_EditorCamera = nullptr;
 
-		void SyncRenderProxy()
-		{
-			for (const Scene::Object& obj : *m_ActiveScene)
-			{
-				for (const Scene::Component* component : obj)
-				{
-					if (const Scene::IRenderObject* renderComponent = dynamic_cast<const Scene::IRenderObject*>(component))
-					{
-						m_SceneRenderProxy->SyncRenderObject
-						(
-							obj.GetUID(),
-							renderComponent->GetVertices(),
-							renderComponent->GetIndices(),
-							renderComponent->GetUVs(),
-							renderComponent->GetShaderID(),
-							renderComponent->GetTextureID(),
-							obj.GetTransform()->GetModelMatrix()
-						);
-					}
-				}
-			}
-
-			m_SceneRenderProxy->Bake();
-		}
 	};
 }
