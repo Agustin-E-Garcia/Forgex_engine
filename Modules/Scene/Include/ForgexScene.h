@@ -1,9 +1,9 @@
 #pragma once
 #include "../Source/Scene.h"
 
-#include "../Source/Object.h"
-#include "../Source/Components/Component.h"
+#include "../Source/Components/EntityInfo.h"
+#include "../Source/Components/Transform.h"
+#include "../Source/Components/Render.h"
+#include "../Source/Components/Camera.h"
 
-#include "../Source/Components/TransformComponent.h"
-#include "../Source/Components/CameraComponent.h"
-#include "../Source/Components/MeshComponent.h"
+#include "../Source/SystemBase.h"

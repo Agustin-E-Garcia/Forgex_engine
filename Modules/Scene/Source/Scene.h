@@ -1,77 +1,47 @@
 #pragma once
-#include "Object.h"
-#include <vector>
-#include <glm/glm.hpp>
+#include "SceneExports.h"
+#include "SystemBase.h"
+#include <map>
+#include <string>
 
 namespace Forgex::Scene
 {
-	class SCENE_API Scene
-	{
-	public:
-		Scene(const char* name) : m_Name(name) {}
-		~Scene() {}
+    struct SceneData;
 
-		void Update(float deltaTime)
-		{
-			for (Object& obj : m_Hierarchy)
-			{
-				obj.Update(deltaTime);
-			}
-		}
+    class SCENE_API Scene
+    {
+    public:
+        Scene(const char* name);
+        ~Scene();
 
-		const char* GetName() const { return m_Name; }
+        int CreateEntity(const char* EntityName);
+        void DestroyEntity(int entity);
 
-		Object* CreateObject(std::string name, glm::vec3 position = glm::vec3(0),  Object* parent = nullptr)
-		{
-			Object& obj = m_Hierarchy.emplace_back(name, position, this);
+        template<class T>
+        void AddSystem()
+        {
+            static_assert(std::is_base_of<ISystem, T>::value, "T must inherit from Component");
+            m_SystemMap[T::Name()] = new T();
+        }
 
-			if(parent)
-			{
-				obj.SetParent(parent);
-				parent->AddChildObject(&obj);
-			}
-			
-			return &obj;
-		}
+        template<class T>
+        void RemoveSystem()
+        {
+            static_assert(std::is_base_of<ISystem, T>::value, "T must inherit from ISystem");
 
-		void DestroyObject(Object* object)
-		{
-			if (!object) return;
-		
-			for (int i = 0; i < m_Hierarchy.size(); i++)
-			{
-				if (m_Hierarchy[i].GetUID() == object->GetUID())
-					m_Hierarchy.erase(m_Hierarchy.begin() + i);
-			}
-		}
+            auto it = m_SystemMap.find(T::Name());
+            if(it == m_SystemMap.end()) return;
+            delete it->second;
+            m_SystemMap.erase(it);
+        }
 
-		template<class T>
-		T* GetComponentOfType() 
-		{
-			for (Object& obj : m_Hierarchy) 
-			{
-				T* component = obj.GetComponentOfType<T>();
-				if (component) return component;
-			}
+        void Update(float deltaTime);
 
-			return nullptr;
-		}
+        const char* GetName() const { return m_Name; }
 
-		Object* FindObjectByID(uint32_t id) 
-		{
-			for (Object& obj : m_Hierarchy)
-			{
-				if (obj.GetUID() == id) return &obj;
-			}
-
-			return nullptr;
-		}
-
-		std::vector<Object>::const_iterator begin() const { return m_Hierarchy.cbegin(); }
-		std::vector<Object>::const_iterator end() const { return m_Hierarchy.cend(); }
-		
-	private:
-		const char* m_Name;
-		std::vector<Object> m_Hierarchy;
-	};
+    private:
+        const char* m_Name;
+        SceneData* m_Data;
+        std::map<std::string, ISystem*> m_SystemMap;
+    };
 }

@@ -45,6 +45,7 @@ target_include_directories(Core_Module PRIVATE
     Modules/Graphics/Include
     Modules/Scene/Include
     ExternalLibraries/GLM
+    ExternalLibraries/EnTT
 )
 target_compile_definitions(Core_Module PRIVATE CORE_DLL)
 target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Debug_Module)
@@ -75,7 +76,10 @@ set_module_properties(Graphics_Module)
 # Scene_Module
 file(GLOB_RECURSE SCENE_SRC Modules/Scene/*.cpp Modules/Scene/*.h)
 add_library(Scene_Module SHARED ${SCENE_SRC})
-target_include_directories(Scene_Module PRIVATE ExternalLibraries/GLM ExternalLibraries/EnTT)
+target_include_directories(Scene_Module PRIVATE 
+    ExternalLibraries/GLM 
+    ExternalLibraries/EnTT
+)
 target_compile_definitions(Scene_Module PRIVATE SCENE_DLL)
 target_link_libraries(Scene_Module PRIVATE Debug_Module)
 set_module_properties(Scene_Module)

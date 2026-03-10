@@ -5,6 +5,8 @@
 #include <ForgexGraphics.h>
 #include <ForgexDebugTools.h>
 
+#include "../MovementSystem.h"
+
 namespace Forgex::Core
 {
 	class GameLayer : public Layer
@@ -18,22 +20,17 @@ namespace Forgex::Core
 		~GameLayer() override
 		{
 			delete m_ActiveScene;
-			delete m_EditorCameraObject;
 		}
 
 		void OnAttach() override {}
 
 		void OnBegin() override
 		{
-			m_ActiveScene = new Scene::Scene("Default Scene");
-			m_EditorCameraObject = m_ActiveScene->CreateObject("Editor Camera"); //new Scene::Object("Camera Object");
-			m_EditorCamera = m_EditorCameraObject->AddComponent<Scene::CameraComponent>();
+            m_ActiveScene = new Scene::Scene("Default Scene");
+            int ent = m_ActiveScene->CreateEntity("FirstEntity");
 
-			m_EditorCameraObject->GetTransform()->SetPosition(glm::vec3(0, 0, 2));
-
-			m_ActiveScene->CreateObject("Game Camera");
-			m_ActiveScene->CreateObject("Terrain");
-		}
+            m_ActiveScene->AddSystem<MovementSystem>();
+        }
 
 		void OnUpdate(float deltaTime) override
 		{
@@ -42,12 +39,12 @@ namespace Forgex::Core
 
 		void OnRender() override
 		{
-			Graphics::Resources::RenderView renderView{};
-			renderView.m_ViewMatrix = m_EditorCamera->GetViewMatrix();
-			renderView.m_ProjectionMatrix = m_EditorCamera->GetProjectionMatrix();
+			//Graphics::Resources::RenderView renderView{};
+			//renderView.m_ViewMatrix = m_EditorCamera->GetViewMatrix();
+			//renderView.m_ProjectionMatrix = m_EditorCamera->GetProjectionMatrix();
 
-			Graphics::SceneRenderer renderer;
-			renderer.Render(&renderView);
+			//Graphics::SceneRenderer renderer;
+			//renderer.Render(&renderView);
 		}
 
 		void OnEvent(Event* event) override {}
@@ -56,8 +53,5 @@ namespace Forgex::Core
 
 	private:
 		Scene::Scene* m_ActiveScene = nullptr;
-		Scene::Object* m_EditorCameraObject = nullptr;
-		Scene::CameraComponent* m_EditorCamera = nullptr;
-
 	};
 }
