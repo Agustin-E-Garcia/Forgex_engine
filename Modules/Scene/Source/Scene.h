@@ -3,11 +3,10 @@
 #include "SystemBase.h"
 #include <map>
 #include <string>
+#include <entt.hpp>
 
 namespace Forgex::Scene
 {
-    struct SceneData;
-
     class SCENE_API Scene
     {
     public:
@@ -16,6 +15,12 @@ namespace Forgex::Scene
 
         int CreateEntity(const char* EntityName);
         void DestroyEntity(int entity);
+
+        template<typename T>
+        void AddComponent(int entity)
+        {
+            m_Registry.emplace<T>((entt::entity)entity);
+        }
 
         template<class T>
         void AddSystem()
@@ -37,11 +42,12 @@ namespace Forgex::Scene
 
         void Update(float deltaTime);
 
+        entt::registry& GetRegistry() { return m_Registry; }
         const char* GetName() const { return m_Name; }
 
     private:
         const char* m_Name;
-        SceneData* m_Data;
+        entt::registry m_Registry;
         std::map<std::string, ISystem*> m_SystemMap;
     };
 }

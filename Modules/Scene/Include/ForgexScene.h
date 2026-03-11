@@ -5,5 +5,6 @@
 #include "../Source/Components/Transform.h"
 #include "../Source/Components/Render.h"
 #include "../Source/Components/Camera.h"
+#include "../Source/Components/Speed.h"
 
 #include "../Source/SystemBase.h"

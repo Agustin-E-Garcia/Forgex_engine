@@ -1,4 +1,5 @@
 #include "SceneRenderer.h"
+#include "Resources/RenderInfo.h"
 #include "Resources/RenderView.h"
 #include "Resources/RenderConstants.h"
 
@@ -10,14 +11,14 @@
 namespace Forgex::Graphics
 {
     using namespace Resources::Constants;
-    
+
     void RenderSkybox(const Resources::RenderView* renderView)
     {
         Skybox::InitResources();
-        
+
         glDepthMask(GL_FALSE);
         glUseProgram(Skybox::g_ShaderID);
-        
+
         const int ProjectionLoc = glGetUniformLocation(Skybox::g_ShaderID, "projection");
         if(ProjectionLoc != -1)
             glUniformMatrix4fv(ProjectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
@@ -27,11 +28,11 @@ namespace Forgex::Graphics
         if(ViewLoc != -1)
             glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
         else LOG_CORE(Debug::Error, "Failed to find uniform location 'View'");
-        
+
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, Skybox::g_VertexBufferID);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        
+
         glBindTexture(GL_TEXTURE_CUBE_MAP, Skybox::g_DefaultTextureID);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -40,7 +41,7 @@ namespace Forgex::Graphics
         glDepthMask(GL_TRUE);
     }
 
-    void SceneRenderer::Render(const Resources::RenderView* renderView)
+    void SceneRenderer::Render(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos)
     {
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
@@ -56,7 +57,7 @@ namespace Forgex::Graphics
 
         RenderSkybox(renderView);
 
-        /*for (const RenderObjectInfo& info : *renderProxy->GetRenderObjectCollection())
+        for (const Resources::RenderInfo& info : *renderInfos)
         {
             glUseProgram(info.m_ShaderID);
 
@@ -65,9 +66,9 @@ namespace Forgex::Graphics
             const int projectionLoc = glGetUniformLocation(info.m_ShaderID, "projection");
             const int TextureLoc = glGetUniformLocation(info.m_ShaderID, "textureSampler");
 
-            if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, info.m_ModelMatrix.Ptr());
-            if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, renderView->m_ViewMatrix.Ptr());
-            if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, renderView->m_ProjectionMatrix.Ptr());
+            if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info.m_ModelMatrix[0][0]);
+            if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
+            if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
 
             GLenum error = glGetError();
             if (error != GL_NO_ERROR) {
@@ -87,15 +88,15 @@ namespace Forgex::Graphics
             }
 
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, renderProxy->GetVertexBufferID());
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            glBindBuffer(GL_ARRAY_BUFFER, info.m_VertexBufferID);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 
             error = glGetError();
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after binding vertex buffer: ", error);
             }
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderProxy->GetIndexBufferID());
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info.m_IndexBufferID);
 
             error = glGetError();
             if (error != GL_NO_ERROR) {
@@ -103,8 +104,8 @@ namespace Forgex::Graphics
             }
 
             glEnableVertexAttribArray(1);
-            glBindBuffer(GL_ARRAY_BUFFER, renderProxy->GetUVBufferID());
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            glBindBuffer(GL_ARRAY_BUFFER, info.m_VertexBufferID);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
             error = glGetError();
             if (error != GL_NO_ERROR) {
@@ -119,6 +120,6 @@ namespace Forgex::Graphics
             if (error != GL_NO_ERROR) {
                 LOG_CORE(Debug::Error, "Error after drawing: ", error);
             }
-        }*/
+        }
     }
 }

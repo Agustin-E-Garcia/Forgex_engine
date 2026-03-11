@@ -5,53 +5,88 @@
 #include <ForgexGraphics.h>
 #include <ForgexDebugTools.h>
 
-#include "../MovementSystem.h"
-
 namespace Forgex::Core
 {
-	class GameLayer : public Layer
-	{
-		using EventCallbackFn = std::function<void(Event&)>;
+    class GameLayer : public Layer
+    {
+    using EventCallbackFn = std::function<void(Event&)>;
 
-	public:
-		GameLayer() : Layer("Game") {}
-		GameLayer(const EventCallbackFn& callback) : Layer("Game", callback) {}
+    public:
+        GameLayer() : Layer("Game") {}
+        GameLayer(const EventCallbackFn& callback) : Layer("Game", callback) {}
 
-		~GameLayer() override
-		{
-			delete m_ActiveScene;
-		}
-
-		void OnAttach() override {}
-
-		void OnBegin() override
-		{
-            m_ActiveScene = new Scene::Scene("Default Scene");
-            int ent = m_ActiveScene->CreateEntity("FirstEntity");
-
-            m_ActiveScene->AddSystem<MovementSystem>();
+        ~GameLayer() override
+        {
+            delete m_ActiveScene;
         }
 
-		void OnUpdate(float deltaTime) override
-		{
-			m_ActiveScene->Update(deltaTime);
-		}
+        void OnAttach() override {}
 
-		void OnRender() override
-		{
-			//Graphics::Resources::RenderView renderView{};
-			//renderView.m_ViewMatrix = m_EditorCamera->GetViewMatrix();
-			//renderView.m_ProjectionMatrix = m_EditorCamera->GetProjectionMatrix();
+        void OnBegin() override
+        {
+            m_ActiveScene = new Scene::Scene("Default Scene");
+            int cameraEntity = m_ActiveScene->CreateEntity("MainCamera");
+            m_ActiveScene->AddComponent<Scene::Camera>(cameraEntity);
 
-			//Graphics::SceneRenderer renderer;
-			//renderer.Render(&renderView);
-		}
+            int boxEntity = m_ActiveScene->CreateEntity("Box");
+            m_ActiveScene->AddComponent<Scene::Render>(boxEntity);
+        }
 
-		void OnEvent(Event* event) override {}
-		void OnDetach() override {}
-		void OnEnd() override {}
+        void OnUpdate(float deltaTime) override
+        {
+            m_ActiveScene->Update(deltaTime);
+        }
 
-	private:
-		Scene::Scene* m_ActiveScene = nullptr;
-	};
+        void OnRender() override
+        {
+            auto cameraCollection = m_ActiveScene->GetRegistry().view<Scene::Camera, Scene::Transform>();
+            Graphics::Resources::RenderView renderView{};
+
+            for (entt::entity entity : cameraCollection)
+            {
+                const Scene::Camera& camera = cameraCollection.get<Scene::Camera>(entity);
+                if(!camera.m_IsActiveCamera) continue;
+
+                const Scene::Transform transform = cameraCollection.get<Scene::Transform>(entity);
+                renderView.m_ViewMatrix = glm::lookAt(transform.m_Position, transform.m_Position + transform.m_Forward, glm::vec3(0.0f, 1.0f, 0.0f));
+                renderView.m_ProjectionMatrix = glm::perspective(camera.m_FieldOfView, (camera.m_AspectRatio.x / camera.m_AspectRatio.y), camera.m_NearPlane, camera.m_FarPlane);
+            }
+
+            auto renderCollection = m_ActiveScene->GetRegistry().view<Scene::Transform, Scene::Render>();
+            std::vector<Graphics::Resources::RenderInfo> renderInfos;
+            for(entt::entity entity : renderCollection)
+            {
+                Scene::Render& render = renderCollection.get<Scene::Render>(entity);
+                const Scene::Transform& transform = renderCollection.get<Scene::Transform>(entity);
+
+                if(render.m_VertexBufferID == -1)
+                    render.m_VertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
+                        (
+                            Graphics::Utils::BufferType::VertexBuffer, 
+                            sizeof(float) * render.m_VertexSize, 
+                            render.m_Vertices
+                        );
+
+                if(render.m_IndexBufferID == -1)
+                    render.m_IndexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
+                        (
+                            Graphics::Utils::BufferType::IndexBuffer,
+                            render.m_IndexSize,
+                            render.m_Indices
+                        );
+
+                renderInfos.emplace_back(render.m_ShaderID, render.m_TextureID, transform.m_ModelMatrix, render.m_VertexBufferID, render.m_IndexBufferID, render.m_IndexSize);
+            }
+
+            m_SceneRenderer.Render(&renderView, &renderInfos);
+        }
+
+        void OnEvent(Event* event) override {}
+        void OnDetach() override {}
+        void OnEnd() override {}
+
+    private:
+        Scene::Scene* m_ActiveScene = nullptr;
+        Graphics::SceneRenderer m_SceneRenderer;
+    };
 }
