@@ -4,6 +4,10 @@
 #include <ForgexScene.h>
 #include <ForgexGraphics.h>
 #include <ForgexDebugTools.h>
+#include <ForgexAssets.h>
+
+#include "../AssetTypes/TextureAsset.h"
+#include "../AssetTypes/ShaderAsset.h"
 
 namespace Forgex::Core
 {
@@ -25,11 +29,16 @@ namespace Forgex::Core
         void OnBegin() override
         {
             m_ActiveScene = new Scene::Scene("Default Scene");
+            m_AssetManager = new Assets::AssetsManager();
+
             int cameraEntity = m_ActiveScene->CreateEntity("MainCamera");
             m_ActiveScene->AddComponent<Scene::Camera>(cameraEntity);
 
             int boxEntity = m_ActiveScene->CreateEntity("Box");
-            m_ActiveScene->AddComponent<Scene::Render>(boxEntity);
+            Scene::Render& renderComponent = m_ActiveScene->AddComponent<Scene::Render>(boxEntity);
+
+            renderComponent.m_TextureID = m_AssetManager->LoadAsset<TextureAsset>("Resources/Textures/edge2.png")->GetTextureID();
+            renderComponent.m_ShaderID = m_AssetManager->LoadAsset<ShaderAsset>("Resources/Shaders/Texture.FShader")->GetShaderID();
         }
 
         void OnUpdate(float deltaTime) override
@@ -87,6 +96,7 @@ namespace Forgex::Core
 
     private:
         Scene::Scene* m_ActiveScene = nullptr;
+        Assets::AssetsManager* m_AssetManager = nullptr;
         Graphics::SceneRenderer m_SceneRenderer;
     };
 }

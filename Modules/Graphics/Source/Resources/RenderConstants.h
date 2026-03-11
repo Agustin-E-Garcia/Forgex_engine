@@ -7,7 +7,7 @@
 namespace Forgex::Graphics::Resources::Constants
 {
     inline constexpr int INVALID_ID = -1;
-    
+
     namespace RenderObjects
     {
         inline int vertexArrayID = INVALID_ID;

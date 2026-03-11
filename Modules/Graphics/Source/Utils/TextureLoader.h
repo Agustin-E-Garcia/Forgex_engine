@@ -9,7 +9,7 @@ namespace Forgex::Graphics::Utils
         Default = 0,
         Cubemap = 1
     };
-    
+
     class GRAPHICS_API TextureLoader
     {
     public:

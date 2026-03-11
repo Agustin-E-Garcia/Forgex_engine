@@ -17,9 +17,9 @@ namespace Forgex::Scene
         void DestroyEntity(int entity);
 
         template<typename T>
-        void AddComponent(int entity)
+        T& AddComponent(int entity)
         {
-            m_Registry.emplace<T>((entt::entity)entity);
+            return m_Registry.emplace<T>((entt::entity)entity);
         }
 
         template<class T>

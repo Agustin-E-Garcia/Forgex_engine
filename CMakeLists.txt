@@ -44,11 +44,12 @@ add_library(Core_Module SHARED ${CORE_SRC})
 target_include_directories(Core_Module PRIVATE
     Modules/Graphics/Include
     Modules/Scene/Include
+    Modules/Assets/Include
     ExternalLibraries/GLM
     ExternalLibraries/EnTT
 )
 target_compile_definitions(Core_Module PRIVATE CORE_DLL)
-target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Debug_Module)
+target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Debug_Module Assets_Module)
 set_module_properties(Core_Module)
 
 # Graphics_Module
