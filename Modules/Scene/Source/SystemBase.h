@@ -9,7 +9,7 @@ namespace Forgex::Scene
     {
     public:
         virtual ~ISystem() = default;
-        virtual void Run(entt::registry& registry) = 0;
+        virtual void Update(entt::registry& registry) = 0;
     };
 
     template<typename... Components>
@@ -19,7 +19,7 @@ namespace Forgex::Scene
         virtual ~PerEntitySystem() = default;
         virtual void OnUpdate(const entt::entity entity, Components&... components) = 0;
 
-        void Run(entt::registry& registry) override
+        void Update(entt::registry& registry) override
         {
             auto view = registry.view<Components...>();
             view.each([this](const entt::entity entity, Components&... components) { OnUpdate(entity, components...); });

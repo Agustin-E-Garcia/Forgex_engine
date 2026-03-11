@@ -19,7 +19,12 @@ namespace Forgex::Assets
             if(m_LoadedAssets.contains(assetPath)) return dynamic_cast<T*>(m_LoadedAssets[assetPath]);
 
             Asset* newAsset = new T();
-            newAsset->Load(assetPath);
+            if(!newAsset->Load(assetPath))
+            {
+                delete newAsset;
+                return nullptr;
+            }
+
             m_LoadedAssets[assetPath] = newAsset;
 
             return static_cast<T*>(newAsset);

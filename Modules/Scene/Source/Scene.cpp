@@ -33,7 +33,7 @@ namespace Forgex::Scene
     {
         for(auto& [name, system] : m_SystemMap)
         {
-            system->Run(m_Registry);
+            system->Update(m_Registry);
         }
     }
 }

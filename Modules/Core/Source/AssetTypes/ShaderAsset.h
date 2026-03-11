@@ -10,7 +10,7 @@ namespace Forgex::Core
     class ShaderAsset : public Assets::Asset
     {
     public:
-        void Load(const char* assetPath) override
+        bool Load(const char* assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Loading ShaderAsset: '{0}'", assetPath);
 
@@ -23,11 +23,14 @@ namespace Forgex::Core
             std::string fragmentShader = line.substr(commaPos + 1);
 
             m_ShaderID = Graphics::Utils::ShaderLoader::LoadShader(vertexShader.c_str(), fragmentShader.c_str());
+
+            return m_ShaderID != -1;
         }
 
-        void Save(const char* assetPath) override
+        bool Save(const char* assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Saving ShaderAsset: '{0}'", assetPath);
+            return true;
         }
 
         int GetShaderID() { return m_ShaderID; }

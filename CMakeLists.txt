@@ -45,11 +45,12 @@ target_include_directories(Core_Module PRIVATE
     Modules/Graphics/Include
     Modules/Scene/Include
     Modules/Assets/Include
+    Modules/Voxel/Include
     ExternalLibraries/GLM
     ExternalLibraries/EnTT
 )
 target_compile_definitions(Core_Module PRIVATE CORE_DLL)
-target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Debug_Module Assets_Module)
+target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Debug_Module Assets_Module Voxel_Module)
 set_module_properties(Core_Module)
 
 # Graphics_Module
@@ -77,7 +78,7 @@ set_module_properties(Graphics_Module)
 # Scene_Module
 file(GLOB_RECURSE SCENE_SRC Modules/Scene/*.cpp Modules/Scene/*.h)
 add_library(Scene_Module SHARED ${SCENE_SRC})
-target_include_directories(Scene_Module PRIVATE 
+target_include_directories(Scene_Module PRIVATE
     ExternalLibraries/GLM 
     ExternalLibraries/EnTT
 )
@@ -87,12 +88,18 @@ set_module_properties(Scene_Module)
 
 # Assets_Module
 file(GLOB_RECURSE ASSETS_SRC Modules/Assets/*.cpp Modules/Assets/*.h)
-if(ASSETS_SRC)
-    add_library(Assets_Module SHARED ${ASSETS_SRC})
-    target_compile_definitions(Assets_Module PRIVATE ASSETS_DLL)
-    target_link_libraries(Assets_Module PRIVATE Debug_Module)
-    set_module_properties(Assets_Module)
-endif()
+add_library(Assets_Module SHARED ${ASSETS_SRC})
+target_compile_definitions(Assets_Module PRIVATE ASSETS_DLL)
+target_link_libraries(Assets_Module PRIVATE Debug_Module)
+set_module_properties(Assets_Module)
+
+# Voxel_Module
+file(GLOB_RECURSE VOXEL_SRC Modules/Voxel/*.cpp Modules/Voxel/*.h)
+add_library(Voxel_Module SHARED ${VOXEL_SRC})
+target_include_directories(Voxel_Module PRIVATE ExternalLibraries/GLM)
+target_compile_definitions(Voxel_Module PRIVATE VOXEL_DLL)
+target_link_libraries(Voxel_Module PRIVATE Debug_Module)
+set_module_properties(Voxel_Module)
 
 # Forgex_Editor
 file(GLOB_RECURSE EDITOR_SRC Editor/*.cpp Editor/*.h)

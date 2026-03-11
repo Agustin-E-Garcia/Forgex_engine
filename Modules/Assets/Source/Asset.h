@@ -8,7 +8,7 @@ namespace Forgex::Assets
     public:
         virtual ~Asset() = default;
 
-        virtual void Load(const char* assetPath) = 0;
-        virtual void Save(const char* assetPath) = 0;
+        virtual bool Load(const char* assetPath) = 0;
+        virtual bool Save(const char* assetPath) = 0;
     };
 }
