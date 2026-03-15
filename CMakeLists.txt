@@ -97,7 +97,7 @@ set_module_properties(Assets_Module)
 # Voxel_Module
 file(GLOB_RECURSE VOXEL_SRC Modules/Voxel/*.cpp Modules/Voxel/*.h)
 add_library(Voxel_Module SHARED ${VOXEL_SRC})
-target_include_directories(Voxel_Module PRIVATE ExternalLibraries/GLM)
+target_include_directories(Voxel_Module PRIVATE ExternalLibraries/GLM ExternalLibraries/FastNoiseLite)
 target_compile_definitions(Voxel_Module PRIVATE VOXEL_DLL)
 target_link_libraries(Voxel_Module PRIVATE Debug_Module)
 set_module_properties(Voxel_Module)

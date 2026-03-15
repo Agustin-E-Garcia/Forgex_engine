@@ -141,7 +141,7 @@ namespace Forgex::Graphics
 
         RenderObjects::InitResources();
 
-        //RenderSkybox(renderView);
+        RenderSkybox(renderView);
 
         glUseProgram(info->m_ShaderID);
 
@@ -158,9 +158,15 @@ namespace Forgex::Graphics
             LOG_CORE(Debug::Error, "Error after binding uniforms: ", error);
         }
 
-        glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, info->m_VertexBufferID);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        int stride = 6 * sizeof(float);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 
         glDrawArrays(GL_TRIANGLES, 0, info->m_IndexCount);
         glDisableVertexAttribArray(0);
