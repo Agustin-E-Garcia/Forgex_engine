@@ -48,6 +48,7 @@ target_include_directories(Core_Module PRIVATE
     Modules/Voxel/Include
     ExternalLibraries/GLM
     ExternalLibraries/EnTT
+    ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include
 )
 target_compile_definitions(Core_Module PRIVATE CORE_DLL)
 target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Debug_Module Assets_Module Voxel_Module)

@@ -26,7 +26,10 @@ namespace Forgex::Graphics
 
         const int ViewLoc = glGetUniformLocation(Skybox::g_ShaderID, "view");
         if(ViewLoc != -1)
-            glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
+        {
+            glm::mat4 skyboxView = glm::mat4(glm::mat3(renderView->m_ViewMatrix));
+            glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &skyboxView[0][0]);
+        }
         else LOG_CORE(Debug::Error, "Failed to find uniform location 'View'");
 
         glEnableVertexAttribArray(0);
@@ -48,7 +51,7 @@ namespace Forgex::Graphics
         glViewport(0, 0, width, height);
 
         glEnable(GL_DEPTH_TEST);
-        //glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
         glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -121,5 +124,45 @@ namespace Forgex::Graphics
                 LOG_CORE(Debug::Error, "Error after drawing: ", error);
             }
         }
+    }
+
+    void SceneRenderer::RenderMap(const Resources::RenderView* renderView, Resources::RenderInfo* info)
+    {
+        int width, height;
+        glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
+        glViewport(0, 0, width, height);
+
+        glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_CULL_FACE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDepthFunc(GL_LESS);
+        glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        RenderObjects::InitResources();
+
+        //RenderSkybox(renderView);
+
+        glUseProgram(info->m_ShaderID);
+
+        const int modelLoc = glGetUniformLocation(info->m_ShaderID, "model");
+        const int viewLoc = glGetUniformLocation(info->m_ShaderID, "view");
+        const int projectionLoc = glGetUniformLocation(info->m_ShaderID, "projection");
+
+        if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info->m_ModelMatrix[0][0]);
+        if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
+        if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
+
+        GLenum error = glGetError();
+        if (error != GL_NO_ERROR) {
+            LOG_CORE(Debug::Error, "Error after binding uniforms: ", error);
+        }
+
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, info->m_VertexBufferID);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        glDrawArrays(GL_TRIANGLES, 0, info->m_IndexCount);
+        glDisableVertexAttribArray(0);
     }
 }

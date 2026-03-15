@@ -29,11 +29,11 @@ namespace Forgex::Scene
         m_Registry.destroy((entt::entity)entity);
     }
 
-    void Scene::Update(float deltatime)
+    void Scene::Update(float deltaTime)
     {
         for(auto& [name, system] : m_SystemMap)
         {
-            system->Update(m_Registry);
+            system->Update(m_Registry, deltaTime);
         }
     }
 }
