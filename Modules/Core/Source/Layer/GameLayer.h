@@ -33,7 +33,15 @@ namespace Forgex::Core
             m_AssetManager = new Assets::AssetsManager();
             m_ActiveMap = new Voxel::VoxelMap();
 
-            mapVertexID = Graphics::Utils::BufferManager::GenerateBuffer(Graphics::Utils::BufferType::VertexBuffer, m_ActiveMap->GetVertexCount() * 3 * sizeof(float), m_ActiveMap->GetVertices());
+            for (Voxel::Chunk& chunk : *m_ActiveMap)
+            {
+                chunk.vertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
+                (
+                    Graphics::Utils::BufferType::VertexBuffer,
+                    chunk.GetVertexCount() * 6 * sizeof(float),
+                    chunk.GetVertices()
+                );
+            }
 
             int cameraEntity = m_ActiveScene->CreateEntity("MainCamera");
             m_ActiveScene->AddComponent<Scene::Camera>(cameraEntity);
@@ -63,17 +71,21 @@ namespace Forgex::Core
             }
 
             Graphics::SceneRenderer renderer;
-            Graphics::Resources::RenderInfo info = Graphics::Resources::RenderInfo
-            (
-                m_AssetManager->LoadAsset<ShaderAsset>("Resources/Shaders/ColorShader.FShader")->GetShaderID(),
-                -1,
-                glm::mat4(1.0f),
-                mapVertexID,
-                -1,
-                m_ActiveMap->GetVertexCount()
-            );
+            std::vector<Graphics::Resources::RenderInfo> renderInfos;
+            for(Voxel::Chunk& chunk : *m_ActiveMap)
+            {
+                renderInfos.emplace_back
+                (
+                    m_AssetManager->LoadAsset<ShaderAsset>("Resources/Shaders/ColorShader.FShader")->GetShaderID(),
+                    -1,
+                    chunk.GetModelMatrix(),
+                    chunk.vertexBufferID,
+                    -1,
+                    chunk.GetVertexCount()
+                );
+            }
 
-            renderer.RenderMap(&renderView, &info);
+            renderer.RenderMap(&renderView, &renderInfos);
         }
 
         void OnEvent(Event* event) override {}
@@ -86,7 +98,5 @@ namespace Forgex::Core
         Voxel::VoxelMap* m_ActiveMap = nullptr;
         Assets::AssetsManager* m_AssetManager = nullptr;
         Graphics::SceneRenderer m_SceneRenderer;
-
-        int mapVertexID;
     };
 }

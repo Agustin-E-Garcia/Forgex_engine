@@ -126,7 +126,7 @@ namespace Forgex::Graphics
         }
     }
 
-    void SceneRenderer::RenderMap(const Resources::RenderView* renderView, Resources::RenderInfo* info)
+    void SceneRenderer::RenderMap(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos)
     {
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
@@ -143,32 +143,35 @@ namespace Forgex::Graphics
 
         RenderSkybox(renderView);
 
-        glUseProgram(info->m_ShaderID);
+        for(Resources::RenderInfo& info : *renderInfos)
+        {
+            glUseProgram(info.m_ShaderID);
 
-        const int modelLoc = glGetUniformLocation(info->m_ShaderID, "model");
-        const int viewLoc = glGetUniformLocation(info->m_ShaderID, "view");
-        const int projectionLoc = glGetUniformLocation(info->m_ShaderID, "projection");
+            const int modelLoc = glGetUniformLocation(info.m_ShaderID, "model");
+            const int viewLoc = glGetUniformLocation(info.m_ShaderID, "view");
+            const int projectionLoc = glGetUniformLocation(info.m_ShaderID, "projection");
 
-        if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info->m_ModelMatrix[0][0]);
-        if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
-        if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
+            if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info.m_ModelMatrix[0][0]);
+            if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
+            if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
 
-        GLenum error = glGetError();
-        if (error != GL_NO_ERROR) {
-            LOG_CORE(Debug::Error, "Error after binding uniforms: ", error);
+            GLenum error = glGetError();
+            if (error != GL_NO_ERROR) {
+                LOG_CORE(Debug::Error, "Error after binding uniforms: ", error);
+            }
+
+            glBindBuffer(GL_ARRAY_BUFFER, info.m_VertexBufferID);
+
+            int stride = 6 * sizeof(float);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+
+            glDrawArrays(GL_TRIANGLES, 0, info.m_IndexCount);
+            glDisableVertexAttribArray(0);
         }
-
-        glBindBuffer(GL_ARRAY_BUFFER, info->m_VertexBufferID);
-
-        int stride = 6 * sizeof(float);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-
-        glDrawArrays(GL_TRIANGLES, 0, info->m_IndexCount);
-        glDisableVertexAttribArray(0);
     }
 }

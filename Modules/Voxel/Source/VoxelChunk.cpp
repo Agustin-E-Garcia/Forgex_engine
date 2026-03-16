@@ -1,5 +1,6 @@
 #include "VoxelChunk.h"
 #include "Resources/MarchingCubesTable.h"
+#include <ForgexDebugTools.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <FastNoiseLite.h>
 
@@ -7,14 +8,15 @@ namespace Forgex::Voxel
 {
     float Chunk::s_Cutoff = 127;
     float Chunk::s_SampleDensity = 0.5f;
+    int Chunk::s_NoiseSeed = 1337;
 
     Chunk::Chunk(glm::vec3 chunkPos, glm::vec3 size) : m_ChunkSize(size), m_ChunkPosition(chunkPos)
     {
-        m_ChunkModelMatrix = glm::translate(glm::mat4(1.0f), chunkPos);
+        m_ChunkModelMatrix = glm::translate(glm::mat4(1.0f), (chunkPos * size));
 
         CalculateMesh();
-        GenerateMesh();
     }
+
     Chunk::~Chunk() {}
 
     void Chunk::CalculateMesh()
@@ -24,16 +26,28 @@ namespace Forgex::Voxel
         m_DensityValues.resize(totalSamples, 255);
 
         FastNoiseLite noise;
+        noise.SetSeed(s_NoiseSeed);
         noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
         noise.SetFractalType(FastNoiseLite::FractalType_FBm);
 
+        glm::vec3 worldOffset = m_ChunkPosition * m_ChunkSize;
+
+        bool hasAir = false;
+        bool hasGround = false;
         for(int i = 0; i < m_DensityValues.size(); i++)
         {
             glm::vec3 position = GetSamplePosition(i);
-            float n = noise.GetNoise(position.x, position.z); // 2D, only sample x and z
+            glm::vec3 worldPosition = worldOffset + position;
+            float n = noise.GetNoise(worldPosition.x, worldPosition.z); // 2D, only sample x and z
             float surfaceHeight = (n + 1.0f) / 2.0f * m_ChunkSize.y;
-            m_DensityValues[i] = position.y < surfaceHeight ? 255 : 0;
+            float density = (surfaceHeight - worldPosition.y) / m_ChunkSize.y * 255.0f;
+            m_DensityValues[i] = (uint8_t)glm::clamp(density + 127.0f, 0.0f, 255.0f);
+
+            if(worldPosition.y < surfaceHeight) hasGround = true;
+            else hasAir = true;
         }
+
+        if(hasAir && hasGround) GenerateMesh();
     }
 
     void Chunk::GenerateMesh()
@@ -115,11 +129,11 @@ namespace Forgex::Voxel
                     m_CornerDensityValues[Resources::sidesTable[index][1]]
                 );
 
-                glm::vec3 normal = glm::normalize(glm::cross(v2 - v1, v3 - v1));
+                glm::vec3 normal = glm::normalize(glm::cross(v3 - v1, v2 - v1));
 
-                PushVertex(v1, normal);
-                PushVertex(v2, normal);
-                PushVertex(v3, normal);
+                PushVertex(v1 * s_SampleDensity, normal);
+                PushVertex(v2 * s_SampleDensity, normal);
+                PushVertex(v3 * s_SampleDensity, normal);
             }
         }
     }

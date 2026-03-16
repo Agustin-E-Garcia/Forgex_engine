@@ -1,167 +1,35 @@
 #include "VoxelMap.h"
-#include "Resources/MarchingCubesTable.h"
 #include <ForgexDebugTools.h>
 #include <FastNoiseLite.h>
 
 #include <chrono>
-#include <string>
 
 namespace Forgex::Voxel
 {
     VoxelMap::VoxelMap()
     {
-        CalculateMesh();
-        GenerateMesh();
-    }
+        glm::vec3 chunks = m_MapArea / m_ChunkSize;
+        int chunkCount = chunks.x * chunks.y * chunks.z;
 
-    VoxelMap::~VoxelMap() {}
+        m_Chunks.reserve(chunkCount);
 
-    void VoxelMap::CalculateMesh()
-    {
-        m_Samples = (m_MapArea / glm::vec3(m_SampleDensity)) + glm::vec3(1.0f);
-        int totalSamples = (int)m_Samples.x * (int)m_Samples.y * (int)m_Samples.z;
-        m_DensityValues.resize(totalSamples, 255);
+        Chunk::s_SampleDensity = m_SampleDensity;
+        Chunk::s_Cutoff = m_Cutoff;
+        Chunk::s_NoiseSeed = 1337; // Hardcoded for now, eventually we'll be able to setup whichever seed we want
 
-        FastNoiseLite noise;
-        noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-        noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-
-        for(int i = 0; i < m_DensityValues.size(); i++)
-        {
-            glm::vec3 position = GetSamplePosition(i);
-            float n = noise.GetNoise(position.x, position.z); // 2D, only sample x and z
-            float surfaceHeight = (n + 1.0f) / 2.0f * m_MapArea.y;
-            m_DensityValues[i] = position.y < surfaceHeight ? 255 : 0;
-        }
-    }
-
-    void VoxelMap::GenerateMesh()
-    {
-
-        m_Vertices.reserve(m_Samples.x * m_Samples.y * m_Samples.z * 5 * 3 * 6);
         auto start = std::chrono::high_resolution_clock::now();
 
-        for (int z = 0; z < (int)m_Samples.z - 1; z++)
-        for (int y = 0; y < (int)m_Samples.y - 1; y++)
-        for (int x = 0; x < (int)m_Samples.x - 1; x++)
+        for(int z = 0; z < chunks.z; z++)
+        for(int y = 0; y < chunks.y; y++)
+        for(int x = 0; x < chunks.x; x++)
         {
-           // We need the vectors to adhere to this order:
-            //    4----5
-            //   /|   /|
-            //  7----6 |
-            //  | 0--|-1
-            //  |/   |/
-            //  3----2
-
-            glm::vec3 m_CornerPositions[8] =
-            {
-                glm::vec3(x    , y    , z + 1), // 0
-                glm::vec3(x + 1, y    , z + 1), // 1
-                glm::vec3(x + 1, y    , z    ), // 2
-                glm::vec3(x    , y    , z    ), // 3
-                glm::vec3(x    , y + 1, z + 1), // 4
-                glm::vec3(x + 1, y + 1, z + 1), // 5
-                glm::vec3(x + 1, y + 1, z    ), // 6
-                glm::vec3(x    , y + 1, z    ), // 7
-            };
-
-            int m_CornerDensityValues[8] = 
-            {
-                m_DensityValues[GetSampleID(glm::vec3(x    , y    , z + 1))], // 0
-                m_DensityValues[GetSampleID(glm::vec3(x + 1, y    , z + 1))], // 1
-                m_DensityValues[GetSampleID(glm::vec3(x + 1, y    , z    ))], // 2
-                m_DensityValues[GetSampleID(glm::vec3(x    , y    , z    ))], // 3
-                m_DensityValues[GetSampleID(glm::vec3(x    , y + 1, z + 1))], // 4
-                m_DensityValues[GetSampleID(glm::vec3(x + 1, y + 1, z + 1))], // 5
-                m_DensityValues[GetSampleID(glm::vec3(x + 1, y + 1, z    ))], // 6
-                m_DensityValues[GetSampleID(glm::vec3(x    , y + 1, z    ))], // 7
-            };
-
-            int caseID = 0;
-            for (int i = 0; i < 8; i++)
-            {
-
-                if(m_CornerDensityValues[i] < m_Cutoff) continue;
-
-                caseID |= (1 << i);
-            }
-
-            if(caseID == 0 || caseID == 255) continue; // if no sample is over cutoff, then we skip this cube
-
-            for (int i = 0; i < 16; i += 3)
-            {
-                if(Resources::triTable[caseID][i] == -1) break;
-
-                int index = Resources::triTable[caseID][i];
-                glm::vec3 v1 = Interpolate
-                (
-                    m_CornerPositions[Resources::sidesTable[index][0]],
-                    m_CornerPositions[Resources::sidesTable[index][1]],
-                    m_CornerDensityValues[Resources::sidesTable[index][0]],
-                    m_CornerDensityValues[Resources::sidesTable[index][1]]
-                );
-
-                index = Resources::triTable[caseID][i + 1];
-                glm::vec3 v2 = Interpolate
-                (
-                    m_CornerPositions[Resources::sidesTable[index][0]],
-                    m_CornerPositions[Resources::sidesTable[index][1]],
-                    m_CornerDensityValues[Resources::sidesTable[index][0]],
-                    m_CornerDensityValues[Resources::sidesTable[index][1]]
-                );
-
-                index = Resources::triTable[caseID][i + 2];
-                glm::vec3 v3 = Interpolate
-                (
-                    m_CornerPositions[Resources::sidesTable[index][0]],
-                    m_CornerPositions[Resources::sidesTable[index][1]],
-                    m_CornerDensityValues[Resources::sidesTable[index][0]],
-                    m_CornerDensityValues[Resources::sidesTable[index][1]]
-                );
-
-                glm::vec3 normal = glm::normalize(glm::cross(v2 - v1, v3 - v1));
-
-                PushVertex(v1, normal);
-                PushVertex(v2, normal);
-                PushVertex(v3, normal);
-            }
+            m_Chunks.emplace_back(glm::vec3(x, y, z), m_ChunkSize);
         }
 
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        LOG_CORE(Debug::Info, "GenerateMesh took: " + std::to_string(duration.count()) + "ms");
-        LOG_CORE(Debug::Info, "Triangle count: " + std::to_string(m_Vertices.size() / 18));
+        LOG_CORE(Debug::Info, "Took: " + std::to_string(duration.count()) + "ms");
     }
 
-    glm::vec3 VoxelMap::Interpolate(glm::vec3 posA, glm::vec3 posB, uint8_t valA, uint8_t valB)
-    {
-        float t = (m_Cutoff - valA) / (float)(valB - valA);
-        return posA + t * (posB - posA);
-    }
-
-    glm::vec3 VoxelMap::GetSamplePosition(int sampleID)
-    {
-        glm::ivec3 samples = glm::ivec3((m_MapArea / glm::vec3(m_SampleDensity)) + glm::vec3(1.0f));
-
-        int x = sampleID % samples.x;
-        int y = (sampleID / samples.x) % samples.y;
-        int z = sampleID / (samples.x * samples.y);
-
-        return glm::vec3(x, y, z) * m_SampleDensity;
-    }
-
-    int VoxelMap::GetSampleID(glm::vec3 position)
-    {
-        return position.x + (position.y * m_Samples.x) + (position.z * m_Samples.x * m_Samples.y);
-    }
-
-    void VoxelMap::PushVertex(glm::vec3 vertex, glm::vec3 normal)
-    {
-        m_Vertices.push_back(vertex.x);
-        m_Vertices.push_back(vertex.y);
-        m_Vertices.push_back(vertex.z);
-        m_Vertices.push_back(normal.x);
-        m_Vertices.push_back(normal.y);
-        m_Vertices.push_back(normal.z);
-    }
+    VoxelMap::~VoxelMap() {}
 }

@@ -12,9 +12,12 @@ namespace Forgex::Voxel
 
         static float s_Cutoff;
         static float s_SampleDensity;
+        static int s_NoiseSeed;
 
         void CalculateMesh();
         void GenerateMesh();
+
+        int vertexBufferID;
 
         glm::vec3 Interpolate(glm::vec3 posA, glm::vec3 posB, uint8_t valA, uint8_t valB);
         glm::vec3 GetSamplePosition(int sampleID);

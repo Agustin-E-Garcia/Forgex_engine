@@ -14,6 +14,6 @@ namespace Forgex::Graphics
         ~SceneRenderer() = default;
 
         void Render(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos);
-        void RenderMap(const Resources::RenderView* renderView, Resources::RenderInfo* info);
+        void RenderMap(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos);
     };
 }
