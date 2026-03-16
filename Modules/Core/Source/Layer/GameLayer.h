@@ -5,6 +5,7 @@
 #include <ForgexGraphics.h>
 #include <ForgexAssets.h>
 #include <ForgexVoxel.h>
+#include <cstdint>
 
 #include "../AssetTypes/ShaderAsset.h"
 #include "../Systems/MovementSystem.h"
@@ -41,6 +42,13 @@ namespace Forgex::Core
                     chunk.GetVertexCount() * 6 * sizeof(float),
                     chunk.GetVertices()
                 );
+
+                chunk.indexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
+                 (
+                    Graphics::Utils::BufferType::IndexBuffer,
+                    chunk.GetIndexCount() * sizeof(uint32_t),
+                    chunk.GetIndices()
+                 );
             }
 
             int cameraEntity = m_ActiveScene->CreateEntity("MainCamera");
@@ -80,8 +88,8 @@ namespace Forgex::Core
                     -1,
                     chunk.GetModelMatrix(),
                     chunk.vertexBufferID,
-                    -1,
-                    chunk.GetVertexCount()
+                    chunk.indexBufferID,
+                    chunk.GetIndexCount()
                 );
             }
 

@@ -23,8 +23,8 @@ namespace Forgex::Core
             bool right = glfwGetKey(window, GLFW_KEY_RIGHT);
             bool up = glfwGetKey(window, GLFW_KEY_SPACE);
             bool down = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
-            bool rotateLeft = glfwGetKey(window, GLFW_KEY_Q);
-            bool rotateRight = glfwGetKey(window, GLFW_KEY_E);
+            bool rotateLeft = glfwGetKey(window, GLFW_KEY_E);
+            bool rotateRight = glfwGetKey(window, GLFW_KEY_Q);
 
             // Rotation
             if (rotateLeft || rotateRight)

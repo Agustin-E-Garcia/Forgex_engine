@@ -16,6 +16,7 @@ namespace Forgex::Voxel
         Chunk::s_SampleDensity = m_SampleDensity;
         Chunk::s_Cutoff = m_Cutoff;
         Chunk::s_NoiseSeed = 1337; // Hardcoded for now, eventually we'll be able to setup whichever seed we want
+        Chunk::s_TopMapY = m_MapArea.y;
 
         auto start = std::chrono::high_resolution_clock::now();
 

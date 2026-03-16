@@ -9,17 +9,19 @@ namespace Forgex::Voxel
     float Chunk::s_Cutoff = 127;
     float Chunk::s_SampleDensity = 0.5f;
     int Chunk::s_NoiseSeed = 1337;
+    float Chunk::s_TopMapY = -1.0f;
 
     Chunk::Chunk(glm::vec3 chunkPos, glm::vec3 size) : m_ChunkSize(size), m_ChunkPosition(chunkPos)
     {
         m_ChunkModelMatrix = glm::translate(glm::mat4(1.0f), (chunkPos * size));
 
-        CalculateMesh();
+        bool shouldGenerateMesh = GenerateDensity();
+        if(shouldGenerateMesh) GenerateMesh();
     }
 
     Chunk::~Chunk() {}
 
-    void Chunk::CalculateMesh()
+    bool Chunk::GenerateDensity()
     {
         m_Samples = (m_ChunkSize / glm::vec3(s_SampleDensity)) + glm::vec3(1.0f);
         int totalSamples = (int)m_Samples.x * (int)m_Samples.y * (int)m_Samples.z;
@@ -36,9 +38,8 @@ namespace Forgex::Voxel
         bool hasGround = false;
         for(int i = 0; i < m_DensityValues.size(); i++)
         {
-            glm::vec3 position = GetSamplePosition(i);
-            glm::vec3 worldPosition = worldOffset + position;
-            float n = noise.GetNoise(worldPosition.x, worldPosition.z); // 2D, only sample x and z
+            glm::vec3 worldPosition = worldOffset + GetSamplePosition(i);
+            float n = noise.GetNoise(worldPosition.x, worldPosition.z);
             float surfaceHeight = (n + 1.0f) / 2.0f * m_ChunkSize.y;
             float density = (surfaceHeight - worldPosition.y) / m_ChunkSize.y * 255.0f;
             m_DensityValues[i] = (uint8_t)glm::clamp(density + 127.0f, 0.0f, 255.0f);
@@ -47,7 +48,7 @@ namespace Forgex::Voxel
             else hasAir = true;
         }
 
-        if(hasAir && hasGround) GenerateMesh();
+        return hasAir && hasGround;
     }
 
     void Chunk::GenerateMesh()
@@ -103,39 +104,93 @@ namespace Forgex::Voxel
                 if(Resources::triTable[caseID][i] == -1) break;
 
                 int index = Resources::triTable[caseID][i];
-                glm::vec3 v1 = Interpolate
-                (
-                    m_CornerPositions[Resources::sidesTable[index][0]],
-                    m_CornerPositions[Resources::sidesTable[index][1]],
-                    m_CornerDensityValues[Resources::sidesTable[index][0]],
-                    m_CornerDensityValues[Resources::sidesTable[index][1]]
-                );
+                int index_v1 = GetOrAddVertexIndex
+                    (
+                        m_CornerPositions[Resources::sidesTable[index][0]],
+                        m_CornerPositions[Resources::sidesTable[index][1]]
+                    );
 
                 index = Resources::triTable[caseID][i + 1];
-                glm::vec3 v2 = Interpolate
-                (
-                    m_CornerPositions[Resources::sidesTable[index][0]],
-                    m_CornerPositions[Resources::sidesTable[index][1]],
-                    m_CornerDensityValues[Resources::sidesTable[index][0]],
-                    m_CornerDensityValues[Resources::sidesTable[index][1]]
-                );
+                int index_v2 = GetOrAddVertexIndex
+                    (
+                        m_CornerPositions[Resources::sidesTable[index][0]],
+                        m_CornerPositions[Resources::sidesTable[index][1]]
+                    );
 
                 index = Resources::triTable[caseID][i + 2];
-                glm::vec3 v3 = Interpolate
-                (
-                    m_CornerPositions[Resources::sidesTable[index][0]],
-                    m_CornerPositions[Resources::sidesTable[index][1]],
-                    m_CornerDensityValues[Resources::sidesTable[index][0]],
-                    m_CornerDensityValues[Resources::sidesTable[index][1]]
-                );
+                int index_v3 = GetOrAddVertexIndex
+                    (
+                        m_CornerPositions[Resources::sidesTable[index][0]],
+                        m_CornerPositions[Resources::sidesTable[index][1]]
+                    );
 
-                glm::vec3 normal = glm::normalize(glm::cross(v3 - v1, v2 - v1));
+                m_Indices.push_back(index_v1);
+                m_Indices.push_back(index_v2);
+                m_Indices.push_back(index_v3);
 
-                PushVertex(v1 * s_SampleDensity, normal);
-                PushVertex(v2 * s_SampleDensity, normal);
-                PushVertex(v3 * s_SampleDensity, normal);
-            }
+                CalculateNormal(index_v1, index_v2, index_v3);
+           }
         }
+
+        NormalizeNormals();
+    }
+
+    void Chunk::NormalizeNormals()
+    {
+        // We iterate starting at position 3 with a stride of 6 as to only modify the normals of each vertex
+        for(int i = 3; i < m_Vertices.size(); i += 6)
+        {
+            glm::vec3 finalNormal = glm::normalize(glm::vec3(m_Vertices[i], m_Vertices[i + 1], m_Vertices[i + 2]));
+            m_Vertices[i] = finalNormal.x;
+            m_Vertices[i + 1] = finalNormal.y;
+            m_Vertices[i + 2] = finalNormal.z;
+        }
+    }
+
+    uint32_t Chunk::GetOrAddVertexIndex(glm::vec3 posA, glm::vec3 posB)
+    {
+        uint64_t idA = GetSampleID(posA);
+        uint64_t idB = GetSampleID(posB);
+
+        // We make sure we always have posA being the smaller number so it doesn't matter if we pass positions 0 - 1 or 1 - 0
+        // We always get the same vertex that was generated between them
+        if(idA > idB)
+        {
+            std::swap(idA, idB);
+            std::swap(posA, posB);
+        }
+
+        uint64_t mapKey = idB << 32 | idA;
+
+        if(m_VertexToIndexMap.contains(mapKey))
+            return m_VertexToIndexMap[mapKey];
+
+        glm::vec3 vertex = Interpolate(posA, posB, m_DensityValues[idA], m_DensityValues[idB]);
+        uint32_t vertexIndex = PushVertex(vertex * s_SampleDensity);
+        m_VertexToIndexMap[mapKey] = vertexIndex;
+
+        return vertexIndex;
+    }
+
+    void Chunk::CalculateNormal(uint32_t index_v1, uint32_t index_v2, uint32_t index_v3)
+    {
+        glm::vec3 v1 = glm::vec3(m_Vertices[index_v1 * 6], m_Vertices[(index_v1 * 6) + 1], m_Vertices[(index_v1 * 6) + 2]);
+        glm::vec3 v2 = glm::vec3(m_Vertices[index_v2 * 6], m_Vertices[(index_v2 * 6) + 1], m_Vertices[(index_v2 * 6) + 2]);
+        glm::vec3 v3 = glm::vec3(m_Vertices[index_v3 * 6], m_Vertices[(index_v3 * 6) + 1], m_Vertices[(index_v3 * 6) + 2]);
+
+        glm::vec3 normal = glm::cross(v3 - v1, v2 - v1);
+
+        m_Vertices[(index_v1 * 6) + 3] += normal.x;
+        m_Vertices[(index_v1 * 6) + 4] += normal.y;
+        m_Vertices[(index_v1 * 6) + 5] += normal.z;
+
+        m_Vertices[(index_v2 * 6) + 3] += normal.x;
+        m_Vertices[(index_v2 * 6) + 4] += normal.y;
+        m_Vertices[(index_v2 * 6) + 5] += normal.z;
+
+        m_Vertices[(index_v3 * 6) + 3] += normal.x;
+        m_Vertices[(index_v3 * 6) + 4] += normal.y;
+        m_Vertices[(index_v3 * 6) + 5] += normal.z;
     }
 
     glm::vec3 Chunk::Interpolate(glm::vec3 posA, glm::vec3 posB, uint8_t valA, uint8_t valB)
@@ -155,18 +210,23 @@ namespace Forgex::Voxel
         return glm::vec3(x, y, z) * s_SampleDensity;
     }
 
-    int Chunk::GetSampleID(glm::vec3 position)
+    uint64_t Chunk::GetSampleID(glm::vec3 position)
     {
         return position.x + (position.y * m_Samples.x) + (position.z * m_Samples.x * m_Samples.y);
     }
 
-    void Chunk::PushVertex(glm::vec3 vertex, glm::vec3 normal)
+    uint32_t Chunk::PushVertex(glm::vec3 vertex)
     {
+        uint32_t index = GetVertexCount();
+        // Add Vertex
         m_Vertices.push_back(vertex.x);
         m_Vertices.push_back(vertex.y);
         m_Vertices.push_back(vertex.z);
-        m_Vertices.push_back(normal.x);
-        m_Vertices.push_back(normal.y);
-        m_Vertices.push_back(normal.z);
+        // Add Normal
+        m_Vertices.push_back(0.0f);
+        m_Vertices.push_back(1.0f);
+        m_Vertices.push_back(0.0f);
+
+        return index;
     }
 }
