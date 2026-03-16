@@ -27,22 +27,15 @@ namespace Forgex::Voxel
         int totalSamples = (int)m_Samples.x * (int)m_Samples.y * (int)m_Samples.z;
         m_DensityValues.resize(totalSamples, 255);
 
-        FastNoiseLite noise;
-        noise.SetSeed(s_NoiseSeed);
-        noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-        noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-
         glm::vec3 worldOffset = m_ChunkPosition * m_ChunkSize;
 
-        bool hasAir = false;
-        bool hasGround = false;
+        bool hasAir = true;
+        bool hasGround = true;
         for(int i = 0; i < m_DensityValues.size(); i++)
         {
             glm::vec3 worldPosition = worldOffset + GetSamplePosition(i);
-            float n = noise.GetNoise(worldPosition.x, worldPosition.z);
-            float surfaceHeight = (n + 1.0f) / 2.0f * m_ChunkSize.y;
-            float density = (surfaceHeight - worldPosition.y) / m_ChunkSize.y * 255.0f;
-            m_DensityValues[i] = (uint8_t)glm::clamp(density + 127.0f, 0.0f, 255.0f);
+            float surfaceHeight;
+            m_DensityValues[i] = GetDensityValueAtPoint(worldPosition, &surfaceHeight);
 
             if(worldPosition.y < surfaceHeight) hasGround = true;
             else hasAir = true;
@@ -127,23 +120,7 @@ namespace Forgex::Voxel
                 m_Indices.push_back(index_v1);
                 m_Indices.push_back(index_v2);
                 m_Indices.push_back(index_v3);
-
-                CalculateNormal(index_v1, index_v2, index_v3);
            }
-        }
-
-        NormalizeNormals();
-    }
-
-    void Chunk::NormalizeNormals()
-    {
-        // We iterate starting at position 3 with a stride of 6 as to only modify the normals of each vertex
-        for(int i = 3; i < m_Vertices.size(); i += 6)
-        {
-            glm::vec3 finalNormal = glm::normalize(glm::vec3(m_Vertices[i], m_Vertices[i + 1], m_Vertices[i + 2]));
-            m_Vertices[i] = finalNormal.x;
-            m_Vertices[i + 1] = finalNormal.y;
-            m_Vertices[i + 2] = finalNormal.z;
         }
     }
 
@@ -166,31 +143,37 @@ namespace Forgex::Voxel
             return m_VertexToIndexMap[mapKey];
 
         glm::vec3 vertex = Interpolate(posA, posB, m_DensityValues[idA], m_DensityValues[idB]);
-        uint32_t vertexIndex = PushVertex(vertex * s_SampleDensity);
+        glm::vec3 normal = CalculateSampleGradientNormal(vertex);
+        uint32_t vertexIndex = PushVertex(vertex * s_SampleDensity, normal);
         m_VertexToIndexMap[mapKey] = vertexIndex;
 
         return vertexIndex;
     }
 
-    void Chunk::CalculateNormal(uint32_t index_v1, uint32_t index_v2, uint32_t index_v3)
+    glm::vec3 Chunk::CalculateSampleGradientNormal(glm::vec3 vertexLocalPos)
     {
-        glm::vec3 v1 = glm::vec3(m_Vertices[index_v1 * 6], m_Vertices[(index_v1 * 6) + 1], m_Vertices[(index_v1 * 6) + 2]);
-        glm::vec3 v2 = glm::vec3(m_Vertices[index_v2 * 6], m_Vertices[(index_v2 * 6) + 1], m_Vertices[(index_v2 * 6) + 2]);
-        glm::vec3 v3 = glm::vec3(m_Vertices[index_v3 * 6], m_Vertices[(index_v3 * 6) + 1], m_Vertices[(index_v3 * 6) + 2]);
+        glm::vec3 worldPos = (m_ChunkPosition * m_ChunkSize) + (vertexLocalPos * s_SampleDensity);
+        float delta = 0.5f;
+        float surfaceHeight;
 
-        glm::vec3 normal = glm::cross(v3 - v1, v2 - v1);
+        float dx = GetDensityValueAtPoint(worldPos + glm::vec3(delta, 0, 0), &surfaceHeight) - GetDensityValueAtPoint(worldPos - glm::vec3(delta, 0, 0), &surfaceHeight);
+        float dy = GetDensityValueAtPoint(worldPos + glm::vec3(0, delta, 0), &surfaceHeight) - GetDensityValueAtPoint(worldPos - glm::vec3(0, delta, 0), &surfaceHeight);
+        float dz = GetDensityValueAtPoint(worldPos + glm::vec3(0, 0, delta), &surfaceHeight) - GetDensityValueAtPoint(worldPos - glm::vec3(0, 0, delta), &surfaceHeight);
 
-        m_Vertices[(index_v1 * 6) + 3] += normal.x;
-        m_Vertices[(index_v1 * 6) + 4] += normal.y;
-        m_Vertices[(index_v1 * 6) + 5] += normal.z;
+        return glm::normalize(-glm::vec3(dx, dy, dz));
+    }
 
-        m_Vertices[(index_v2 * 6) + 3] += normal.x;
-        m_Vertices[(index_v2 * 6) + 4] += normal.y;
-        m_Vertices[(index_v2 * 6) + 5] += normal.z;
+    uint8_t Chunk::GetDensityValueAtPoint(glm::vec3 position, float* surfaceHeight)
+    {
+        FastNoiseLite noise;
+        noise.SetSeed(s_NoiseSeed);
+        noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+        noise.SetFractalType(FastNoiseLite::FractalType_FBm);
 
-        m_Vertices[(index_v3 * 6) + 3] += normal.x;
-        m_Vertices[(index_v3 * 6) + 4] += normal.y;
-        m_Vertices[(index_v3 * 6) + 5] += normal.z;
+        float n = noise.GetNoise(position.x, position.z);
+        *surfaceHeight = (n + 1.0f) / 2.0f * m_ChunkSize.y;
+        float density = (*surfaceHeight - position.y) / m_ChunkSize.y * 255.0f;
+        return glm::clamp(density + 127.0f, 0.0f, 255.0f);
     }
 
     glm::vec3 Chunk::Interpolate(glm::vec3 posA, glm::vec3 posB, uint8_t valA, uint8_t valB)
@@ -215,7 +198,7 @@ namespace Forgex::Voxel
         return position.x + (position.y * m_Samples.x) + (position.z * m_Samples.x * m_Samples.y);
     }
 
-    uint32_t Chunk::PushVertex(glm::vec3 vertex)
+    uint32_t Chunk::PushVertex(glm::vec3 vertex, glm::vec3 normal)
     {
         uint32_t index = GetVertexCount();
         // Add Vertex
@@ -223,9 +206,9 @@ namespace Forgex::Voxel
         m_Vertices.push_back(vertex.y);
         m_Vertices.push_back(vertex.z);
         // Add Normal
-        m_Vertices.push_back(0.0f);
-        m_Vertices.push_back(1.0f);
-        m_Vertices.push_back(0.0f);
+        m_Vertices.push_back(normal.x);
+        m_Vertices.push_back(normal.y);
+        m_Vertices.push_back(normal.z);
 
         return index;
     }

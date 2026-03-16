@@ -40,13 +40,13 @@ namespace Forgex::Voxel
 
         bool GenerateDensity();
         void GenerateMesh();
-        void NormalizeNormals();
 
         uint32_t GetOrAddVertexIndex(glm::vec3 posA, glm::vec3 posB);
-        void CalculateNormal(uint32_t index_v1, uint32_t index_v2, uint32_t index_v3);
+        glm::vec3 CalculateSampleGradientNormal(glm::vec3 vertexLocalPos);
+        uint8_t GetDensityValueAtPoint(glm::vec3 position, float* surfaceHeight);
         glm::vec3 Interpolate(glm::vec3 posA, glm::vec3 posB, uint8_t valA, uint8_t valB);
         glm::vec3 GetSamplePosition(int sampleID);
         uint64_t GetSampleID(glm::vec3 position);
-        uint32_t PushVertex(glm::vec3 vertex);
+        uint32_t PushVertex(glm::vec3 vertex, glm::vec3 normal);
     };
 }

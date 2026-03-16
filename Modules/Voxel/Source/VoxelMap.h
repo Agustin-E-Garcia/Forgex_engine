@@ -18,7 +18,7 @@ namespace Forgex::Voxel
     private:
         glm::vec3 m_MapArea = glm::vec3(256.0f);
         glm::vec3 m_ChunkSize = glm::vec3(32.0f);
-        float m_SampleDensity = 0.5f;
+        float m_SampleDensity = 1.0f;
         int m_Cutoff = 127;
 
         std::vector<Chunk> m_Chunks;
