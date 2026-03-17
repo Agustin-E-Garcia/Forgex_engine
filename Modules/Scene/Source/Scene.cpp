@@ -10,10 +10,13 @@ namespace Forgex::Scene
     Scene::Scene(const char* name) : m_Name(name) {}
     Scene::~Scene()
     {
-        for (auto& [name, system] : m_SystemMap)
+        for (auto& [name, system] : m_UpdateSystemMap)
+            delete system;
+        for (auto& [name, system] : m_RenderSystemMap)
             delete system;
 
-        m_SystemMap.clear();
+        m_UpdateSystemMap.clear();
+        m_RenderSystemMap.clear();
     }
 
     int Scene::CreateEntity(const char* EntityName)
@@ -31,9 +34,17 @@ namespace Forgex::Scene
 
     void Scene::Update(float deltaTime)
     {
-        for(auto& [name, system] : m_SystemMap)
+        for(auto& [name, system] : m_UpdateSystemMap)
         {
-            system->Update(m_Registry, deltaTime);
+            system->Run(m_Registry, deltaTime);
+        }
+    }
+
+    void Scene::Render()
+    {
+        for(auto& [name, system] : m_RenderSystemMap)
+        {
+            system->Run(m_Registry, 0);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Forgex::Core
     {
     public:
         SYSTEM_NAME(MovementSystem);
+        SYSTEM_TYPE(UpdateSystem);
 
         void OnUpdate(float deltaTime, entt::entity entity, Scene::Transform& transform, Scene::PlayerControlled& control) override
         {

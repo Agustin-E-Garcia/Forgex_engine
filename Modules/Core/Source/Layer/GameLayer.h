@@ -5,11 +5,11 @@
 #include <ForgexGraphics.h>
 #include <ForgexAssets.h>
 #include <ForgexVoxel.h>
-#include <cstdint>
 
 #include "../AssetTypes/ShaderAsset.h"
 #include "../Systems/MovementSystem.h"
-#include "glm/trigonometric.hpp"
+#include "../Systems/VoxelTerrainSetupSystem.h"
+#include "../Systems/ChunkMeshingSystem.h"
 
 namespace Forgex::Core
 {
@@ -32,30 +32,15 @@ namespace Forgex::Core
         {
             m_ActiveScene = new Scene::Scene("Default Scene");
             m_AssetManager = new Assets::AssetsManager();
-            m_ActiveMap = new Voxel::VoxelMap();
-
-            for (Voxel::Chunk& chunk : *m_ActiveMap)
-            {
-                chunk.vertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
-                (
-                    Graphics::Utils::BufferType::VertexBuffer,
-                    chunk.GetVertexCount() * 6 * sizeof(float),
-                    chunk.GetVertices()
-                );
-
-                chunk.indexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
-                 (
-                    Graphics::Utils::BufferType::IndexBuffer,
-                    chunk.GetIndexCount() * sizeof(uint32_t),
-                    chunk.GetIndices()
-                 );
-            }
 
             int cameraEntity = m_ActiveScene->CreateEntity("MainCamera");
             m_ActiveScene->AddComponent<Scene::Camera>(cameraEntity);
             m_ActiveScene->AddComponent<Scene::PlayerControlled>(cameraEntity);
 
+            m_ActiveScene->RunSystem<VoxelTerrainSetupSystem>();
+
             m_ActiveScene->AddSystem<MovementSystem>();
+            m_ActiveScene->AddSystem<ChunkMeshingSystem>();
         }
 
         void OnUpdate(float deltaTime) override
@@ -80,16 +65,19 @@ namespace Forgex::Core
 
             Graphics::SceneRenderer renderer;
             std::vector<Graphics::Resources::RenderInfo> renderInfos;
-            for(Voxel::Chunk& chunk : *m_ActiveMap)
+            auto chunkCollection = m_ActiveScene->GetRegistry().view<Voxel::Chunk>();
+            for(entt::entity entity : chunkCollection)
             {
+                Voxel::Chunk& chunk = chunkCollection.get<Voxel::Chunk>(entity);
+
                 renderInfos.emplace_back
                 (
                     m_AssetManager->LoadAsset<ShaderAsset>("Resources/Shaders/ColorShader.FShader")->GetShaderID(),
                     -1,
-                    chunk.GetModelMatrix(),
+                    chunk.m_ModelMatrix,
                     chunk.vertexBufferID,
                     chunk.indexBufferID,
-                    chunk.GetIndexCount()
+                    chunk.m_Indices.size()
                 );
             }
 
@@ -103,7 +91,6 @@ namespace Forgex::Core
 
     private:
         Scene::Scene* m_ActiveScene = nullptr;
-        Voxel::VoxelMap* m_ActiveMap = nullptr;
         Assets::AssetsManager* m_AssetManager = nullptr;
         Graphics::SceneRenderer m_SceneRenderer;
     };

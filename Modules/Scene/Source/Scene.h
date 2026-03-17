@@ -1,7 +1,6 @@
 #pragma once
 #include "SceneExports.h"
 #include "SystemBase.h"
-#include <map>
 #include <string>
 #include <entt.hpp>
 
@@ -23,10 +22,21 @@ namespace Forgex::Scene
         }
 
         template<class T>
+        void RunSystem()
+        {
+            static_assert(std::is_base_of<ISystem, T>::value, "T must inherit from Component");
+            T* system = new T();
+            system->Run(m_Registry, 0.0f);
+            delete system;
+        }
+
+        template<class T>
         void AddSystem()
         {
             static_assert(std::is_base_of<ISystem, T>::value, "T must inherit from Component");
-            m_SystemMap[T::Name()] = new T();
+
+            std::unordered_map<std::string, ISystem*>& systemMap = T::GetSystemType() == SystemType::UpdateSystem ? m_UpdateSystemMap : m_RenderSystemMap;
+            systemMap[T::GetName()] = new T();
         }
 
         template<class T>
@@ -34,13 +44,15 @@ namespace Forgex::Scene
         {
             static_assert(std::is_base_of<ISystem, T>::value, "T must inherit from ISystem");
 
-            auto it = m_SystemMap.find(T::Name());
-            if(it == m_SystemMap.end()) return;
+            std::unordered_map<std::string, ISystem*>& systemMap = T::GetSystemType() == SystemType::UpdateSystem ? m_UpdateSystemMap : m_RenderSystemMap;
+            auto it = systemMap.find(T::GetName());
+            if(it == systemMap.end()) return;
             delete it->second;
-            m_SystemMap.erase(it);
+            systemMap.erase(it);
         }
 
         void Update(float deltaTime);
+        void Render();
 
         entt::registry& GetRegistry() { return m_Registry; }
         const char* GetName() const { return m_Name; }
@@ -48,6 +60,7 @@ namespace Forgex::Scene
     private:
         const char* m_Name;
         entt::registry m_Registry;
-        std::map<std::string, ISystem*> m_SystemMap;
+        std::unordered_map<std::string, ISystem*> m_UpdateSystemMap;
+        std::unordered_map<std::string, ISystem*> m_RenderSystemMap;
     };
 }
