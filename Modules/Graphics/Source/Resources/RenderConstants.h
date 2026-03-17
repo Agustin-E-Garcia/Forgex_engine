@@ -86,7 +86,7 @@ namespace Forgex::Graphics::Resources::Constants
         {
             if(g_VertexBufferID == INVALID_ID) g_VertexBufferID = Utils::BufferManager::GenerateBuffer(Utils::BufferType::VertexBuffer,
                 sizeof(float) * g_SkyboxVertices.size(), g_SkyboxVertices.data());
-            
+
             if(g_ShaderID == INVALID_ID) g_ShaderID = Utils::ShaderLoader::LoadShader(g_SkyboxVertexShaderPath, g_SkyboxFragmentShaderPath);
 
             if(g_DefaultTextureID == INVALID_ID) g_DefaultTextureID = Utils::TextureLoader::LoadCubemapTexture(Utils::TextureType::Cubemap,

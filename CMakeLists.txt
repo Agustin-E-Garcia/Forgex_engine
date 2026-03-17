@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(BUILD_OUTPUT_DIR ${CMAKE_BINARY_DIR}/Build/Bin)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Find OpenGL properly
 find_package(OpenGL REQUIRED)
@@ -33,7 +34,7 @@ endfunction()
 
 # Debug_Module
 file(GLOB_RECURSE DEBUG_SRC Modules/Debug/*.cpp Modules/Debug/*.h)
-add_library(Debug_Module SHARED ${DEBUG_SRC})
+add_library(Debug_Module STATIC ${DEBUG_SRC})
 target_include_directories(Debug_Module PRIVATE ExternalLibraries/Spdlog/include)
 target_compile_definitions(Debug_Module PRIVATE DEBUG_DLL)
 set_module_properties(Debug_Module)
@@ -56,7 +57,7 @@ set_module_properties(Core_Module)
 
 # Graphics_Module
 file(GLOB_RECURSE GRAPHICS_SRC Modules/Graphics/*.cpp Modules/Graphics/*.h)
-add_library(Graphics_Module SHARED ${GRAPHICS_SRC})
+add_library(Graphics_Module STATIC ${GRAPHICS_SRC})
 target_include_directories(Graphics_Module PRIVATE
     ExternalLibraries/GLM
     ExternalLibraries/GLEW/glew-2.1.0/include
@@ -78,7 +79,7 @@ set_module_properties(Graphics_Module)
 
 # Scene_Module
 file(GLOB_RECURSE SCENE_SRC Modules/Scene/*.cpp Modules/Scene/*.h)
-add_library(Scene_Module SHARED ${SCENE_SRC})
+add_library(Scene_Module STATIC ${SCENE_SRC})
 target_include_directories(Scene_Module PRIVATE
     ExternalLibraries/GLM 
     ExternalLibraries/EnTT
@@ -89,14 +90,14 @@ set_module_properties(Scene_Module)
 
 # Assets_Module
 file(GLOB_RECURSE ASSETS_SRC Modules/Assets/*.cpp Modules/Assets/*.h)
-add_library(Assets_Module SHARED ${ASSETS_SRC})
+add_library(Assets_Module STATIC ${ASSETS_SRC})
 target_compile_definitions(Assets_Module PRIVATE ASSETS_DLL)
 target_link_libraries(Assets_Module PRIVATE Debug_Module)
 set_module_properties(Assets_Module)
 
 # Voxel_Module
 file(GLOB_RECURSE VOXEL_SRC Modules/Voxel/*.cpp Modules/Voxel/*.h)
-add_library(Voxel_Module SHARED ${VOXEL_SRC})
+add_library(Voxel_Module STATIC ${VOXEL_SRC})
 target_include_directories(Voxel_Module PRIVATE ExternalLibraries/GLM ExternalLibraries/FastNoiseLite)
 target_compile_definitions(Voxel_Module PRIVATE VOXEL_DLL)
 target_link_libraries(Voxel_Module PRIVATE Debug_Module)
