@@ -14,6 +14,12 @@ namespace Forgex::Debug
 		Critical
 	};
 	
+    struct ConsoleMessage
+    {
+        std::string text;
+        LogLevel level;
+    };
+
 	class DEBUG_API Log
 	{
 	public:
@@ -22,16 +28,19 @@ namespace Forgex::Debug
 		template<typename... Args>
 		static void CoreLog(LogLevel level, std::string_view fmt, Args&&... args)
 		{
-			const std::string message = std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+			const std::string message = std::vformat(fmt, std::make_format_args(args...));
 			LogMessage(s_CoreLogger, level, message);
 		}
 
 		template<typename... Args>
 		static void ClientLog(LogLevel level, std::string_view fmt, Args&&... args)
 		{
-			const std::string message = std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+			const std::string message = std::vformat(fmt, std::make_format_args(args...));
 			LogMessage(s_ClientLogger, level, message);
 		}
+
+        static bool HasConsoleMessage();
+        static ConsoleMessage GetNextConsoleMessage();
 
 	private:
 		static const std::string s_CoreLogger;

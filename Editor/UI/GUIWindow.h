@@ -9,6 +9,8 @@ namespace Forgex::UI
 		GUIWindow(const char* name, bool isActive = false) : m_Name(name), m_IsActive(isActive) {}
 		~GUIWindow() {}
 
+        void ToggleWindow() { m_IsActive = !m_IsActive; }
+
 		void Draw()
 		{
 			if(!m_IsActive) return;
@@ -17,9 +19,11 @@ namespace Forgex::UI
 			OnDraw();
 			ImGui::End();
 		}
+
+        void Update() { OnUpdate(); }
 	protected:
 		virtual void OnDraw() {};
-		virtual void Update() {};
+		virtual void OnUpdate() {};
 	private:
 		bool m_IsActive = false;
 		const char* m_Name;

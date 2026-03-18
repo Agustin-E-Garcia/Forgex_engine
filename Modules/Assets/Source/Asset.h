@@ -1,5 +1,6 @@
 #pragma once
 #include "AssetsExports.h"
+#include <string>
 
 namespace Forgex::Assets
 {
@@ -8,7 +9,7 @@ namespace Forgex::Assets
     public:
         virtual ~Asset() = default;
 
-        virtual bool Load(const char* assetPath) = 0;
-        virtual bool Save(const char* assetPath) = 0;
+        virtual bool Load(const std::string& assetPath) = 0;
+        virtual bool Save(const std::string& assetPath) = 0;
     };
 }

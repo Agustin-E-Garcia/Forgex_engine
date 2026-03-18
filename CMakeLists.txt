@@ -111,6 +111,7 @@ target_link_libraries(Forgex_Editor PRIVATE Core_Module Debug_Module ImGui)
 set_target_properties(Forgex_Editor PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
 )
+target_compile_options(Forgex_Editor PRIVATE -g)
 
 # Only Windows needs DLL copy steps
 if(WIN32)

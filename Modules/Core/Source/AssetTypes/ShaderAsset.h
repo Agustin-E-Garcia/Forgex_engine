@@ -10,7 +10,7 @@ namespace Forgex::Core
     class ShaderAsset : public Assets::Asset
     {
     public:
-        bool Load(const char* assetPath) override
+        bool Load(const std::string& assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Loading ShaderAsset: '{0}'", assetPath);
 
@@ -27,7 +27,7 @@ namespace Forgex::Core
             return m_ShaderID != -1;
         }
 
-        bool Save(const char* assetPath) override
+        bool Save(const std::string& assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Saving ShaderAsset: '{0}'", assetPath);
             return true;

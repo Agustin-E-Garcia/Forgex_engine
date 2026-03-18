@@ -3,7 +3,7 @@
 
 EngineInstance::EngineInstance() : Forgex::Core::Application()
 {
-    //m_LayerStack.PushOverlay(new Forgex::UI::UILayer());
+    m_LayerStack.PushOverlay(new Forgex::UI::UILayer());
 }
 
 EngineInstance::~EngineInstance()

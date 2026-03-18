@@ -8,15 +8,15 @@ namespace Forgex::Core
     class TextureAsset : public Assets::Asset
     {
     public:
-        bool Load(const char* assetPath) override
+        bool Load(const std::string& assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Loading TextureAsset: '{0}'", assetPath);
-            m_TextureID = Graphics::Utils::TextureLoader::LoadDefaultTexture(Graphics::Utils::TextureType::Default, assetPath);
+            m_TextureID = Graphics::Utils::TextureLoader::LoadDefaultTexture(Graphics::Utils::TextureType::Default, assetPath.c_str());
 
             return m_TextureID != -1;
         }
 
-        bool Save(const char* assetPath) override
+        bool Save(const std::string& assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Saving TextureAsset: '{0}'", assetPath);
             return true;

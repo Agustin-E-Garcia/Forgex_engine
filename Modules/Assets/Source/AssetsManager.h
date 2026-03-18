@@ -2,6 +2,7 @@
 #include "AssetsExports.h"
 #include "Asset.h"
 #include <unordered_map>
+#include <string>
 
 namespace Forgex::Assets
 {
@@ -15,7 +16,7 @@ namespace Forgex::Assets
         }
 
         template<class T>
-        T* LoadAsset(const char* assetPath)
+        T* LoadAsset(const std::string& assetPath)
         {
             static_assert(std::is_base_of<Asset, T>::value, "T must inherit from Asset");
 
@@ -33,7 +34,7 @@ namespace Forgex::Assets
             return static_cast<T*>(newAsset);
         }
 
-        void UnloadAsset(const char* path)
+        void UnloadAsset(const std::string& path)
         {
             if(!m_LoadedAssets.contains(path)) return;
 
@@ -46,6 +47,6 @@ namespace Forgex::Assets
         AssetManager(const AssetManager&) = delete;
         AssetManager& operator=(const AssetManager&) = delete;
 
-        std::unordered_map<const char*, Asset*> m_LoadedAssets;
+        std::unordered_map<std::string, Asset*> m_LoadedAssets;
     };
 }
