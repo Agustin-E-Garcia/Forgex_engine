@@ -80,9 +80,11 @@ namespace Forgex::UI
         // need to implement a function to translate GLFW keycodes into ImGui keycodes
         // F1 is 290
         // Backspace is 259
+        // Enter is 257
 
         if(keycode == 259) ImGui::GetIO().AddKeyEvent(ImGuiKey_Backspace, pressed);
         if(keycode == 290) ImGui::GetIO().AddKeyEvent(ImGuiKey_F1, pressed);
+        if(keycode == 257) ImGui::GetIO().AddKeyEvent(ImGuiKey_Enter, pressed);
     }
 
     void UIWindowManager::OnWindowResized(int width, int height)

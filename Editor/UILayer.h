@@ -15,7 +15,11 @@ namespace Forgex::UI
 
         ~UILayer() override { delete m_WindowManager; }
 
-        void OnAttach() override {  m_WindowManager = UI::CreateWindowManager(); }
+        void OnAttach() override 
+        {  
+            m_WindowManager = UI::CreateWindowManager();
+            REGISTER_COMMAND("entity", [](){ LOG_CORE(Debug::Warning, "Attempted to open window: Entity"); }, "Toggles the entity inspector window");
+        }
 
         void OnDetach() override {}
 

@@ -84,7 +84,12 @@ namespace Forgex::UI
             ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
             if (ImGui::InputText("Input", m_CommandBuffer, IM_COUNTOF(m_CommandBuffer), input_text_flags))
             {
-                // Execute commands
+                if(m_CommandBuffer[0] != '\0')
+                {
+                    Debug::Command::Get().Execute(std::string(m_CommandBuffer));
+                    m_CommandBuffer[0] = '\0';
+                }
+
                 reclaim_focus = true;
             }
 
