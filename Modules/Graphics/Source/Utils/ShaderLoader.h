@@ -7,5 +7,6 @@ namespace Forgex::Graphics::Utils
     {
     public:
         static int LoadShader(const char* vertexShader, const char* fragmentShader);
+        static void UnloadShader(unsigned int shaderID);
     };
 }

@@ -16,6 +16,8 @@ namespace Forgex::Core
             return m_TextureID != -1;
         }
 
+        void Unload() override { Graphics::Utils::TextureLoader::UnloadTexture(m_TextureID); }
+
         bool Save(const std::string& assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Saving TextureAsset: '{0}'", assetPath);

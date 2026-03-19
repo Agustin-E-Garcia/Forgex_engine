@@ -14,14 +14,14 @@ namespace Forgex::Graphics::Utils
         unsigned int m_Format;
         unsigned int m_Type;
     };
-    
+
     unsigned int GenerateTexture(TextureType type, TextureInfo info, const void* data)
     {
         unsigned int textureID;
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, info.m_InternalFormat, info.m_Width, info.m_Height, 0, info.m_Format, info.m_Type, data);
-        
+
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -30,32 +30,34 @@ namespace Forgex::Graphics::Utils
         glBindTexture(GL_TEXTURE_2D, 0);
         return textureID;
     }
-    
+
     int TextureLoader::LoadDefaultTexture(TextureType type, const char* file)
     {
         LOG_CORE(Debug::Info, "Loading Texture '{0}'", file);
         stbi_set_flip_vertically_on_load(true);
-        
+
         int width, height, nrChannels;
-        const unsigned char* image = stbi_load(file, &width, &height, &nrChannels, 0);
+        unsigned char* image = stbi_load(file, &width, &height, &nrChannels, 0);
 
         if(!image)
         {
             LOG_CORE(Debug::Error, "Failed to load Texture '{0}'", file);
             return -1;
         }
-        
-        return GenerateTexture(type, {GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE}, image);
+
+        unsigned int textureID =  GenerateTexture(type, {GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE}, image);
+        stbi_image_free(image);
+        return textureID;
     }
 
-    
+
     int TextureLoader::LoadCubemapTexture(TextureType type, std::vector<const char*> filePaths)
     {
         stbi_set_flip_vertically_on_load(false);
         unsigned int textureID;
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-        
+
         int width, height, nrChannels;
         for (unsigned int i = 0; i < filePaths.size(); i++)
         {
@@ -82,5 +84,10 @@ namespace Forgex::Graphics::Utils
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         return textureID;
+    }
+
+    void TextureLoader::UnloadTexture(unsigned int textureID)
+    {
+        glDeleteTextures(1, &textureID);
     }
 }

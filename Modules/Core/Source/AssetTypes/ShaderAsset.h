@@ -27,6 +27,8 @@ namespace Forgex::Core
             return m_ShaderID != -1;
         }
 
+        void Unload() override { Graphics::Utils::ShaderLoader::UnloadShader(m_ShaderID); }
+
         bool Save(const std::string& assetPath) override
         {
             LOG_CORE(Debug::LogLevel::Info, "Saving ShaderAsset: '{0}'", assetPath);

@@ -9,11 +9,9 @@ namespace Forgex::Assets
     class ASSETS_API AssetManager
     {
     public:
-        static AssetManager& Get()
-        {
-            static AssetManager instance;
-            return instance;
-        }
+        static AssetManager& Get();
+
+        const std::unordered_map<std::string, Asset*>& GetLoadedAssets() const;
 
         template<class T>
         T* LoadAsset(const std::string& assetPath)
@@ -46,6 +44,12 @@ namespace Forgex::Assets
         AssetManager() = default;
         AssetManager(const AssetManager&) = delete;
         AssetManager& operator=(const AssetManager&) = delete;
+
+        ~AssetManager() 
+        { 
+            for(auto& [path, asset] : m_LoadedAssets) 
+                delete asset; 
+        }
 
         std::unordered_map<std::string, Asset*> m_LoadedAssets;
     };

@@ -2,6 +2,8 @@
 #include <ForgexCore.h>
 #include "UI/UIWindowManager.h"
 #include "UI/Panels/Console.h"
+#include "UI/Panels/AssetInspector.h"
+#include "UI/Panels/Profiler.h"
 #include "imgui.h"
 
 #include <ForgexDebugTools.h>
@@ -19,11 +21,18 @@ namespace Forgex::UI
         {  
             m_WindowManager = UI::CreateWindowManager();
             REGISTER_COMMAND("entity", [](){ LOG_CORE(Debug::Warning, "Attempted to open window: Entity"); }, "Toggles the entity inspector window");
+            REGISTER_COMMAND("asset", [this](){ m_WindowManager->GetWindow<AssetInspector>(m_AssetInspectorID)->ToggleWindow(); }, "Toggles the asset inspector window");
+            REGISTER_COMMAND("profiler", [this]() { m_WindowManager->GetWindow<Profiler>(m_ProfilerID)->ToggleWindow(); }, "Toggles the profiler window");
         }
 
         void OnDetach() override {}
 
-        void OnBegin() override { m_ConsolePanelID = m_WindowManager->AddWindow<ConsolePanel>(); }
+        void OnBegin() override 
+        {
+            m_ConsolePanelID = m_WindowManager->AddWindow<ConsolePanel>();
+            m_AssetInspectorID = m_WindowManager->AddWindow<AssetInspector>();
+            m_ProfilerID = m_WindowManager->AddWindow<Profiler>();
+        }
 
         void OnEnd() override {}
 
@@ -51,6 +60,8 @@ namespace Forgex::UI
     private:
         UI::UIWindowManager* m_WindowManager = nullptr;
         unsigned int m_ConsolePanelID;
+        unsigned int m_AssetInspectorID;
+        unsigned int m_ProfilerID;
 
         bool HandleCharInputEvent(Core::CharInputEvent& event) { m_WindowManager->OnCharInput(event.GetKeyCode()); return false; }
         bool HandleKeyPressedEvent(Core::KeyPressedEvent& event) { m_WindowManager->OnKeyPressed(event.GetKeyCode(), event.IsRepeat(), event.IsPressed()); return false; }

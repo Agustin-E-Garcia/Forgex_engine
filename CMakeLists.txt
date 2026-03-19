@@ -106,7 +106,7 @@ set_module_properties(Voxel_Module)
 # Forgex_Editor
 file(GLOB_RECURSE EDITOR_SRC Editor/*.cpp Editor/*.h)
 add_executable(Forgex_Editor ${EDITOR_SRC})
-target_include_directories(Forgex_Editor PRIVATE Modules/Core/Include ExternalLibraries/ImGui)
+target_include_directories(Forgex_Editor PRIVATE Modules/Core/Include Modules/Assets/Include ExternalLibraries/ImGui)
 target_link_libraries(Forgex_Editor PRIVATE Core_Module Debug_Module ImGui)
 set_target_properties(Forgex_Editor PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>

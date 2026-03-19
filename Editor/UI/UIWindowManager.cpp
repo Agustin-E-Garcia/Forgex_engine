@@ -24,6 +24,11 @@ namespace Forgex::UI
 
     UIWindowManager::~UIWindowManager()
     {
+        for(GUIWindow* window : m_WindowCollection)
+            delete window;
+
+        m_WindowCollection.clear();
+
     	ImGui_ImplOpenGL3_Shutdown();
     	ImGui::DestroyContext();
     }

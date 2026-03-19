@@ -102,4 +102,9 @@ namespace Forgex::Graphics::Utils
 	
 		return programID;
     }
+
+    void ShaderLoader::UnloadShader(unsigned int shaderID)
+    {
+        glDeleteProgram(shaderID);
+    }
 }

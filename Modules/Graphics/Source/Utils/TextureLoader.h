@@ -15,5 +15,6 @@ namespace Forgex::Graphics::Utils
     public:
         static int LoadDefaultTexture(TextureType type, const char* filePaths);
         static int LoadCubemapTexture(TextureType type, std::vector<const char*> filePaths);
+        static void UnloadTexture(unsigned int textureID);
     };
 }

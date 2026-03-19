@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include <entt.hpp>
 #include <ForgexDebugTools.h>
+#include <string>
 
 #include "Components/EntityInfo.h"
 #include "Components/Transform.h"
@@ -36,6 +37,7 @@ namespace Forgex::Scene
     {
         for(auto& [name, system] : m_UpdateSystemMap)
         {
+            PROFILE_FUNCTION(std::string(name));
             system->Run(m_Registry, deltaTime);
         }
     }
@@ -44,6 +46,7 @@ namespace Forgex::Scene
     {
         for(auto& [name, system] : m_RenderSystemMap)
         {
+            PROFILE_FUNCTION(std::string(name));
             system->Run(m_Registry, 0);
         }
     }
