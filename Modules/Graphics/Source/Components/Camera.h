@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 
-namespace Forgex::Scene 
+namespace Forgex::Graphics
 {
     struct Camera
     {

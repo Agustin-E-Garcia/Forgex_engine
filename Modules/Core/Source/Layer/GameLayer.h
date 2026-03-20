@@ -32,7 +32,7 @@ namespace Forgex::Core
             m_ActiveScene = new Scene::Scene("Default Scene");
 
             int cameraEntity = m_ActiveScene->CreateEntity("MainCamera");
-            m_ActiveScene->AddComponent<Scene::Camera>(cameraEntity);
+            m_ActiveScene->AddComponent<Graphics::Camera>(cameraEntity);
             m_ActiveScene->AddComponent<Scene::PlayerControlled>(cameraEntity);
 
             m_ActiveScene->RunSystem<VoxelTerrainSetupSystem>();

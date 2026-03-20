@@ -1,5 +1,5 @@
 #include "SceneRenderer.h"
-#include "Resources/RenderInfo.h"
+#include "Components/Renderable.h"
 #include "Resources/RenderView.h"
 #include "Resources/RenderConstants.h"
 
@@ -44,7 +44,7 @@ namespace Forgex::Graphics
         glDepthMask(GL_TRUE);
     }
 
-    void SceneRenderer::Render(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos)
+    void SceneRenderer::Render(const Resources::RenderView* renderView, std::vector<Renderable>* renderInfos)
     {
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
@@ -60,14 +60,14 @@ namespace Forgex::Graphics
 
         RenderSkybox(renderView);
 
-        for (const Resources::RenderInfo& info : *renderInfos)
+        for (const Renderable& info : *renderInfos)
         {
-            glUseProgram(info.m_ShaderID);
+            glUseProgram(info.m_ShaderAsset->GetShaderID());
 
-            const int modelLoc = glGetUniformLocation(info.m_ShaderID, "model");
-            const int viewLoc = glGetUniformLocation(info.m_ShaderID, "view");
-            const int projectionLoc = glGetUniformLocation(info.m_ShaderID, "projection");
-            const int TextureLoc = glGetUniformLocation(info.m_ShaderID, "textureSampler");
+            const int modelLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "model");
+            const int viewLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "view");
+            const int projectionLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "projection");
+            const int TextureLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "textureSampler");
 
             if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info.m_ModelMatrix[0][0]);
             if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
@@ -81,7 +81,7 @@ namespace Forgex::Graphics
             if(TextureLoc != -1)
             {
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, info.m_TextureID);
+                glBindTexture(GL_TEXTURE_2D, info.m_TextureAsset->GetTextureID());
                 glUniform1i(TextureLoc, 0);
             }
 
@@ -115,7 +115,7 @@ namespace Forgex::Graphics
                 LOG_CORE(Debug::Error, "Error after binding uv buffer: ", error);
             }
 
-            glDrawElements(GL_TRIANGLES, info.m_IndexCount, GL_UNSIGNED_INT, (void*)0);
+            glDrawElements(GL_TRIANGLES, info.m_IndexSize, GL_UNSIGNED_INT, (void*)0);
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);
 
@@ -126,7 +126,7 @@ namespace Forgex::Graphics
         }
     }
 
-    void SceneRenderer::RenderMap(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos)
+    void SceneRenderer::RenderMap(const Resources::RenderView* renderView, std::vector<Renderable>* renderInfos)
     {
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
@@ -143,13 +143,13 @@ namespace Forgex::Graphics
 
         RenderSkybox(renderView);
 
-        for(Resources::RenderInfo& info : *renderInfos)
+        for(const Renderable& info : *renderInfos)
         {
-            glUseProgram(info.m_ShaderID);
+            glUseProgram(info.m_ShaderAsset->GetShaderID());
 
-            const int modelLoc = glGetUniformLocation(info.m_ShaderID, "model");
-            const int viewLoc = glGetUniformLocation(info.m_ShaderID, "view");
-            const int projectionLoc = glGetUniformLocation(info.m_ShaderID, "projection");
+            const int modelLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "model");
+            const int viewLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "view");
+            const int projectionLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "projection");
 
             if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info.m_ModelMatrix[0][0]);
             if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
@@ -172,7 +172,7 @@ namespace Forgex::Graphics
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info.m_IndexBufferID);
 
-            glDrawElements(GL_TRIANGLES, info.m_IndexCount, GL_UNSIGNED_INT, (void*)0);
+            glDrawElements(GL_TRIANGLES, info.m_IndexSize, GL_UNSIGNED_INT, (void*)0);
             //glDrawArrays(GL_TRIANGLES, 0, info.m_IndexCount);
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);

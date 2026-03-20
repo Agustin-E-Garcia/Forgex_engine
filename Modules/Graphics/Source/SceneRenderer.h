@@ -1,6 +1,6 @@
 #pragma once
 #include "GraphicsExports.h"
-#include "Resources/RenderInfo.h"
+#include "Components/Renderable.h"
 
 namespace Forgex::Graphics
 {
@@ -13,7 +13,7 @@ namespace Forgex::Graphics
         SceneRenderer() = default;
         ~SceneRenderer() = default;
 
-        void Render(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos);
-        void RenderMap(const Resources::RenderView* renderView, std::vector<Resources::RenderInfo>* renderInfos);
+        void Render(const Resources::RenderView* renderView, std::vector<Renderable>* renderInfos);
+        void RenderMap(const Resources::RenderView* renderView, std::vector<Renderable>* renderInfos);
     };
 }
