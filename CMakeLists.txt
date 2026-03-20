@@ -15,15 +15,13 @@ find_package(glfw3 REQUIRED)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Copy compile_commands.json to project root after generation
-# Only supported with Makefile/Ninja generators (not MSVC)
-if(NOT MSVC)
-    add_custom_target(copy_compile_commands ALL
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_BINARY_DIR}/compile_commands.json
-            ${CMAKE_SOURCE_DIR}/compile_commands.json
-    )
-endif()
+# Copy compile_commands.json to project root after generation if it exists
+add_custom_target(copy_compile_commands ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}/compile_commands.json
+    COMMENT "Copying compile_commands.json if it exists"
+)
 
 # Global includes and options
 include_directories(
