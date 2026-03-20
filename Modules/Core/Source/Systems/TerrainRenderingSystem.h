@@ -1,11 +1,8 @@
 #pragma once
 #include <ForgexScene.h>
-#include <ForgexAssets.h>
 #include <ForgexGraphics.h>
 #include <ForgexVoxel.h>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "../AssetTypes/ShaderAsset.h"
 
 namespace Forgex::Core
 {
@@ -32,19 +29,19 @@ namespace Forgex::Core
 
             Graphics::SceneRenderer renderer;
             std::vector<Graphics::Resources::RenderInfo> renderInfos;
-            auto chunkCollection = registry.view<Voxel::Chunk>();
+            auto chunkCollection = registry.view<Voxel::Chunk, Graphics::Renderable>();
             for(entt::entity entity : chunkCollection)
             {
-                Voxel::Chunk& chunk = chunkCollection.get<Voxel::Chunk>(entity);
+                Graphics::Renderable& chunk = chunkCollection.get<Graphics::Renderable>(entity);
 
-                renderInfos.emplace_back // Need to make the asset manager a singleton so we're able to request asset loading from wherever
+                renderInfos.emplace_back
                 (
-                    Assets::AssetManager::Get().LoadAsset<ShaderAsset>("Resources/Shaders/ColorShader.FShader")->GetShaderID(),
+                    chunk.m_ShaderAsset->GetShaderID(),
                     -1,
                     chunk.m_ModelMatrix,
-                    chunk.vertexBufferID,
-                    chunk.indexBufferID,
-                    chunk.m_Indices.size()
+                    chunk.m_VertexBufferID,
+                    chunk.m_IndexBufferID,
+                    chunk.m_IndexSize
                 );
             }
 

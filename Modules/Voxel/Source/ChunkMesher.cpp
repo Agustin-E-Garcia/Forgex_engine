@@ -1,5 +1,6 @@
 #include "ChunkMesher.h"
 #include "Resources/MarchingCubesTable.h"
+#include <ForgexDebugTools.h>
 
 namespace Forgex::Voxel
 {
@@ -8,6 +9,8 @@ namespace Forgex::Voxel
 
     void ChunkMesher::GenerateMesh()
     {
+        PROFILE_FUNCTION("ChunkMesher::GenerateMesh");
+
         m_Chunk->m_Vertices.clear();
         m_Chunk->m_Indices.clear();
 

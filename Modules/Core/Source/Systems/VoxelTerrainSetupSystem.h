@@ -1,8 +1,7 @@
 #pragma once
 #include <ForgexScene.h>
 #include <ForgexVoxel.h>
-#include <format>
-#include <glm/gtc/matrix_transform.hpp>
+#include <ForgexGraphics.h>
 
 namespace Forgex::Core
 {
@@ -28,6 +27,8 @@ namespace Forgex::Core
             {
                 entt::entity ent = registry.create();
                 registry.emplace<Scene::EntityInfo>(ent, std::format("Chunk [{0},{1},{2}]", x, y, z).c_str());
+                registry.emplace<Graphics::Renderable>(ent);
+
                 Voxel::Chunk& chunk = registry.emplace<Voxel::Chunk>(ent);
                 chunk.m_Position = glm::vec3(x, y, z);
                 chunk.m_Size = map.m_ChunkSize;

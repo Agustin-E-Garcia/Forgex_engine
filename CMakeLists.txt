@@ -21,7 +21,10 @@ add_custom_target(copy_compile_commands ALL
 )
 
 # Global includes and options
-include_directories(Modules/Debug/Include)
+include_directories(
+    Modules/Debug/Include
+    Modules/Assets/Include
+)
 
 # Helper function to set common properties for modules
 function(set_module_properties target_name)

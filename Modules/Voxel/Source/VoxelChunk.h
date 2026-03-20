@@ -1,9 +1,12 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
+#include <ForgexAssets.h>
 
 namespace Forgex::Voxel
 {
+    namespace Core { class ShaderAsset; }
+
     struct Chunk
     {
         glm::vec3 m_Position = glm::vec3(0.0f);
@@ -17,7 +20,7 @@ namespace Forgex::Voxel
 
         std::vector<float> m_Vertices;
         int vertexBufferID;
-        std::vector<uint32_t> m_Indices;
+        std::vector<int> m_Indices;
         int indexBufferID;
         glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 

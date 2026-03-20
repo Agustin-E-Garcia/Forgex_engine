@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
-#include "../Utils/TextureLoader.h"
-#include "../Utils/ShaderLoader.h"
 #include "../Utils/BufferManager.h"
+#include <ForgexAssets.h>
+#include "../AssetTypes/ShaderAsset.h"
+#include "../Utils/TextureLoader.h"
 
 namespace Forgex::Graphics::Resources::Constants
 {
@@ -20,12 +21,11 @@ namespace Forgex::Graphics::Resources::Constants
  
     namespace Skybox
     {
-        inline int g_ShaderID = INVALID_ID;
-        inline int g_VertexBufferID = INVALID_ID;
-        inline int g_DefaultTextureID = INVALID_ID;
+        int g_VertexBufferID = INVALID_ID;
+        Assets::AssetHandle<ShaderAsset> g_ShaderHandle;
+        int g_DefaultTextureID = INVALID_ID;
  
-        const char* g_SkyboxVertexShaderPath = "Resources/Shaders/Skybox.vertex";
-        const char* g_SkyboxFragmentShaderPath = "Resources/Shaders/Skybox.fragment";
+        const char* g_SkyboxShaderPath = "Resources/Shaders/Skybox.FShader";
         inline const std::vector<const char*> g_DefaultSkyboxTextures =
         {
            "Resources/Textures/right.jpg",
@@ -87,10 +87,9 @@ namespace Forgex::Graphics::Resources::Constants
             if(g_VertexBufferID == INVALID_ID) g_VertexBufferID = Utils::BufferManager::GenerateBuffer(Utils::BufferType::VertexBuffer,
                 sizeof(float) * g_SkyboxVertices.size(), g_SkyboxVertices.data());
 
-            if(g_ShaderID == INVALID_ID) g_ShaderID = Utils::ShaderLoader::LoadShader(g_SkyboxVertexShaderPath, g_SkyboxFragmentShaderPath);
+            if(!g_ShaderHandle.IsValid()) g_ShaderHandle = Assets::AssetManager::Get().LoadAsset<ShaderAsset>(g_SkyboxShaderPath);
 
-            if(g_DefaultTextureID == INVALID_ID) g_DefaultTextureID = Utils::TextureLoader::LoadCubemapTexture(Utils::TextureType::Cubemap,
-                                                                          g_DefaultSkyboxTextures);
+            if(g_DefaultTextureID == INVALID_ID) g_DefaultTextureID = Utils::TextureLoader::LoadCubemapTexture(Utils::TextureType::Cubemap, g_DefaultSkyboxTextures);
         }
     }
 };

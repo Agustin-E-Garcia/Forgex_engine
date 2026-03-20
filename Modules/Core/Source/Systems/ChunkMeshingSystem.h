@@ -2,22 +2,25 @@
 #include <ForgexScene.h>
 #include <ForgexGraphics.h>
 #include <ForgexVoxel.h>
+#include <ForgexAssets.h>
 
 namespace Forgex::Core
 {
-    class ChunkMeshingSystem : public Scene::PerEntitySystem<Voxel::Chunk>
+    class ChunkMeshingSystem : public Scene::PerEntitySystem<Voxel::Chunk, Graphics::Renderable>
     {
     public:
         SYSTEM_NAME(ChunkMeshingSystem);
         SYSTEM_TYPE(UpdateSystem);
 
-        void OnUpdate(float deltaTime, entt::entity entity, Voxel::Chunk& chunk) override
+        void OnUpdate(float deltaTime, entt::entity entity, Voxel::Chunk& chunk, Graphics::Renderable& renderable) override
         {
             if(!chunk.m_Initialized)
             {
-                chunk.m_ModelMatrix = glm::translate(glm::mat4(1.0f), (chunk.m_Position * chunk.m_Size));
+                renderable.m_ModelMatrix = glm::translate(glm::mat4(1.0f), (chunk.m_Position * chunk.m_Size));
                 GenerateDensity(chunk);
                 chunk.m_Initialized = true;
+
+                renderable.m_ShaderAsset = Assets::AssetManager::Get().LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/ColorShader.FShader");
             }
 
             if(!chunk.m_IsMeshed && chunk.m_IsDirty)
@@ -25,20 +28,25 @@ namespace Forgex::Core
                 Voxel::TerrainGenerator generator = Voxel::TerrainGenerator(chunk.m_NoiseSeed);
                 Voxel::ChunkMesher mesher = Voxel::ChunkMesher(&chunk, &generator);
 
-                mesher.GenerateMesh();
+                mesher.GenerateMesh(); // Should take a foat& and int& where to store the data that is generated
 
-                chunk.vertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
+                renderable.m_Vertices = chunk.m_Vertices.data();
+                renderable.m_Indices = chunk.m_Indices.data();
+                renderable.m_IndexSize = chunk.m_Indices.size();
+                renderable.m_VertexSize = chunk.m_Vertices.size();
+
+                renderable.m_VertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
                 (
                     Graphics::Utils::BufferType::VertexBuffer,
-                    chunk.m_Vertices.size() * sizeof(float),
-                    chunk.m_Vertices.data()
+                    renderable.m_VertexSize * sizeof(float),
+                    renderable.m_Vertices
                 );
 
-                chunk.indexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
+                renderable.m_IndexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
                 (
                     Graphics::Utils::BufferType::IndexBuffer,
-                    chunk.m_Indices.size() * sizeof(uint32_t),
-                    chunk.m_Indices.data()
+                    renderable.m_IndexSize * sizeof(uint32_t),
+                    renderable.m_Indices
                 );
 
                 chunk.m_IsDirty = false;

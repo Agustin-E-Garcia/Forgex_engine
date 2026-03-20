@@ -1,17 +1,18 @@
 #pragma once
 #include <ForgexAssets.h>
-#include <ForgexGraphics.h>
 #include <ForgexDebugTools.h>
 
-namespace Forgex::Core
+#include "../Utils/TextureLoader.h"
+
+namespace Forgex::Graphics
 {
     class TextureAsset : public Assets::Asset
     {
     public:
-        bool Load(const std::string& assetPath) override
+        bool Load() override
         {
-            LOG_CORE(Debug::LogLevel::Info, "Loading TextureAsset: '{0}'", assetPath);
-            m_TextureID = Graphics::Utils::TextureLoader::LoadDefaultTexture(Graphics::Utils::TextureType::Default, assetPath.c_str());
+            LOG_CORE(Debug::LogLevel::Info, "Loading TextureAsset: '{0}'", m_Path);
+            m_TextureID = Utils::TextureLoader::LoadDefaultTexture(Graphics::Utils::TextureType::Default, m_Path.c_str());
 
             return m_TextureID != -1;
         }
@@ -25,6 +26,7 @@ namespace Forgex::Core
         }
 
         int GetTextureID() { return m_TextureID; }
+        size_t GetMemorySize() const override { return sizeof(*this); }
 
     private:
         int m_TextureID = -1;

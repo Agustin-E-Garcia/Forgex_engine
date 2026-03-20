@@ -17,14 +17,14 @@ namespace Forgex::Graphics
         Skybox::InitResources();
 
         glDepthMask(GL_FALSE);
-        glUseProgram(Skybox::g_ShaderID);
+        glUseProgram(Skybox::g_ShaderHandle->GetShaderID());
 
-        const int ProjectionLoc = glGetUniformLocation(Skybox::g_ShaderID, "projection");
+        const int ProjectionLoc = glGetUniformLocation(Skybox::g_ShaderHandle->GetShaderID(), "projection");
         if(ProjectionLoc != -1)
             glUniformMatrix4fv(ProjectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
         else LOG_CORE(Debug::Error, "Failed to find uniform location 'Projection'");
 
-        const int ViewLoc = glGetUniformLocation(Skybox::g_ShaderID, "view");
+        const int ViewLoc = glGetUniformLocation(Skybox::g_ShaderHandle->GetShaderID(), "view");
         if(ViewLoc != -1)
         {
             glm::mat4 skyboxView = glm::mat4(glm::mat3(renderView->m_ViewMatrix));

@@ -80,7 +80,7 @@ namespace Forgex::UI
             ImGui::Separator();
 
             // --- Command input ---
-            bool reclaim_focus = false;
+            bool reclaim_focus = ImGui::IsWindowAppearing();
             ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
             if (ImGui::InputText("Input", m_CommandBuffer, IM_COUNTOF(m_CommandBuffer), input_text_flags))
             {

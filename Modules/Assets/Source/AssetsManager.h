@@ -6,39 +6,40 @@
 
 namespace Forgex::Assets
 {
+    template<class T> class AssetHandle;
+    class Asset;
+
     class ASSETS_API AssetManager
     {
     public:
         static AssetManager& Get();
 
-        const std::unordered_map<std::string, Asset*>& GetLoadedAssets() const;
+        const std::unordered_map<int, Asset*>& GetLoadedAssets() const;
+        Asset* GetAsset(int id);
+        bool IsIDValid(int id) const;
 
         template<class T>
-        T* LoadAsset(const std::string& assetPath)
+        AssetHandle<T> LoadAsset(const std::string& assetPath)
         {
             static_assert(std::is_base_of<Asset, T>::value, "T must inherit from Asset");
 
-            if(m_LoadedAssets.contains(assetPath)) return dynamic_cast<T*>(m_LoadedAssets[assetPath]);
+            if(m_AssetPathToID.contains(assetPath)) { return AssetHandle<T>(m_AssetPathToID[assetPath]); }
 
-            Asset* newAsset = new T();
-            if(!newAsset->Load(assetPath))
+            Asset* newAsset = new T(assetPath);
+            if(!newAsset->Load())
             {
                 delete newAsset;
-                return nullptr;
+                return AssetHandle<T>(-1);
             }
 
-            m_LoadedAssets[assetPath] = newAsset;
+            int newID = m_IDCounter++;
+            m_AssetPathToID[assetPath] = newID;
+            m_LoadedAssets[newID] = newAsset;
 
-            return static_cast<T*>(newAsset);
+            return AssetHandle<T>(newID);
         }
 
-        void UnloadAsset(const std::string& path)
-        {
-            if(!m_LoadedAssets.contains(path)) return;
-
-            delete m_LoadedAssets[path];
-            m_LoadedAssets.erase(path);
-        }
+        void UnloadAsset(int assetID);
 
     private:
         AssetManager() = default;
@@ -47,10 +48,12 @@ namespace Forgex::Assets
 
         ~AssetManager() 
         { 
-            for(auto& [path, asset] : m_LoadedAssets) 
+            for(auto& [id, asset] : m_LoadedAssets) 
                 delete asset; 
         }
 
-        std::unordered_map<std::string, Asset*> m_LoadedAssets;
+        std::unordered_map<std::string, int> m_AssetPathToID;
+        std::unordered_map<int, Asset*> m_LoadedAssets;
+        int m_IDCounter = 0;
     };
 }
