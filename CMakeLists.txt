@@ -10,6 +10,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Find OpenGL properly
 find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glfw3 REQUIRED)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -52,7 +54,7 @@ target_include_directories(Core_Module PRIVATE
     Modules/Voxel/Include
     ExternalLibraries/GLM
     ExternalLibraries/EnTT
-    ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include
+    $<TARGET_PROPERTY:glfw,INTERFACE_INCLUDE_DIRECTORIES>
 )
 target_compile_definitions(Core_Module PRIVATE CORE_DLL)
 target_link_libraries(Core_Module PRIVATE Graphics_Module Scene_Module Debug_Module Assets_Module Voxel_Module)
@@ -63,20 +65,12 @@ file(GLOB_RECURSE GRAPHICS_SRC Modules/Graphics/*.cpp Modules/Graphics/*.h)
 add_library(Graphics_Module STATIC ${GRAPHICS_SRC})
 target_include_directories(Graphics_Module PRIVATE
     ExternalLibraries/GLM
-    ExternalLibraries/GLEW/glew-2.1.0/include
-    ExternalLibraries/GLFW/glfw-3.4.bin.WIN64/include
     ExternalLibraries/STB_Image
 )
 target_compile_definitions(Graphics_Module PRIVATE GRAPHICS_DLL)
 target_link_libraries(Graphics_Module PRIVATE Debug_Module)
 
-if(WIN32)
-    target_link_libraries(Graphics_Module PRIVATE glew32 glfw3 opengl32)
-else()
-    find_package(GLEW REQUIRED)
-    find_package(glfw3 REQUIRED)
-    target_link_libraries(Graphics_Module PRIVATE GLEW::GLEW glfw OpenGL::GL)
-endif()
+target_link_libraries(Graphics_Module PRIVATE GLEW::GLEW glfw OpenGL::GL)
 
 set_module_properties(Graphics_Module)
 
@@ -114,7 +108,9 @@ target_link_libraries(Forgex_Editor PRIVATE Core_Module Debug_Module ImGui)
 set_target_properties(Forgex_Editor PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
 )
-target_compile_options(Forgex_Editor PRIVATE -g)
+if(NOT MSVC)
+    target_compile_options(Forgex_Editor PRIVATE -g)
+endif()
 
 # Only Windows needs DLL copy steps
 if(WIN32)
@@ -154,8 +150,4 @@ set_target_properties(ImGui PROPERTIES
 )
 target_include_directories(ImGui PRIVATE ExternalLibraries/ImGui)
 
-if(WIN32)
-    target_link_libraries(ImGui PRIVATE opengl32)
-else()
-    target_link_libraries(ImGui PRIVATE OpenGL::GL)
-endif()
+target_link_libraries(ImGui PRIVATE OpenGL::GL)
