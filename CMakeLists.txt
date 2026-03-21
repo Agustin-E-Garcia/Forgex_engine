@@ -130,6 +130,21 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${BUILD_OUTPUT_DIR}/Debug_Module/$<CONFIG>/Debug_Module.dll
             ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${BUILD_OUTPUT_DIR}/Assets_Module/$<CONFIG>/Assets_Module.dll
+            ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${BUILD_OUTPUT_DIR}/Graphics_Module/$<CONFIG>/Graphics_Module.dll
+            ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${BUILD_OUTPUT_DIR}/Scene_Module/$<CONFIG>/Scene_Module.dll
+            ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${BUILD_OUTPUT_DIR}/Voxel_Module/$<CONFIG>/Voxel_Module.dll
+            ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:ImGui>
+            ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_SOURCE_DIR}/Editor/Resources
             ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>/Resources
