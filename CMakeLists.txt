@@ -15,6 +15,9 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
 
 if(GENERATE_COMPILE_COMMANDS)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
