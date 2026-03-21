@@ -1,4 +1,4 @@
-name: Test Build
+name: Build Status (Windows)
 
 on:
   workflow_dispatch:
