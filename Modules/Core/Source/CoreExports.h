@@ -1,6 +1,6 @@
 #pragma once
-#if WIN32
-	#if CORE_DLL
+#ifdef _WIN32
+	#ifdef CORE_DLL
 		#define CORE_API __declspec(dllexport)
 	#else
 		#define CORE_API __declspec(dllimport)
