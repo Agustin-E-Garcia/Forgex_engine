@@ -16,7 +16,7 @@ find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 
 
-if(GENERATE_COMPILE_COMMANDS) {
+if(GENERATE_COMPILE_COMMANDS)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     # Copy compile_commands.json to project root after generation if it exists
@@ -26,7 +26,7 @@ if(GENERATE_COMPILE_COMMANDS) {
             ${CMAKE_SOURCE_DIR}/compile_commands.json
         COMMENT "Copying compile_commands.json if it exists"
     )
-}
+endif()
 
 # Global includes and options
 include_directories(
