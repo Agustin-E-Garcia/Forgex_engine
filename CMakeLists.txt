@@ -48,7 +48,7 @@ endfunction()
 
 # Debug_Module
 file(GLOB_RECURSE DEBUG_SRC Modules/Debug/*.cpp Modules/Debug/*.h)
-add_library(Debug_Module STATIC ${DEBUG_SRC})
+add_library(Debug_Module SHARED ${DEBUG_SRC})
 target_include_directories(Debug_Module PRIVATE ExternalLibraries/Spdlog/include)
 target_compile_definitions(Debug_Module PRIVATE DEBUG_DLL)
 set_module_properties(Debug_Module)
@@ -71,7 +71,7 @@ set_module_properties(Core_Module)
 
 # Graphics_Module
 file(GLOB_RECURSE GRAPHICS_SRC Modules/Graphics/*.cpp Modules/Graphics/*.h)
-add_library(Graphics_Module STATIC ${GRAPHICS_SRC})
+add_library(Graphics_Module SHARED ${GRAPHICS_SRC})
 target_include_directories(Graphics_Module PRIVATE
     ExternalLibraries/GLM
     ExternalLibraries/STB_Image
@@ -85,7 +85,7 @@ set_module_properties(Graphics_Module)
 
 # Scene_Module
 file(GLOB_RECURSE SCENE_SRC Modules/Scene/*.cpp Modules/Scene/*.h)
-add_library(Scene_Module STATIC ${SCENE_SRC})
+add_library(Scene_Module SHARED ${SCENE_SRC})
 target_include_directories(Scene_Module PRIVATE
     ExternalLibraries/GLM 
     ExternalLibraries/EnTT
@@ -96,14 +96,14 @@ set_module_properties(Scene_Module)
 
 # Assets_Module
 file(GLOB_RECURSE ASSETS_SRC Modules/Assets/*.cpp Modules/Assets/*.h)
-add_library(Assets_Module STATIC ${ASSETS_SRC})
+add_library(Assets_Module SHARED ${ASSETS_SRC})
 target_compile_definitions(Assets_Module PRIVATE ASSETS_DLL)
 target_link_libraries(Assets_Module PRIVATE Debug_Module)
 set_module_properties(Assets_Module)
 
 # Voxel_Module
 file(GLOB_RECURSE VOXEL_SRC Modules/Voxel/*.cpp Modules/Voxel/*.h)
-add_library(Voxel_Module STATIC ${VOXEL_SRC})
+add_library(Voxel_Module SHARED ${VOXEL_SRC})
 target_include_directories(Voxel_Module PRIVATE ExternalLibraries/GLM ExternalLibraries/FastNoiseLite)
 target_compile_definitions(Voxel_Module PRIVATE VOXEL_DLL)
 target_link_libraries(Voxel_Module PRIVATE Debug_Module)
@@ -113,7 +113,7 @@ set_module_properties(Voxel_Module)
 file(GLOB_RECURSE EDITOR_SRC Editor/*.cpp Editor/*.h)
 add_executable(Forgex_Editor ${EDITOR_SRC})
 target_include_directories(Forgex_Editor PRIVATE Modules/Core/Include Modules/Assets/Include ExternalLibraries/ImGui)
-target_link_libraries(Forgex_Editor PRIVATE Core_Module Debug_Module ImGui)
+target_link_libraries(Forgex_Editor PRIVATE Core_Module Debug_Module Assets_Module ImGui)
 set_target_properties(Forgex_Editor PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${BUILD_OUTPUT_DIR}/Forgex_Editor/$<CONFIG>
 )
@@ -152,7 +152,7 @@ file(GLOB IMGUI_SRC
     ExternalLibraries/ImGui/misc/cpp/imgui_stdlib.cpp
     ExternalLibraries/ImGui/misc/cpp/imgui_stdlib.h
 )
-add_library(ImGui STATIC ${IMGUI_SRC})
+add_library(ImGui SHARED ${IMGUI_SRC})
 set_target_properties(ImGui PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/ExternalLibraries/ImGui/bin
