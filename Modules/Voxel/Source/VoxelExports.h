@@ -1,5 +1,5 @@
 #pragma once
-#if _WIN32
+#if WIN32
 	#if VOXEL_DLL
 		#define VOXEL_API __declspec(dllexport)
 	#else

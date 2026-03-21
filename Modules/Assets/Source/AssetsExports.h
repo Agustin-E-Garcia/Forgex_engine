@@ -1,5 +1,5 @@
 #pragma once
-#if _WIN32
+#if WIN32
 	#if ASSETS_DLL
 		#define ASSETS_API __declspec(dllexport)
 	#else

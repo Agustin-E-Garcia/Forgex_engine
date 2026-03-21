@@ -1,5 +1,5 @@
 #pragma once
-#if _WIN32
+#if WIN32
 	#if GRAPHICS_DLL
 		#define GRAPHICS_API __declspec(dllexport)
 	#else

@@ -1,5 +1,5 @@
 #pragma once
-#if _WIN32
+#if WIN32
 	#if DEBUG_DLL
 		#define DEBUG_API __declspec(dllexport)
 	#else
