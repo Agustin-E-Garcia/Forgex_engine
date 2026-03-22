@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 option(GENERATE_COMPILE_COMMANDS "Generates compile_commands.json and copies it to the project root" OFF)
 
-project(Forgex_Engine)
+project(Forgex)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -107,7 +107,7 @@ add_library(Forgex_Engine SHARED ${ENGINE_SRC})
 target_compile_definitions(Forgex_Engine PRIVATE ENGINE_DLL)
 
 target_include_directories(Forgex_Engine INTERFACE Engine/Include)
-target_link_libraries(Forgex_Engine PUBLIC Graphics_Module Scene_Module Voxel_Module)
+target_link_libraries(Forgex_Engine PUBLIC Graphics_Module Scene_Module Voxel_Module Core_Module)
 set_module_properties(Forgex_Engine)
 
 # ImGui
@@ -134,6 +134,7 @@ target_compile_definitions(Forgex_Editor PRIVATE EDITOR_DLL)
 target_include_directories(Forgex_Editor INTERFACE Editor/Include)
 target_link_libraries(Forgex_Editor PUBLIC Forgex_Engine)
 target_link_libraries(Forgex_Editor PRIVATE ImGui)
+set_module_properties(Forgex_Editor)
 
 # Forgex_Executable
 file(GLOB_RECURSE EXEC_SRC Forgex/*.cpp Forgex/*.h)
