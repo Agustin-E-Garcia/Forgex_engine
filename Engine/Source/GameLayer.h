@@ -1,4 +1,7 @@
 #pragma once
+#include "Input/InputManager.h"
+#include "Input/PlayerInput.h"
+
 #include <ForgexCore.h>
 #include <ForgexScene.h>
 #include <ForgexGraphics.h>
@@ -21,28 +24,56 @@ namespace Forgex::Engine
             sceneManager->LoadScene(new Scene::Scene("Default Scene"));
             Scene::Scene* activeScene = sceneManager->GetActiveScene();
 
-            // Temp for now to test if the skybox rendering is still working
-            int skyboxEntity = activeScene->CreateEntity("Skybox");
-            Graphics::Components::Skybox& skybox = activeScene->AddComponent<Graphics::Components::Skybox>(skyboxEntity);
-            Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(skyboxEntity);
-
-            renderable.m_Vertices = skybox.m_SkyboxVertices.data();
-            renderable.m_VertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer(Graphics::Utils::BufferType::VertexBuffer, sizeof(float) * skybox.m_SkyboxVertices.size(), renderable.m_Vertices);
-
-            renderable.m_ShaderAsset = Core::ServiceLocator::Get().Fetch<Assets::AssetManager>()->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/Skybox.FShader");
-            renderable.m_TextureAsset = Core::ServiceLocator::Get().Fetch<Assets::AssetManager>()->LoadAsset<Graphics::TextureAsset>("Resources/Textures/Skybox.FTexture", Graphics::TextureType::Cubemap);
-            // ==============================================================
-
             int cameraEntity = activeScene->CreateEntity("Main Camera");
             activeScene->AddComponent<Graphics::Components::Camera>(cameraEntity);
+            activeScene->AddComponent<Core::Components::Transform>(cameraEntity);
+            activeScene->AddComponent<Input::PlayerInput>(cameraEntity);
+
+            sceneManager->Setup();
         }
 
         void OnEnd() override {}
 
-        void OnUpdate(float deltaTime) override { Core::ServiceLocator::Get().Fetch<Scene::SceneManager>()->Update(deltaTime); }
+        void OnUpdate(float deltaTime) override
+        {
+            Core::ServiceLocator::Get().Fetch<Scene::SceneManager>()->Update(deltaTime);
+            GET_SERVICE(Input::InputManager)->ResetMouseDelta();
+        }
 
-        void OnEvent(Core::Layer::Event::Event* event) override {}
+        void OnEvent(Core::Layer::Event::Event* event) override 
+        {
+            Core::Layer::Event::EventDispatcher dispatcher(*event);
+            dispatcher.Dispatch<Core::Layer::Event::KeyPressedEvent>(BIND_EVENT_FUNCTION(GameLayer::HandleKeyPressedEvent));
+            dispatcher.Dispatch<Core::Layer::Event::KeyReleasedEvent>(BIND_EVENT_FUNCTION(GameLayer::HandleKeyReleasedEvent));
+            dispatcher.Dispatch<Core::Layer::Event::MouseClickEvent>(BIND_EVENT_FUNCTION(GameLayer::HandleMouseClickEvent));
+            dispatcher.Dispatch<Core::Layer::Event::MousePositionEvent>(BIND_EVENT_FUNCTION(GameLayer::HandleMousePositionEvent));
+        }
 
         void OnRender() override { Core::ServiceLocator::Get().Fetch<Scene::SceneManager>()->Render(); }
+
+    private:
+        bool HandleKeyPressedEvent(Core::Layer::Event::KeyPressedEvent& event)
+        {
+            GET_SERVICE(Input::InputManager)->RegisterKeyState(event.GetKeyCode(), event.IsPressed());
+            return true;
+        }
+
+        bool HandleKeyReleasedEvent(Core::Layer::Event::KeyReleasedEvent& event)
+        {
+            GET_SERVICE(Input::InputManager)->RegisterKeyState(event.GetKeyCode(), false);
+            return true;
+        }
+
+        bool HandleMouseClickEvent(Core::Layer::Event::MouseClickEvent& event)
+        {
+            GET_SERVICE(Input::InputManager)->RegisterKeyState(event.GetButton(), event.IsPressed());
+            return true;
+        }
+
+        bool HandleMousePositionEvent(Core::Layer::Event::MousePositionEvent& event)
+        {
+            GET_SERVICE(Input::InputManager)->UpdateMouseDelta(glm::dvec2(event.GetPositionX(), event.GetPositionY()));
+            return true;
+        }
     };
 }

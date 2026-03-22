@@ -19,6 +19,57 @@ namespace Forgex::Graphics
 
         glfwGetWindowSize(m_Window, &m_Width, &m_Height);
         glfwMakeContextCurrent(m_Window);
+        glfwSetWindowUserPointer(m_Window, this);
+        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+        {
+            Window& self = *(Window*)glfwGetWindowUserPointer(window);
+            switch (action)
+            {
+                case GLFW_PRESS:
+                case GLFW_REPEAT:
+                {
+                    Core::Layer::Event::KeyPressedEvent event(key, action == GLFW_REPEAT, true);
+                    self.m_EventCallback(event);
+                    break;
+                }
+                case GLFW_RELEASE:
+                {
+                    Core::Layer::Event::KeyReleasedEvent event(key);
+                    self.m_EventCallback(event);
+                    break;
+                }
+            }
+        });
+
+        glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int codepoint)
+        {
+            Window& self = *(Window*)glfwGetWindowUserPointer(window);
+            Core::Layer::Event::CharInputEvent event(codepoint);
+            self.m_EventCallback(event);
+        });
+
+        glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
+        {
+            Window& self = *(Window*)glfwGetWindowUserPointer(window);
+            Core::Layer::Event::MouseClickEvent event(button, action == GLFW_PRESS);
+            self.m_EventCallback(event);
+        });
+
+        glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xpos, double ypos)
+        {
+            Window& self = *(Window*)glfwGetWindowUserPointer(window);
+            Core::Layer::Event::MousePositionEvent event(xpos, ypos);
+            self.m_EventCallback(event);
+        });
+
+        glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xoffset, double yoffset)
+        {
+            Window& self = *(Window*)glfwGetWindowUserPointer(window);
+            Core::Layer::Event::MouseWheelScrollEvent event(xoffset, yoffset);
+            self.m_EventCallback(event);
+        });
 
         LOG_CORE(Debug::LogLevel::Info, "Window '{0}' created successfully", title);
     }

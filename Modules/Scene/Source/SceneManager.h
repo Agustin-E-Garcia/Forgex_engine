@@ -12,6 +12,7 @@ namespace Forgex::Scene
 
         void LoadScene(Scene* newScene);
 
+        void Setup();
         void Update(float deltaTime);
         void Render();
 

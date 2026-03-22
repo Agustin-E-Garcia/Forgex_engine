@@ -14,6 +14,8 @@ namespace Forgex::Core::Layer
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
+		void OnEvent(Event::Event& event);
+
 		template<class T>
 		T* GetLayerOfType() const
 		{

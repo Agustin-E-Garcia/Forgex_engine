@@ -37,4 +37,6 @@ namespace Forgex::Core
 
         std::unordered_map<std::type_index, void*> m_Services;
     };
+
+#define GET_SERVICE(x) Forgex::Core::ServiceLocator::Get().Fetch<x>()
 }

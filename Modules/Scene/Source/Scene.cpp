@@ -18,6 +18,12 @@ namespace Forgex::Scene
         m_Registry.destroy((entt::entity)entity);
     }
 
+    void Scene::Setup(Core::Registry<Core::Interfaces::ISystem>& systemRegistry)
+    {
+        for(auto& [index, system] : systemRegistry)
+            system->Setup(m_Registry);
+    }
+
     void Scene::Update(Core::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime)
     {
         for(auto& [index, system] : systemRegistry)

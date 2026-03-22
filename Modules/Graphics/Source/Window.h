@@ -13,8 +13,10 @@ namespace Forgex::Graphics
 
         void Update() override;
         bool ShouldClose() const override;
+        void SetEventCallback(const Core::Interfaces::IWindow::EventCallbackFn& callback) override { m_EventCallback = callback; }
 
     private:
         GLFWwindow* m_Window;
+        Core::Interfaces::IWindow::EventCallbackFn m_EventCallback;
     };
 }

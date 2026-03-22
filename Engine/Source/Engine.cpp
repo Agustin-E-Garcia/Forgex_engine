@@ -1,5 +1,7 @@
 #include "Engine.h"
 #include "GameLayer.h"
+#include "Input/InputManager.h"
+#include "Input/InputSystem.h"
 
 #include <ForgexGraphics.h>
 #include <ForgexScene.h>
@@ -12,6 +14,8 @@ namespace Forgex::Engine
         m_EngineCore->RegisterModule<Graphics::GraphicsModule>();
         m_EngineCore->RegisterModule<Scene::SceneModule>();
 
+        Core::ServiceLocator::Get().Register<Input::InputManager>();
+        m_EngineCore->RegisterSystem<Input::InputSystem>();
         PushLayer(new GameLayer());
 
         m_EngineCore->Run();

@@ -1,6 +1,8 @@
 #pragma once
 #include <ForgexCore.h>
 
+#include "../Utils/BufferManager.h"
+
 #include "../Resources/RenderView.h"
 #include "../Renderers/SceneRenderer.h"
 #include "../Renderers/SkyboxRenderer.h"
@@ -14,6 +16,19 @@ namespace Forgex::Graphics::Systems
     class RenderingSystem : public Core::Interfaces::ISystem
     {
     public:
+        void Setup(entt::registry& registry) override
+        {
+            entt::entity skyboxEntity = registry.create();
+            Components::Skybox& skybox = registry.emplace<Components::Skybox>(skyboxEntity);
+            Components::Renderable& renderable = registry.emplace<Components::Renderable>(skyboxEntity);
+
+            renderable.m_Vertices = skybox.m_SkyboxVertices.data();
+            renderable.m_VertexBufferID = Utils::BufferManager::GenerateBuffer(Utils::BufferType::VertexBuffer, sizeof(float) * skybox.m_SkyboxVertices.size(), renderable.m_Vertices);
+
+            renderable.m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/Skybox.FShader");
+            renderable.m_TextureAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::TextureAsset>("Resources/Textures/Skybox.FTexture", Graphics::TextureType::Cubemap);
+        }
+
         void Render(entt::registry& registry) override 
         {
             Resources::RenderView renderView;

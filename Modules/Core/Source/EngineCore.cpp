@@ -22,6 +22,7 @@ namespace Forgex::Core
     void EngineCore::Run()
     {
         Init();
+        m_Window->SetEventCallback([this](Layer::Event::Event& event) { m_LayerStack.OnEvent(event); });
         DeltaTimeHandler deltaTimeHandler;
 
         for(Layer::Layer* layer : m_LayerStack)

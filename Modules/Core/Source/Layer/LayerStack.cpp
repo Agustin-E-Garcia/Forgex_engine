@@ -47,4 +47,13 @@ namespace Forgex::Core::Layer
 			overlay->OnDetach();
 		}
 	}
+
+	void LayerStack::OnEvent(Event::Event& event)
+	{
+		for (auto it = m_Layers.rbegin(); it != m_Layers.rend(); ++it)
+		{
+			(*it)->OnEvent(&event);
+			if (event.m_Handled) break;
+		}
+	}
 }

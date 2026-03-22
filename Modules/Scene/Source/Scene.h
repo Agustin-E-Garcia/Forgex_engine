@@ -19,6 +19,7 @@ namespace Forgex::Scene
             return m_Registry.emplace<T>((entt::entity)entity);
         }
 
+        void Setup(Core::Registry<Core::Interfaces::ISystem>& systemRegistry);
         void Update(Core::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime);
         void Render(Core::Registry<Core::Interfaces::ISystem>& systemRegistry);
 
