@@ -2,6 +2,7 @@
 #include "Asset.h"
 #include <unordered_map>
 #include <string>
+#include <utility>
 
 namespace Forgex::Assets
 {
@@ -13,14 +14,14 @@ namespace Forgex::Assets
         AssetManager();
         ~AssetManager();
 
-        template<class T>
-        AssetHandle<T> LoadAsset(const std::string& assetPath)
+        template<class T, typename... Args>
+        AssetHandle<T> LoadAsset(const std::string& assetPath, Args&&... args)
         {
             static_assert(std::is_base_of<Asset, T>::value, "T must inherit from Asset");
 
             if(m_AssetPathToID.contains(assetPath)) { return AssetHandle<T>(this, m_AssetPathToID[assetPath]); }
 
-            Asset* newAsset = new T(assetPath);
+            Asset* newAsset = new T(assetPath, std::forward<Args>(args)...);
             if(!newAsset->Load())
             {
                 delete newAsset;

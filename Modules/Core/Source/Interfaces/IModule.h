@@ -10,7 +10,6 @@ namespace Forgex::Core::Interfaces
         virtual ~IModule() = default;
 
         virtual void Init(EngineCore& core) = 0;
-        virtual void Update(float deltaTime) {}
         virtual void Shutdown() = 0;
         virtual const char* GetName() const = 0;
     };

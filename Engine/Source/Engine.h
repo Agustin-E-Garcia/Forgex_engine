@@ -12,8 +12,6 @@ namespace Forgex::Engine
         void PushLayer(Core::Layer::Layer* layer);
         void PushOverlay(Core::Layer::Layer* overlay);
 
-        void RegisterSystem(Core::Interfaces::ISystem* system);
-
     private:
         Core::EngineCore* m_EngineCore;
     };

@@ -7,7 +7,6 @@ namespace Forgex::Scene
     {
     public:
         void Init(Core::EngineCore& core) override;
-        void Update(float deltatime) override;
         void Shutdown() override;
 
         const char* GetName() const override { return "Scene_Module"; }

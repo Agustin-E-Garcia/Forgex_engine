@@ -1,5 +1,4 @@
 #pragma once
-#include <fstream>
 #include <string>
 #include <ForgexAssets.h>
 #include <ForgexCore.h>
@@ -17,27 +16,14 @@ namespace Forgex::Graphics
         {
             LOG_CORE(Debug::LogLevel::Info, "Loading ShaderAsset: '{0}'", m_Path);
 
-            std::ifstream file(m_Path);
-            if(!file.is_open())
-            {
-                LOG_CORE(Debug::Error, "Failed to open ShaderAsset file: {0}", m_Path);
-                return false;
-            }
-
-            std::string line;
-            std::getline(file, line);
-
-            size_t commaPos = line.find(',');
-            if(commaPos == std::string::npos)
+            std::vector<std::string> shaderPaths;
+            if(!Assets::Files::ReadFile(m_Path.c_str(), shaderPaths))
             {
                 LOG_CORE(Debug::Error, "Invalid ShaderAsset format in '{0}': expected 'vertex,fragment'", m_Path);
                 return false;
             }
 
-            std::string vertexShader = line.substr(0, commaPos);
-            std::string fragmentShader = line.substr(commaPos + 1);
-
-            m_ShaderID = Utils::ShaderLoader::LoadShader(vertexShader.c_str(), fragmentShader.c_str());
+            m_ShaderID = Utils::ShaderLoader::LoadShader(shaderPaths[0].c_str(), shaderPaths[1].c_str());
 
             return m_ShaderID != -1;
         }

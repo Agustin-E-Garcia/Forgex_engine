@@ -1,6 +1,7 @@
 #pragma once
 #include <typeindex>
 #include <unordered_map>
+#include <utility>
 
 namespace Forgex::Core
 {
@@ -11,13 +12,13 @@ namespace Forgex::Core
     public:
         static ServiceLocator& Get();
 
-        template<typename T>
-        bool Register(T* service)
+        template<typename T, typename... Args>
+        bool Register(Args&&... args)
         {
             std::type_index index = std::type_index(typeid(T));
 
             if(m_Services.contains(index)) return false;
-            m_Services[index] = service;
+            m_Services[index] = new T(std::forward<Args>(args)...);
 
             return true;
         }
@@ -33,6 +34,7 @@ namespace Forgex::Core
 
     private:
         ServiceLocator() = default;
+
         std::unordered_map<std::type_index, void*> m_Services;
     };
 }

@@ -10,25 +10,39 @@ namespace Forgex::Engine
     public:
         GameLayer() : Core::Layer::Layer("Game Layer") {}
 
-        void OnAttach() override { m_ActiveScene = new Scene::Scene("Default Scene"); }
+        void OnAttach() override {}
 
         void OnDetach() override {}
 
-        void OnBegin() override 
+        void OnBegin() override
         {
-            int cameraEntity = m_ActiveScene->CreateEntity("Main Camera");
-            m_ActiveScene->AddComponent<Graphics::Camera>(cameraEntity);
+            Scene::SceneManager* sceneManager = Core::ServiceLocator::Get().Fetch<Scene::SceneManager>();
+
+            sceneManager->LoadScene(new Scene::Scene("Default Scene"));
+            Scene::Scene* activeScene = sceneManager->GetActiveScene();
+
+            // Temp for now to test if the skybox rendering is still working
+            int skyboxEntity = activeScene->CreateEntity("Skybox");
+            Graphics::Components::Skybox& skybox = activeScene->AddComponent<Graphics::Components::Skybox>(skyboxEntity);
+            Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(skyboxEntity);
+
+            renderable.m_Vertices = skybox.m_SkyboxVertices.data();
+            renderable.m_VertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer(Graphics::Utils::BufferType::VertexBuffer, sizeof(float) * skybox.m_SkyboxVertices.size(), renderable.m_Vertices);
+
+            renderable.m_ShaderAsset = Core::ServiceLocator::Get().Fetch<Assets::AssetManager>()->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/Skybox.FShader");
+            renderable.m_TextureAsset = Core::ServiceLocator::Get().Fetch<Assets::AssetManager>()->LoadAsset<Graphics::TextureAsset>("Resources/Textures/Skybox.FTexture", Graphics::TextureType::Cubemap);
+            // ==============================================================
+
+            int cameraEntity = activeScene->CreateEntity("Main Camera");
+            activeScene->AddComponent<Graphics::Components::Camera>(cameraEntity);
         }
 
         void OnEnd() override {}
 
-        void OnUpdate(float deltaTime) override { m_ActiveScene->Update(deltaTime); }
+        void OnUpdate(float deltaTime) override { Core::ServiceLocator::Get().Fetch<Scene::SceneManager>()->Update(deltaTime); }
 
         void OnEvent(Core::Layer::Event::Event* event) override {}
 
-        void OnRender() override { m_ActiveScene->Render(); }
-
-    private:
-        Scene::Scene* m_ActiveScene = nullptr;
+        void OnRender() override { Core::ServiceLocator::Get().Fetch<Scene::SceneManager>()->Render(); }
     };
 }

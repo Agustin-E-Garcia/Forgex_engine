@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 namespace Forgex::Assets::Files
 {
@@ -16,5 +17,6 @@ namespace Forgex::Assets::Files
     };
 
     bool ReadFile(const char* filePath, std::string& buffer);
+    bool ReadFile(const char* filePath, std::vector<std::string>& buffers);
     bool ReadFile(const char* filePath, TextureData& textureInfo, bool flip = false);
 }

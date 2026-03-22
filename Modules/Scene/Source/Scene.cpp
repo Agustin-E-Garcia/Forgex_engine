@@ -18,11 +18,21 @@ namespace Forgex::Scene
         m_Registry.destroy((entt::entity)entity);
     }
 
-    void Scene::Update(float deltaTime)
+    void Scene::Update(Core::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime)
     {
+        for(auto& [index, system] : systemRegistry)
+        {
+            PROFILE_FUNCTION(system->GetName());
+            system->Update(m_Registry, deltaTime);
+        }
     }
 
-    void Scene::Render()
+    void Scene::Render(Core::Registry<Core::Interfaces::ISystem>& systemRegistry)
     {
+        for(auto& [index, system] : systemRegistry)
+        {
+            PROFILE_FUNCTION(system->GetName());
+            system->Render(m_Registry);
+        }
     }
 }

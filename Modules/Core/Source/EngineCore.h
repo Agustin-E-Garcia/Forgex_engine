@@ -1,11 +1,9 @@
 #pragma once
-#include "Registries/ModuleRegistry.h"
-#include "Registries/SystemRegistry.h"
+#include "Registry.h"
 #include "Interfaces/IWindow.h"
+#include "Interfaces/IModule.h"
+#include "Interfaces/ISystem.h"
 #include "Layer/LayerStack.h"
-
-namespace Forgex::Assets { class AssetManager; }
-namespace Forgex::Debug { class DebugManager; }
 
 namespace Forgex::Core
 {
@@ -16,26 +14,25 @@ namespace Forgex::Core
 
         void SetWindow(Interfaces::IWindow* window) { m_Window = window; }
 
-        void RegisterModule(Interfaces::IModule* module) { m_ModuleRegistry.RegisterModule(module); }
-        void RegisterSystem(Interfaces::ISystem* system) { m_SystemRegistry.registerSystem(system); }
+        template<class T>
+        void RegisterModule() { m_ModuleRegistry.Register<T>(); }
+        template<class T>
+        void RegisterSystem() { m_SystemRegistry.Register<T>(); }
 
         void RegisterLayer(Layer::Layer* layer) { m_LayerStack.PushLayer(layer); }
         void RegisterOverlay(Layer::Layer* overlay) { m_LayerStack.PushOverlay(overlay); }
 
         Interfaces::IWindow* GetWindow() const { return m_Window; }
-        Registries::ModuleRegistry GetModuleRegistry() { return m_ModuleRegistry; }
-        Registries::SystemRegistry GetSystemRegistry() { return m_SystemRegistry; }
+        Registry<Interfaces::IModule>& GetModuleRegistry() { return m_ModuleRegistry; }
+        Registry<Interfaces::ISystem>& GetSystemRegistry() { return m_SystemRegistry; }
 
     private:
         void Init();
         void Shutdown();
 
-        Assets::AssetManager* m_AssetManager;
-        Debug::DebugManager* m_DebugManager;
-
         Interfaces::IWindow* m_Window;
-        Registries::ModuleRegistry m_ModuleRegistry;
-        Registries::SystemRegistry m_SystemRegistry;
+        Registry<Interfaces::IModule> m_ModuleRegistry;
+        Registry<Interfaces::ISystem> m_SystemRegistry;
         Layer::LayerStack m_LayerStack;
     };
 }

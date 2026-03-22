@@ -8,6 +8,8 @@ namespace Forgex::Core::Interfaces
     public:
         virtual ~ISystem() = default;
 
-        virtual void Update(entt::registry& registry, float deltaTime) = 0;
+        virtual void Update(entt::registry& registry, float deltaTime) {}
+        virtual void Render(entt::registry& registry) {}
+        virtual const char* GetName() = 0;
     };
 }

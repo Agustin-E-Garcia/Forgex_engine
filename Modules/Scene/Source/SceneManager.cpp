@@ -1,0 +1,12 @@
+#include "SceneManager.h"
+
+namespace Forgex::Scene
+{
+    SceneManager::SceneManager(Core::Registry<Core::Interfaces::ISystem>& systemRegistry) : m_SystemRegistry(systemRegistry) {}
+    SceneManager::~SceneManager() {}
+
+    void SceneManager::LoadScene(Scene* newScene) { m_ActiveScene = newScene; }
+
+    void SceneManager::Update(float deltaTime) { m_ActiveScene->Update(m_SystemRegistry, deltaTime); }
+    void SceneManager::Render() { m_ActiveScene->Render(m_SystemRegistry); }
+}

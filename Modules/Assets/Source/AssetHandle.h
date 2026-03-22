@@ -29,11 +29,15 @@ namespace Forgex::Assets
 
         ~AssetHandle() { DeInitializeHandle(); }
 
-        T* Get() const { return static_cast<T*>(m_Manager->GetAsset(m_AssetID)); }
+        T* Get() const { return m_Manager ? static_cast<T*>(m_Manager->GetAsset(m_AssetID)) : nullptr; }
         T* operator->() const { return Get(); }
         T& operator*() const { return *Get(); }
 
-        bool IsValid() { return m_Manager->IsIDValid(m_AssetID); }
+        bool IsValid()
+        {
+            if(!m_Manager) return false;
+            return m_Manager->IsIDValid(m_AssetID); 
+        }
 
     private:
         int m_AssetID = -1;

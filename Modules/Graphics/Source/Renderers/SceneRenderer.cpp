@@ -1,50 +1,13 @@
 #include "SceneRenderer.h"
-#include "Components/Renderable.h"
-#include "Resources/RenderView.h"
-#include "Resources/RenderConstants.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 #include <ForgexCore.h>
 
-namespace Forgex::Graphics
+namespace Forgex::Graphics::Renderers
 {
-    using namespace Resources::Constants;
-
-    void RenderSkybox(const Resources::RenderView* renderView)
-    {
-        Skybox::InitResources();
-
-        glDepthMask(GL_FALSE);
-        glUseProgram(Skybox::g_ShaderHandle->GetShaderID());
-
-        const int ProjectionLoc = glGetUniformLocation(Skybox::g_ShaderHandle->GetShaderID(), "projection");
-        if(ProjectionLoc != -1)
-            glUniformMatrix4fv(ProjectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
-        else LOG_CORE(Debug::Error, "Failed to find uniform location 'Projection'");
-
-        const int ViewLoc = glGetUniformLocation(Skybox::g_ShaderHandle->GetShaderID(), "view");
-        if(ViewLoc != -1)
-        {
-            glm::mat4 skyboxView = glm::mat4(glm::mat3(renderView->m_ViewMatrix));
-            glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &skyboxView[0][0]);
-        }
-        else LOG_CORE(Debug::Error, "Failed to find uniform location 'View'");
-
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, Skybox::g_VertexBufferID);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        glBindTexture(GL_TEXTURE_CUBE_MAP, Skybox::g_DefaultTextureID);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        glDisableVertexAttribArray(0);
-        glUseProgram(0);
-        glDepthMask(GL_TRUE);
-    }
-
-    void SceneRenderer::Render(const Resources::RenderView* renderView, std::vector<Renderable>* renderInfos)
+    void SceneRenderer::Render(const Resources::RenderView* renderView, std::vector<Components::Renderable>* renderInfos)
     {
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
@@ -56,11 +19,7 @@ namespace Forgex::Graphics
         glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        RenderObjects::InitResources();
-
-        RenderSkybox(renderView);
-
-        for (const Renderable& info : *renderInfos)
+        for (const Components::Renderable& info : *renderInfos)
         {
             glUseProgram(info.m_ShaderAsset->GetShaderID());
 
@@ -126,7 +85,7 @@ namespace Forgex::Graphics
         }
     }
 
-    void SceneRenderer::RenderMap(const Resources::RenderView* renderView, std::vector<Renderable>* renderInfos)
+    void SceneRenderer::RenderMap(const Resources::RenderView* renderView, std::vector<Components::Renderable>* renderInfos)
     {
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
@@ -139,11 +98,7 @@ namespace Forgex::Graphics
         glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        RenderObjects::InitResources();
-
-        RenderSkybox(renderView);
-
-        for(const Renderable& info : *renderInfos)
+        for(const Components::Renderable& info : *renderInfos)
         {
             glUseProgram(info.m_ShaderAsset->GetShaderID());
 

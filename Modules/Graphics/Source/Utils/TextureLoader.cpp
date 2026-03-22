@@ -15,7 +15,7 @@ namespace Forgex::Graphics::Utils
         unsigned int m_Type;
     };
 
-    unsigned int GenerateTexture(TextureType type, Assets::Files::TextureData& data, int internalFormat, unsigned int format, int dataType)
+    unsigned int GenerateTexture(Assets::Files::TextureData& data, int internalFormat, unsigned int format, int dataType)
     {
         unsigned int textureID;
         glGenTextures(1, &textureID);
@@ -31,7 +31,7 @@ namespace Forgex::Graphics::Utils
         return textureID;
     }
 
-    int TextureLoader::LoadDefaultTexture(TextureType type, const char* file)
+    int TextureLoader::LoadTexture(const char* file)
     {
         LOG_CORE(Debug::Info, "Loading Texture '{0}'", file);
 
@@ -42,12 +42,12 @@ namespace Forgex::Graphics::Utils
             return -1;
         }
 
-        unsigned int textureID = GenerateTexture(type, textureData, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+        unsigned int textureID = GenerateTexture(textureData, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
         return textureID;
     }
 
 
-    int TextureLoader::LoadCubemapTexture(TextureType type, std::vector<const char*> filePaths)
+    int TextureLoader::LoadTexture(std::vector<std::string> filePaths)
     {
         unsigned int textureID;
         glGenTextures(1, &textureID);
@@ -56,7 +56,7 @@ namespace Forgex::Graphics::Utils
         for(unsigned int i = 0; i < filePaths.size(); i++)
         {
             Assets::Files::TextureData textureData;
-            if(!Assets::Files::ReadFile(filePaths[i], textureData))
+            if(!Assets::Files::ReadFile(filePaths[i].c_str(), textureData))
             {
                 LOG_CORE(Debug::Error, "Failed to load cubemap texture '{0}'", filePaths[i]);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

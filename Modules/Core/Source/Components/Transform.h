@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-namespace Forgex::Scene
+namespace Forgex::Core::Components
 {
     struct Transform
     {

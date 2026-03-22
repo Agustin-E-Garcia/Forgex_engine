@@ -7,9 +7,11 @@ namespace Forgex::Graphics
     {
     public:
         void Init(Core::EngineCore& core) override;
-        void Update(float deltatime) override;
         void Shutdown() override;
 
         const char* GetName() const override { return "Graphics_Module"; }
+
+    private:
+        int m_VertexBufferObjectID;
     };
 }

@@ -8,23 +8,39 @@
 
 namespace Forgex::Assets::Files
 {
+    TextureData::TextureData() {}
+    TextureData::~TextureData() { stbi_image_free(m_Image); }
+
+
     bool ReadFile(const char* filePath, std::string& buffer)
     {
         std::ifstream fileStream(filePath, std::ios::in);
-        if (fileStream.is_open())
-        {
-            std::stringstream sstr;
-            sstr << fileStream.rdbuf();
-            buffer = sstr.str();
-            fileStream.close();
-            return true;
-        }
+        if (!fileStream.is_open()) return false;
 
-        return false;
+        std::stringstream sstr;
+        sstr << fileStream.rdbuf();
+        buffer = sstr.str();
+        fileStream.close();
+        return true;
     }
 
-    TextureData::TextureData() {}
-    TextureData::~TextureData() { stbi_image_free(m_Image); }
+    bool ReadFile(const char* filePath, std::vector<std::string>& buffers)
+    {
+        std::ifstream fileStream(filePath, std::ios::in);
+        if (!fileStream.is_open()) return false;
+
+        std::string line;
+        while (std::getline(fileStream, line, ','))
+        {
+            while (!line.empty() && (line.back() == '\n' || line.back() == '\r' || line.back() == ' '))
+                line.pop_back();
+
+            if (!line.empty())
+                buffers.push_back(line);
+        }
+
+        return !buffers.empty();
+    }
 
     bool ReadFile(const char* filePath, TextureData& textureData, bool flip)
     {

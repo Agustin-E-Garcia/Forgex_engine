@@ -19,8 +19,8 @@ namespace Forgex::Scene
             return m_Registry.emplace<T>((entt::entity)entity);
         }
 
-        void Update(float deltaTime);
-        void Render();
+        void Update(Core::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime);
+        void Render(Core::Registry<Core::Interfaces::ISystem>& systemRegistry);
 
         entt::registry& GetRegistry() { return m_Registry; }
         const char* GetName() const { return m_Name; }

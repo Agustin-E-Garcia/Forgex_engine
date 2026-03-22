@@ -3,7 +3,7 @@
 #include "../AssetTypes/TextureAsset.h"
 #include <glm/glm.hpp>
 
-namespace Forgex::Graphics
+namespace Forgex::Graphics::Components
 {
     struct Renderable
     {

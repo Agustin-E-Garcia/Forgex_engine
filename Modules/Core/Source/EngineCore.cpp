@@ -1,5 +1,5 @@
 #include "EngineCore.h"
-#include "DebugMacros.h"
+#include "ServiceLocator.h"
 #include <ForgexAssets.h>
 #include <ForgexDebug.h>
 #include <chrono>
@@ -48,23 +48,17 @@ namespace Forgex::Core
 
     void EngineCore::Init()
     {
-        m_DebugManager = new Debug::DebugManager();
-        m_AssetManager = new Assets::AssetManager();
-
-        ServiceLocator::Get().Register<Debug::DebugManager>(m_DebugManager);
-        ServiceLocator::Get().Register<Assets::AssetManager>(m_AssetManager);
+        ServiceLocator::Get().Register<Debug::DebugManager>();
+        ServiceLocator::Get().Register<Assets::AssetManager>();
 
         // then all modules
-        for (auto* m : m_ModuleRegistry)
-            m->Init(*this);
+        for (auto& [ index, module ] : m_ModuleRegistry)
+            module->Init(*this);
     }
 
     void EngineCore::Shutdown()
     {
-        for (auto* m : m_ModuleRegistry)
-            m->Shutdown();
-
-        delete m_AssetManager;
-        delete m_DebugManager;
+        for (auto& [ index, module ] : m_ModuleRegistry)
+            module->Shutdown();
     }
 }
