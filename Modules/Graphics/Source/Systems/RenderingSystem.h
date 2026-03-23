@@ -29,7 +29,7 @@ namespace Forgex::Graphics::Systems
             renderable.m_TextureAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::TextureAsset>("Resources/Textures/Skybox.FTexture", Graphics::TextureType::Cubemap);
         }
 
-        void Render(entt::registry& registry) override 
+        void Render(entt::registry& registry) override
         {
             Resources::RenderView renderView;
             auto view_camera = registry.view<Components::Camera, Core::Components::Transform>();
@@ -43,12 +43,22 @@ namespace Forgex::Graphics::Systems
                 renderView.m_ProjectionMatrix = glm::perspective(glm::radians(camera.m_FieldOfView), (camera.m_AspectRatio.x / camera.m_AspectRatio.y), camera.m_NearPlane, camera.m_FarPlane);
             }
 
-            Renderers::SkyboxRenderer renderer;
-            auto view_renderable = registry.view<Components::Skybox, Components::Renderable>();
+            Renderers::SkyboxRenderer skybox_renderer;
+            auto view_skybox = registry.view<Components::Skybox, Components::Renderable>();
+            for(entt::entity entity : view_skybox)
+            {
+                skybox_renderer.Render(renderView, view_skybox.get<Components::Renderable>(entity));
+            }
+
+            Renderers::SceneRenderer scene_renderer;
+            auto view_renderable = registry.view<Components::Renderable>();
+            std::vector<Components::Renderable> renderables;
             for(entt::entity entity : view_renderable)
             {
-                renderer.Render(renderView, view_renderable.get<Components::Renderable>(entity));
+                if(registry.all_of<Components::Skybox>(entity)) continue;
+                renderables.push_back(view_renderable.get<Components::Renderable>(entity));
             }
+            scene_renderer.Render(&renderView, &renderables);
         }
 
         const char* GetName() override { return "RenderingSystem"; }

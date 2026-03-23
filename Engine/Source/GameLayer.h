@@ -40,7 +40,7 @@ namespace Forgex::Engine
             GET_SERVICE(Input::InputManager)->ResetMouseDelta();
         }
 
-        void OnEvent(Core::Layer::Event::Event* event) override 
+        void OnEvent(Core::Layer::Event::Event* event) override
         {
             Core::Layer::Event::EventDispatcher dispatcher(*event);
             dispatcher.Dispatch<Core::Layer::Event::KeyPressedEvent>(BIND_EVENT_FUNCTION(GameLayer::HandleKeyPressedEvent));

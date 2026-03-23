@@ -5,6 +5,7 @@
 
 #include <ForgexGraphics.h>
 #include <ForgexScene.h>
+#include <ForgexVoxel.h>
 
 namespace Forgex::Engine
 {
@@ -13,6 +14,7 @@ namespace Forgex::Engine
         m_EngineCore = new Core::EngineCore();
         m_EngineCore->RegisterModule<Graphics::GraphicsModule>();
         m_EngineCore->RegisterModule<Scene::SceneModule>();
+        m_EngineCore->RegisterModule<Voxel::VoxelModule>();
 
         Core::ServiceLocator::Get().Register<Input::InputManager>();
         m_EngineCore->RegisterSystem<Input::InputSystem>();

@@ -18,7 +18,7 @@ namespace Forgex::Graphics
             LOG_CORE(Debug::LogLevel::Critical, "Failed to initialize GLEW: {0}", error);
         }
 
-         m_VertexBufferObjectID = Utils::BufferManager::GenerateVBO();
+        m_VertexBufferObjectID = Utils::BufferManager::GenerateVAO();
 
         core.RegisterSystem<Systems::RenderingSystem>();
     }

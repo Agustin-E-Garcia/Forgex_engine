@@ -14,6 +14,6 @@ namespace Forgex::Graphics::Utils
     public:
         static int GenerateBuffer(BufferType type, int size, const void* data);
         static void DeleteBuffer(unsigned int bufferID);
-        static int GenerateVBO();
+        static int GenerateVAO();
     };
 }

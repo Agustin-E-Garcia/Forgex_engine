@@ -77,7 +77,7 @@ add_library(Graphics_Module SHARED ${GRAPHICS_SRC})
 target_compile_definitions(Graphics_Module PRIVATE GRAPHICS_DLL)
 
 target_include_directories(Graphics_Module INTERFACE Modules/Graphics/Include)
-target_link_libraries(Graphics_Module PRIVATE GLEW::GLEW glfw OpenGL::GL)
+target_link_libraries(Graphics_Module PRIVATE GLEW::GLEW glfw OpenGL::GL OpenGL::GLU)
 target_link_libraries(Graphics_Module PUBLIC Core_Module)
 set_module_properties(Graphics_Module)
 
@@ -98,7 +98,7 @@ target_compile_definitions(Voxel_Module PRIVATE VOXEL_DLL)
 
 target_include_directories(Voxel_Module INTERFACE Modules/Voxel/Include)
 target_include_directories(Voxel_Module PRIVATE ExternalLibraries/FastNoiseLite)
-target_link_libraries(Voxel_Module PUBLIC Core_Module)
+target_link_libraries(Voxel_Module PUBLIC Core_Module Graphics_Module)
 set_module_properties(Voxel_Module)
 
 # Engine

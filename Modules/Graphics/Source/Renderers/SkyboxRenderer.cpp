@@ -1,10 +1,21 @@
 #include "SkyboxRenderer.h"
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 namespace Forgex::Graphics::Renderers
 {
     void SkyboxRenderer::Render(const Resources::RenderView& renderView, const Components::Renderable& renderable)
     {
+        int width, height;
+        glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
+        glViewport(0, 0, width, height);
+
+        glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_CULL_FACE);
+        glDepthFunc(GL_LESS);
+        glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         glDepthMask(GL_FALSE);
         glUseProgram(renderable.m_ShaderAsset->GetShaderID());
 

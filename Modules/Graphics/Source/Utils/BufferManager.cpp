@@ -17,11 +17,11 @@ namespace Forgex::Graphics::Utils
         glDeleteBuffers(1, &bufferID);
     }
 
-    int BufferManager::GenerateVBO()
+    int BufferManager::GenerateVAO()
     {
-        unsigned int VBO;
-        glGenVertexArrays(1, &VBO);
-        glBindVertexArray(VBO);
-        return VBO;
+        unsigned int VAO;
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+        return VAO;
     }
 }
