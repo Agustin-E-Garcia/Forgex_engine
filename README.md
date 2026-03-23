@@ -1,6 +1,7 @@
 # Forgex Engine
 ![Latest Release](https://img.shields.io/github/v/release/Agustin-E-Garcia/Forgex_engine?include_prereleases&label=release&link=)
-[![Build Status](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus.yml/badge.svg)](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus.yml)
+[![Build Status (Linux)](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus_Linux.yml/badge.svg?branch=main)](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus_Linux.yml)
+[![Build Status (Windows)](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus_Windows.yml/badge.svg?branch=main)](https://github.com/Agustin-E-Garcia/Forgex_engine/actions/workflows/BuildStatus_Windows.yml)
 
 
 A personal learning project exploring the creation of a destructible voxel engine, built from scratch in C++.
