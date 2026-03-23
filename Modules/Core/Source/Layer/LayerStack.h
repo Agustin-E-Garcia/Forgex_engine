@@ -1,5 +1,5 @@
 #pragma once
-#include "Layer.h"
+#include "../Interfaces/ILayer.h"
 
 namespace Forgex::Core::Layer
 {
@@ -9,19 +9,17 @@ namespace Forgex::Core::Layer
 		LayerStack();
 		~LayerStack();
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
-		void PopLayer(Layer* layer);
-		void PopOverlay(Layer* overlay);
+		void PushLayer(Interfaces::ILayer* layer);
+		void PushOverlay(Interfaces::ILayer* overlay);
+		void PopLayer(Interfaces::ILayer* layer);
+		void PopOverlay(Interfaces::ILayer* overlay);
 
-		void OnEvent(Event::Event& event);
-
-		template<class T>
+        template<class T>
 		T* GetLayerOfType() const
 		{
-			static_assert(std::is_base_of<Layer, T>::value, "T must inherit from Layer");
+			static_assert(std::is_base_of<Interfaces::ILayer, T>::value, "T must inherit from ILayer");
 
-			for (Layer* layer : m_Layers)
+			for (Interfaces::ILayer* layer : m_Layers)
 			{
 				if (T* castedLayer = dynamic_cast<T*>(layer)) return castedLayer;
 			}
@@ -29,11 +27,16 @@ namespace Forgex::Core::Layer
 			return nullptr;
 		}
 
-		std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
-		std::vector<Layer*>::iterator end() { return m_Layers.end(); }
+        void SetEventCallback(const Interfaces::EventCallbackFn& callback) { m_Callback = callback; }
+
+		std::vector<Interfaces::ILayer*>::iterator begin() { return m_Layers.begin(); }
+		std::vector<Interfaces::ILayer*>::iterator end() { return m_Layers.end(); }
 
 	private:
-		std::vector<Layer*> m_Layers;
-		std::vector<Layer*>::iterator m_LayerInsert;
+        void OnEvent(Event::Event& event);
+
+        std::vector<Interfaces::ILayer*> m_Layers;
+		std::vector<Interfaces::ILayer*>::iterator m_LayerInsert;
+        Interfaces::EventCallbackFn m_Callback;
 	};
 }

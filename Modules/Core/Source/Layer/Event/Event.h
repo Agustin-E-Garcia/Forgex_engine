@@ -10,10 +10,9 @@ namespace Forgex::Core::Layer::Event
 {
 	enum EventType : uint8_t
 	{
-		WindowResized, WindowClose, WindowFocusChanged,
+		WindowResized, WindowFocusChanged,
 		KeyPressed, KeyReleased, CharInput,
-		MouseClicked, MouseUnclicked, MousePosition, mouseWheel,
-		SceneChange, ItemSelected, ViewportResize
+		MouseClicked, MousePosition, MouseWheel, MouseLock
 	};
 
 	enum EventCategory

@@ -2,8 +2,7 @@
 #include "../Source/Interfaces/IWindow.h"
 #include "../Source/Interfaces/IModule.h"
 #include "../Source/Interfaces/ISystem.h"
-
-#include "../Source/Layer/Layer.h"
+#include "../Source/Interfaces/ILayer.h"
 
 #include "../Source/Registry.h"
 #include "../Source/EngineCore.h"

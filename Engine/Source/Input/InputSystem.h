@@ -1,5 +1,6 @@
 #pragma once
 #include <ForgexCore.h>
+#include <ForgexGraphics.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "PlayerInput.h"
 #include "InputManager.h"
@@ -36,12 +37,12 @@ namespace Forgex::Engine::Input
 
             // Translation
             glm::vec3 direction = glm::vec3(0.0f);
-            if(input->IsKeyPressed(87))  direction += transform.m_Forward;
-            if(input->IsKeyPressed(83))  direction -= transform.m_Forward;
-            if(input->IsKeyPressed(65))  direction -= transform.m_Right;
-            if(input->IsKeyPressed(68))  direction += transform.m_Right;
-            if(input->IsKeyPressed(32))  direction += glm::vec3(0.0f, 1.0f, 0.0f);
-            if(input->IsKeyPressed(341)) direction -= glm::vec3(0.0f, 1.0f, 0.0f);
+            if(input->IsKeyPressed(KEYCODE_W))  direction += transform.m_Forward;
+            if(input->IsKeyPressed(KEYCODE_S))  direction -= transform.m_Forward;
+            if(input->IsKeyPressed(KEYCODE_A))  direction -= transform.m_Right;
+            if(input->IsKeyPressed(KEYCODE_D))  direction += transform.m_Right;
+            if(input->IsKeyPressed(KEYCODE_SPACE))  direction += glm::vec3(0.0f, 1.0f, 0.0f);
+            if(input->IsKeyPressed(KEYCODE_LEFT_CONTROL)) direction -= glm::vec3(0.0f, 1.0f, 0.0f);
 
             if (glm::length(direction) > 0.0f)
                 direction = glm::normalize(direction);

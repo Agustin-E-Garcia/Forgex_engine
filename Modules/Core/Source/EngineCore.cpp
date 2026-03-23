@@ -1,4 +1,6 @@
 #include "EngineCore.h"
+#include "Layer/Event/Event.h"
+#include "Layer/Event/EventList.h"
 #include "ServiceLocator.h"
 #include <ForgexAssets.h>
 #include <ForgexDebug.h>
@@ -22,26 +24,25 @@ namespace Forgex::Core
     void EngineCore::Run()
     {
         Init();
-        m_Window->SetEventCallback([this](Layer::Event::Event& event) { m_LayerStack.OnEvent(event); });
         DeltaTimeHandler deltaTimeHandler;
 
-        for(Layer::Layer* layer : m_LayerStack)
+        for(Interfaces::ILayer* layer : m_LayerStack)
                 layer->OnBegin();
 
         while (!m_Window->ShouldClose())
         {
             float deltaTime = deltaTimeHandler.Update();
 
-            for(Layer::Layer* layer : m_LayerStack)
+            for(Interfaces::ILayer* layer : m_LayerStack)
                 layer->OnUpdate(deltaTime);
 
-            for(Layer::Layer* layer : m_LayerStack)
+            for(Interfaces::ILayer* layer : m_LayerStack)
                 layer->OnRender();
 
             m_Window->Update();
         }
 
-        for(Layer::Layer* layer : m_LayerStack)
+        for(Interfaces::ILayer* layer : m_LayerStack)
                 layer->OnEnd();
 
         Shutdown();
@@ -55,11 +56,26 @@ namespace Forgex::Core
         // then all modules
         for (auto& [ index, module ] : m_ModuleRegistry)
             module->Init(*this);
+
+        m_Window->SetEventCallback(BIND_EVENT_FUNCTION(EngineCore::OnEvent));
+        m_LayerStack.SetEventCallback(BIND_EVENT_FUNCTION(EngineCore::OnEvent));
     }
 
     void EngineCore::Shutdown()
     {
         for (auto& [ index, module ] : m_ModuleRegistry)
             module->Shutdown();
+    }
+
+    void EngineCore::OnEvent(Layer::Event::Event& event)
+    {
+        Layer::Event::EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<Layer::Event::MouseLockEvent>([this](Layer::Event::MouseLockEvent& event)->bool { m_Window->SetMouseLock(event.GetState()); return true;});
+
+        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
+        {
+            (*--it)->OnEvent(&event);
+            if (event.m_Handled) break;
+        }
     }
 }

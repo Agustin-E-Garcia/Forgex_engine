@@ -1,0 +1,46 @@
+#pragma once
+#include "GUIWindow.h"
+#include <type_traits>
+#include <vector>
+
+namespace Forgex::Editor::UI
+{
+    class UIWindowManager
+    {
+    public:
+        UIWindowManager();
+        ~UIWindowManager();
+
+        void SetContext();
+        void Update(float deltaTime);
+        void Render();
+
+	template<class T, class... Args>
+	unsigned int AddWindow(Args&&... args)
+	{
+		static_assert(std::is_base_of<GUIWindow, T>::value, "T must inherit from GUIWindow");		
+		unsigned int index = m_WindowCollection.size();
+		m_WindowCollection.emplace_back(new T(std::forward<Args>(args)...));
+		return index;
+	}
+
+    template<class T>
+    T* GetWindow(unsigned int index)
+    {
+        static_assert(std::is_base_of<GUIWindow, T>::value, "T must inherit from GUIWindow");
+        return dynamic_cast<T*>(m_WindowCollection.at(index));
+    }
+
+        void UpdateMousePosition(double xPos, double yPos);
+        void OnMouseClick(unsigned int button, bool clicked);
+        void OnMouseWheelScroll(double xOffset, double yOffset);
+        void OnCharInput(unsigned int keycode);
+        void OnKeyPressed(unsigned int keycode, bool repeat, bool pressed);
+        void OnWindowResized(int width, int height);
+
+    private:
+        void* m_ActiveContext = nullptr;
+        bool m_WindowActive = true;
+	    std::vector<GUIWindow*> m_WindowCollection;
+    };
+}

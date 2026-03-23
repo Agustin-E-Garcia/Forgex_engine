@@ -20,7 +20,7 @@ namespace Forgex::Graphics
         glfwGetWindowSize(m_Window, &m_Width, &m_Height);
         glfwMakeContextCurrent(m_Window);
         glfwSetWindowUserPointer(m_Window, this);
-        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        SetMouseLock(true);
 
         glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
         {
@@ -71,6 +71,13 @@ namespace Forgex::Graphics
             self.m_EventCallback(event);
         });
 
+        glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+        {
+            Window& self = *(Window*)glfwGetWindowUserPointer(window);
+            Core::Layer::Event::WindowResizedEvent event(width, height);
+            self.m_EventCallback(event);
+        });
+
         LOG_CORE(Debug::LogLevel::Info, "Window '{0}' created successfully", title);
     }
 
@@ -89,5 +96,11 @@ namespace Forgex::Graphics
     bool Window::ShouldClose() const
     {
         return glfwWindowShouldClose(m_Window);
+    }
+
+    void Window::SetMouseLock(bool newState)
+    {
+        if (newState) glfwSetCursorPos(m_Window, m_Width / 2.0, m_Height / 2.0);
+        glfwSetInputMode(m_Window, GLFW_CURSOR, newState ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
     }
 }

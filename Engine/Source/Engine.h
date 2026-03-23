@@ -9,8 +9,10 @@ namespace Forgex::Engine
         Engine();
         ~Engine();
 
-        void PushLayer(Core::Layer::Layer* layer);
-        void PushOverlay(Core::Layer::Layer* overlay);
+        void Run();
+
+        void PushLayer(Core::Interfaces::ILayer* layer);
+        void PushOverlay(Core::Interfaces::ILayer* overlay);
 
     private:
         Core::EngineCore* m_EngineCore;

@@ -43,13 +43,13 @@ namespace Forgex::Debug
 
     LogManager::~LogManager() {}
 
-    bool LogManager::GetNextConsoleMessage(std::string* message, LogLevel* level)
+    bool LogManager::GetNextConsoleMessage(std::string& message, LogLevel& level)
     {
         if(!m_ConsoleSink->HasMessages()) return false;
 
         ConsoleMessage msg = m_ConsoleSink->GetNextMessage();
-        *message = msg.text;
-        *level = SpdlogLevelToLogLevel(msg.level);
+        message = msg.text;
+        level = SpdlogLevelToLogLevel(msg.level);
         return true;
     }
 

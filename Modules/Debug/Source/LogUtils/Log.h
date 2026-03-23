@@ -36,7 +36,7 @@ namespace Forgex::Debug
             LogMessage(m_ClientLogger, level, message);
         }
 
-        bool GetNextConsoleMessage(std::string* message, LogLevel* level);
+        bool GetNextConsoleMessage(std::string& message, LogLevel& level);
 
     private:
         const std::string m_CoreLogger = "CORE";

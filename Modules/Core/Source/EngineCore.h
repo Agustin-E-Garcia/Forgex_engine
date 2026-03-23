@@ -1,4 +1,5 @@
 #pragma once
+#include "Layer/Event/EventList.h"
 #include "Registry.h"
 #include "Interfaces/IWindow.h"
 #include "Interfaces/IModule.h"
@@ -19,8 +20,8 @@ namespace Forgex::Core
         template<class T>
         void RegisterSystem() { m_SystemRegistry.Register<T>(); }
 
-        void RegisterLayer(Layer::Layer* layer) { m_LayerStack.PushLayer(layer); }
-        void RegisterOverlay(Layer::Layer* overlay) { m_LayerStack.PushOverlay(overlay); }
+        void RegisterLayer(Interfaces::ILayer* layer) { m_LayerStack.PushLayer(layer); }
+        void RegisterOverlay(Interfaces::ILayer* overlay) { m_LayerStack.PushOverlay(overlay); }
 
         Interfaces::IWindow* GetWindow() const { return m_Window; }
         Registry<Interfaces::IModule>& GetModuleRegistry() { return m_ModuleRegistry; }
@@ -29,6 +30,7 @@ namespace Forgex::Core
     private:
         void Init();
         void Shutdown();
+        void OnEvent(Layer::Event::Event& event);
 
         Interfaces::IWindow* m_Window;
         Registry<Interfaces::IModule> m_ModuleRegistry;

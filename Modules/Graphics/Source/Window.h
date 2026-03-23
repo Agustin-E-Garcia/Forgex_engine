@@ -14,6 +14,7 @@ namespace Forgex::Graphics
         void Update() override;
         bool ShouldClose() const override;
         void SetEventCallback(const Core::Interfaces::IWindow::EventCallbackFn& callback) override { m_EventCallback = callback; }
+        void SetMouseLock(bool newState) override;
 
     private:
         GLFWwindow* m_Window;

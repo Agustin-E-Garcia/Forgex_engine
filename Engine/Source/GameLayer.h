@@ -8,10 +8,10 @@
 
 namespace Forgex::Engine
 {
-    class GameLayer : public Core::Layer::Layer
+    class GameLayer : public Core::Interfaces::ILayer
     {
     public:
-        GameLayer() : Core::Layer::Layer("Game Layer") {}
+        GameLayer() : Core::Interfaces::ILayer("Game Layer") {}
 
         void OnAttach() override {}
 
@@ -55,25 +55,25 @@ namespace Forgex::Engine
         bool HandleKeyPressedEvent(Core::Layer::Event::KeyPressedEvent& event)
         {
             GET_SERVICE(Input::InputManager)->RegisterKeyState(event.GetKeyCode(), event.IsPressed());
-            return true;
+            return false;
         }
 
         bool HandleKeyReleasedEvent(Core::Layer::Event::KeyReleasedEvent& event)
         {
             GET_SERVICE(Input::InputManager)->RegisterKeyState(event.GetKeyCode(), false);
-            return true;
+            return false;
         }
 
         bool HandleMouseClickEvent(Core::Layer::Event::MouseClickEvent& event)
         {
             GET_SERVICE(Input::InputManager)->RegisterKeyState(event.GetButton(), event.IsPressed());
-            return true;
+            return false;
         }
 
         bool HandleMousePositionEvent(Core::Layer::Event::MousePositionEvent& event)
         {
             GET_SERVICE(Input::InputManager)->UpdateMouseDelta(glm::dvec2(event.GetPositionX(), event.GetPositionY()));
-            return true;
+            return false;
         }
     };
 }

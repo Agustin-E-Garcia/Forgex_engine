@@ -19,12 +19,15 @@ namespace Forgex::Engine
         Core::ServiceLocator::Get().Register<Input::InputManager>();
         m_EngineCore->RegisterSystem<Input::InputSystem>();
         PushLayer(new GameLayer());
-
-        m_EngineCore->Run();
     }
 
     Engine::~Engine() { delete m_EngineCore; }
 
-    void Engine::PushLayer(Core::Layer::Layer* layer) { m_EngineCore->RegisterLayer(layer); }
-    void Engine::PushOverlay(Core::Layer::Layer* overlay) { m_EngineCore->RegisterOverlay(overlay); }
+    void Engine::Run()
+    {
+        m_EngineCore->Run();
+    }
+
+    void Engine::PushLayer(Core::Interfaces::ILayer* layer) { m_EngineCore->RegisterLayer(layer); }
+    void Engine::PushOverlay(Core::Interfaces::ILayer* overlay) { m_EngineCore->RegisterOverlay(overlay); }
 }

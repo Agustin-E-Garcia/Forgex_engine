@@ -1,5 +1,6 @@
 #pragma once
 #include "Event.h"
+#include <string>
 
 namespace Forgex::Core::Layer::Event
 {
@@ -23,23 +24,6 @@ namespace Forgex::Core::Layer::Event
 	private:
 		unsigned int m_Width;
 		unsigned int m_Height;
-	};
-
-	/*---------------------------------------------------------------------------------------------------------*/
-
-	class WindowCloseEvent : public Event
-	{
-	public:
-		WindowCloseEvent() {}
-		EVENT_SET_TYPE(WindowClose)
-		EVENT_SET_CATEGORY(ApplicationEvent)
-
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "WindowCloseEvent called";
-			return ss.str();
-		}
 	};
 
 	/*---------------------------------------------------------------------------------------------------------*/
@@ -160,33 +144,11 @@ namespace Forgex::Core::Layer::Event
 
 	/*---------------------------------------------------------------------------------------------------------*/
 
-	class MouseUnclickEvent : public Event
-	{
-	public:
-		MouseUnclickEvent(unsigned int button) : m_Button(button) {}
-		EVENT_SET_TYPE(MouseUnclicked)
-		EVENT_SET_CATEGORY(InputEvent | MouseButtonEvent)
-
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "MouseUnclickEvent: " << m_Button;
-			return ss.str();
-		}
-
-		inline unsigned int GetButton() { return m_Button; }
-
-	private:
-		unsigned int m_Button;
-	};
-
-	/*---------------------------------------------------------------------------------------------------------*/
-
 	class MouseWheelScrollEvent : public Event
 	{
 	public:
 		MouseWheelScrollEvent(double x, double y) : m_XOffset(x), m_YOffset(y) {};
-		EVENT_SET_TYPE(mouseWheel)
+		EVENT_SET_TYPE(MouseWheel)
 		EVENT_SET_CATEGORY(InputEvent | MouseEvent)
 
 		std::string ToString() const override
@@ -230,25 +192,23 @@ namespace Forgex::Core::Layer::Event
 
 	/*---------------------------------------------------------------------------------------------------------*/
 
-	class ViewportResizeEvent : public Event
-	{
-	public:
-		ViewportResizeEvent(float width, float height) : m_width(width), m_height(height) {}
-		EVENT_SET_TYPE(ViewportResize)
-		EVENT_SET_CATEGORY(LayerEvent)
+    class MouseLockEvent : public Event
+    {
+    public:
+        MouseLockEvent(bool lockState) : m_LockState(lockState) {}
+        EVENT_SET_TYPE(MouseLock)
+        EVENT_SET_CATEGORY(ApplicationEvent | LayerEvent)
 
-		std::string ToString() const override 
-		{
-			std::stringstream ss;
-			ss << "ViewportResizeEvent: [" << m_width << "], [" << m_height << "]";
-			return ss.str();
-		}
+        std::string ToString() const override
+        {
+            std::stringstream ss;
+            ss << "MouseLockEvent: " << m_LockState;
+            return ss.str();
+        }
 
-		inline float GetWidth() { return m_width; }
-		inline float GetHeight() { return m_height; }
+        inline bool GetState() { return m_LockState; }
 
-	private:
-		float m_width;
-		float m_height;
-	};
+    private:
+        bool m_LockState;
+    };
 }

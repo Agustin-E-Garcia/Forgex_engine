@@ -14,6 +14,7 @@ namespace Forgex::Core::Interfaces
         virtual void Update() = 0;
         virtual bool ShouldClose() const = 0;
         virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+        virtual void SetMouseLock(bool newState) = 0;
 
         virtual int GetWidth() { return m_Width; }
         virtual int GetHeight() { return m_Height; }
