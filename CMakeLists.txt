@@ -57,7 +57,7 @@ add_library(Assets_Module SHARED ${ASSETS_SRC})
 target_compile_definitions(Assets_Module PRIVATE ASSETS_DLL)
 
 target_include_directories(Assets_Module INTERFACE Modules/Assets/Include)
-target_include_directories(Assets_Module PRIVATE ExternalLibraries/STB_Image)
+target_include_directories(Assets_Module SYSTEM PRIVATE ExternalLibraries/STB_Image ExternalLibraries/Tiny_obj_loader)
 target_link_libraries(Assets_Module PUBLIC Debug_Module)
 set_module_properties(Assets_Module)
 

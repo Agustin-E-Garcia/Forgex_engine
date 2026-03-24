@@ -33,7 +33,7 @@ namespace Forgex::Assets
         T* operator->() const { return Get(); }
         T& operator*() const { return *Get(); }
 
-        bool IsValid()
+        bool IsValid() const
         {
             if(!m_Manager) return false;
             return m_Manager->IsIDValid(m_AssetID); 

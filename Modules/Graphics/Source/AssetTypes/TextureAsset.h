@@ -25,7 +25,8 @@ namespace Forgex::Graphics
             // if textureType is cubemap, we need to parse the texture file into an array of texture files (comma separated for now) and call the correct function
             if(m_Type == TextureType::Default)
             {
-                m_TextureID = Utils::TextureLoader::LoadTexture(m_Path.c_str());
+                m_TextureID = Utils::TextureLoader::LoadTexture(m_Path.c_str(), m_Data);
+                m_GPUSize = m_Data.m_Width * m_Data.m_Height * m_Data.m_Channels;
             }
             else
             {
@@ -35,9 +36,9 @@ namespace Forgex::Graphics
                     LOG_CORE(Debug::Error, "Invalid TextureAsset of type Cubemap in '{0}': expected texture paths with comma-separated-values", m_Path);
                     return false;
                 }
-                m_TextureID = Utils::TextureLoader::LoadTexture(texturePaths);
+                m_TextureID = Utils::TextureLoader::LoadTexture(texturePaths, m_Data);
+                m_GPUSize = m_Data.m_Width * m_Data.m_Height * m_Data.m_Channels * 6;
             }
-
 
             return m_TextureID != -1;
         }
@@ -51,10 +52,12 @@ namespace Forgex::Graphics
         }
 
         int GetTextureID() { return m_TextureID; }
-        size_t GetMemorySize() const override { return sizeof(*this); }
+        size_t GetCPUMemorySize() const override { return sizeof(*this); }
 
     private:
         int m_TextureID = -1;
         TextureType m_Type;
+
+        Assets::Files::TextureData m_Data;
     };
 }

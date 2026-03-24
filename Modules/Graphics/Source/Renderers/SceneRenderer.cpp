@@ -41,8 +41,8 @@ namespace Forgex::Graphics::Renderers
 
             PrintGLError("Error after binding texture");
 
-            int stride = 6 * sizeof(float);
-            glBindBuffer(GL_ARRAY_BUFFER, info.m_VertexBufferID);
+            int stride = 8 * sizeof(float);
+            glBindBuffer(GL_ARRAY_BUFFER, info.m_MeshAsset->GetVertexBuffer());
 
             glEnableVertexAttribArray(0); // Vertices
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
@@ -54,20 +54,19 @@ namespace Forgex::Graphics::Renderers
 
             PrintGLError("Error after binding normal buffer");
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info.m_IndexBufferID);
-
-            PrintGLError("Error after binding index buffer");
-
-            //glEnableVertexAttribArray(2); // UVs
-            //glBindBuffer(GL_ARRAY_BUFFER, info.m_VertexBufferID);
-            //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(2); // UVs
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
 
             PrintGLError("Error after binding UV buffer");
 
-            glDrawElements(GL_TRIANGLES, info.m_IndexSize, GL_UNSIGNED_INT, (void*)0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info.m_MeshAsset->GetIndexBuffer());
+
+            PrintGLError("Error after binding index buffer");
+
+            glDrawElements(GL_TRIANGLES, info.m_MeshAsset->GetIndexBufferCount(), GL_UNSIGNED_INT, (void*)0);
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);
-            //glDisableVertexAttribArray(2);
+            glDisableVertexAttribArray(2);
 
             PrintGLError("Error after drawing");
         }

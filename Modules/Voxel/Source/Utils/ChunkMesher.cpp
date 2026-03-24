@@ -161,7 +161,7 @@ namespace Forgex::Voxel::Utils
 
     uint32_t ChunkMesher::PushVertex(std::vector<float>& vertices, glm::vec3 vertex, glm::vec3 normal)
     {
-        uint32_t index = vertices.size() / 6;
+        uint32_t index = vertices.size() / 8;
         // Add Vertex
         vertices.push_back(vertex.x);
         vertices.push_back(vertex.y);
@@ -170,6 +170,9 @@ namespace Forgex::Voxel::Utils
         vertices.push_back(normal.x);
         vertices.push_back(normal.y);
         vertices.push_back(normal.z);
+        // Add UVs
+        vertices.push_back(0.0f);
+        vertices.push_back(0.0f);
 
         return index;
     }

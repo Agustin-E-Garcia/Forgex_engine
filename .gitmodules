@@ -2,10 +2,6 @@
 	path = ExternalLibraries/GLM
 	url = https://github.com/g-truc/glm
 	branch = master
-[submodule "ExteranlLibraries/Spdlog"]
-	path = ExteranlLibraries/Spdlog
-	url = https://github.com/gabime/spdlog
-	branch = v1.x
 [submodule "ExternalLibraries/Spdlog"]
 	path = ExternalLibraries/Spdlog
 	url = https://github.com/gabime/spdlog

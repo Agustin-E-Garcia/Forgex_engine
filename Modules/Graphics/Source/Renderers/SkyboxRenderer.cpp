@@ -2,10 +2,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <ForgexCore.h>
+
 namespace Forgex::Graphics::Renderers
 {
     void SkyboxRenderer::Render(const Resources::RenderView& renderView, const Components::Renderable& renderable)
     {
+
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
         glViewport(0, 0, width, height);
@@ -33,7 +36,7 @@ namespace Forgex::Graphics::Renderers
         else LOG_CORE(Debug::Error, "Failed to find uniform location 'View'");
 
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, renderable.m_VertexBufferID);
+        glBindBuffer(GL_ARRAY_BUFFER, renderable.m_MeshAsset->GetVertexBuffer());
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, renderable.m_TextureAsset->GetTextureID());

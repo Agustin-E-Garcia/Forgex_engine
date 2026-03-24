@@ -1,11 +1,11 @@
 #pragma once
 #include <ForgexCore.h>
 
-#include "../Utils/BufferManager.h"
-
 #include "../Resources/RenderView.h"
 #include "../Renderers/SceneRenderer.h"
 #include "../Renderers/SkyboxRenderer.h"
+
+#include <ForgexAssets.h>
 
 #include "../Components/Camera.h"
 #include "../Components/Renderable.h"
@@ -22,8 +22,7 @@ namespace Forgex::Graphics::Systems
             Components::Skybox& skybox = registry.emplace<Components::Skybox>(skyboxEntity);
             Components::Renderable& renderable = registry.emplace<Components::Renderable>(skyboxEntity);
 
-            renderable.m_Vertices = skybox.m_SkyboxVertices.data();
-            renderable.m_VertexBufferID = Utils::BufferManager::GenerateBuffer(Utils::BufferType::VertexBuffer, sizeof(float) * skybox.m_SkyboxVertices.size(), renderable.m_Vertices);
+            renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->CreateRuntimeAsset<MeshAsset>("Skybox_Mesh", skybox.m_SkyboxVertices.data(), skybox.m_SkyboxVertices.size());
 
             renderable.m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/Skybox.FShader");
             renderable.m_TextureAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::TextureAsset>("Resources/Textures/Skybox.FTexture", Graphics::TextureType::Cubemap);
@@ -55,10 +54,17 @@ namespace Forgex::Graphics::Systems
             std::vector<Components::Renderable> renderables;
             for(entt::entity entity : view_renderable)
             {
-                if(registry.all_of<Components::Skybox>(entity)) continue;
-                renderables.push_back(view_renderable.get<Components::Renderable>(entity));
+                Components::Renderable& renderable = view_renderable.get<Components::Renderable>(entity);
+                if(IsValid(renderable)) renderables.push_back(renderable);
             }
             scene_renderer.Render(&renderView, &renderables);
+        }
+
+        bool IsValid(const Components::Renderable& renderable) 
+        {
+            return  renderable.m_ShaderAsset->GetShaderID() != -1 &&
+                    renderable.m_MeshAsset->GetIndexBuffer() != -1 &&
+                    renderable.m_MeshAsset->GetVertexBuffer() != -1;
         }
 
         const char* GetName() override { return "RenderingSystem"; }

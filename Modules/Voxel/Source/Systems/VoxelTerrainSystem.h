@@ -22,24 +22,13 @@ namespace Forgex::Voxel::Systems
                 std::vector<int> indices;
                 mesher.GenerateMesh(vertices, indices);
 
-                renderable.m_Vertices = vertices.data();
-                renderable.m_VertexSize = vertices.size();
-
-                renderable.m_Indices = indices.data();
-                renderable.m_IndexSize = indices.size();
-
-                renderable.m_VertexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
+                renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->CreateRuntimeAsset<Graphics::MeshAsset>
                 (
-                    Graphics::Utils::BufferType::VertexBuffer,
-                    renderable.m_VertexSize * sizeof(float),
-                    renderable.m_Vertices
-                );
-
-                renderable.m_IndexBufferID = Graphics::Utils::BufferManager::GenerateBuffer
-                (
-                    Graphics::Utils::BufferType::IndexBuffer,
-                    renderable.m_IndexSize * sizeof(uint32_t),
-                    renderable.m_Indices
+                    "ChunkMesh",
+                    vertices.data(),
+                    vertices.size(),
+                    indices.data(),
+                    indices.size()
                 );
 
                 chunk.m_IsDirty = false;

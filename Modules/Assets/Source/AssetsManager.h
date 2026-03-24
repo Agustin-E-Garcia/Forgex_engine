@@ -1,5 +1,6 @@
 #pragma once
 #include "Asset.h"
+#include <format>
 #include <unordered_map>
 #include <string>
 #include <utility>
@@ -30,6 +31,24 @@ namespace Forgex::Assets
 
             int newID = m_IDCounter++;
             m_AssetPathToID[assetPath] = newID;
+            m_LoadedAssets[newID] = newAsset;
+
+            return AssetHandle<T>(this, newID);
+        }
+
+        template<class T, typename... Args>
+        AssetHandle<T> CreateRuntimeAsset(const std::string& assetPath, Args&&... args)
+        {
+            static_assert(std::is_base_of<Asset, T>::value, "T must inherit from Asset");
+
+            std::string path = std::format("RuntimeAsset_{0}_{1}", assetPath, m_IDCounter + 1);
+
+            if(m_AssetPathToID.contains(path)) { return AssetHandle<T>(this, m_AssetPathToID[path]); }
+
+            Asset* newAsset = new T(path, std::forward<Args>(args)...);
+
+            int newID = m_IDCounter++;
+            m_AssetPathToID[path] = newID;
             m_LoadedAssets[newID] = newAsset;
 
             return AssetHandle<T>(this, newID);

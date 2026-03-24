@@ -37,7 +37,7 @@ namespace Forgex::Graphics
         }
 
         int GetShaderID() { return m_ShaderID; }
-        size_t GetMemorySize() const override { return sizeof(*this); }
+        size_t GetCPUMemorySize() const override { return sizeof(*this); }
 
     private:
         int m_ShaderID = -1;
