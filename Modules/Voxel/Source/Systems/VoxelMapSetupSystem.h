@@ -2,6 +2,7 @@
 #include <ForgexCore.h>
 #include <ForgexGraphics.h>
 #include <ForgexAssets.h>
+#include <cstdint>
 
 #include "../Components/VoxelMap.h"
 #include "../Utils/TerrainGenerator.h"
@@ -33,33 +34,35 @@ namespace Forgex::Voxel::Systems
                 chunk.m_SampleDensity = map.m_SampleDensity;
                 chunk.m_Cutoff = map.m_Cutoff;
 
-                SetupChunk(chunk, renderable);
+                renderable.m_ModelMatrix = glm::translate(glm::mat4(1.0f), (chunk.m_Position * chunk.m_Size));
+
+                chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(1.0f);
+                chunk.m_DensityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);
+
+                renderable.m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/ColorShader.FShader");
+
+                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<std::vector<uint8_t>>([this, &chunk]() { return SetupChunk(chunk); });
 
                 map.m_Chunks.push_back(&chunk);
             }
         }
 
-        void SetupChunk(Components::Chunk& chunk, Graphics::Components::Renderable& renderable)
+        std::vector<uint8_t> SetupChunk(Components::Chunk& chunk)
         {
-            renderable.m_ModelMatrix = glm::translate(glm::mat4(1.0f), (chunk.m_Position * chunk.m_Size));
-
             Utils::TerrainGenerator generator = Utils::TerrainGenerator(chunk.m_NoiseSeed);
 
-            chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(1.0f);
-            int totalSamples = (int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z;
-            chunk.m_DensityValues.resize(totalSamples, 255);
+            std::vector<uint8_t> densityValues;
+            densityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);
 
             glm::vec3 worldOffset = chunk.m_Position * chunk.m_Size;
             for(int i = 0; i < chunk.m_DensityValues.size(); i++)
             {
                 glm::vec3 worldPosition = worldOffset + GetSamplePosition(chunk, i);
                 float surfaceHeight;
-                chunk.m_DensityValues[i] = generator.GetDensityValueAtPoint(worldPosition, chunk.m_Size.y, &surfaceHeight);
+                densityValues[i] = generator.GetDensityValueAtPoint(worldPosition, chunk.m_Size.y, &surfaceHeight);
             }
 
-            chunk.m_IsDirty = true;
-
-            renderable.m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/ColorShader.FShader");
+            return densityValues;
         }
 
         glm::vec3 GetSamplePosition(Components::Chunk& chunk, int sampleID)

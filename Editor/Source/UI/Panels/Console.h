@@ -11,7 +11,6 @@ namespace Forgex::Editor::UI::Panels
     {
     public:
         ConsolePanel() : GUIWindow("Console", false) {}
-        ~ConsolePanel() {}
 
     protected:
         void OnDraw() override

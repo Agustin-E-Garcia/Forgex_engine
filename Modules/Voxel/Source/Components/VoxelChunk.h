@@ -1,6 +1,8 @@
 #pragma once
+#include <future>
 #include <glm/glm.hpp>
 #include <vector>
+#include <ForgexAssets.h>
 
 namespace Forgex::Voxel::Components
 {
@@ -16,5 +18,7 @@ namespace Forgex::Voxel::Components
         std::vector<uint8_t> m_DensityValues;
 
         bool m_IsDirty = true;
+        std::future<std::vector<uint8_t>> m_DensityFuture;
+        std::future<Assets::Files::MeshData> m_MeshingFuture;
     };
 }

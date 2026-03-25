@@ -1,10 +1,13 @@
 #include "EngineCore.h"
-#include "Layer/Event/Event.h"
+#include "DebugMacros.h"
 #include "Layer/Event/EventList.h"
 #include "ServiceLocator.h"
+#include "JobManager.h"
 #include <ForgexAssets.h>
 #include <ForgexDebug.h>
+#include <algorithm>
 #include <chrono>
+#include <thread>
 
 namespace Forgex::Core
 {
@@ -52,6 +55,10 @@ namespace Forgex::Core
     {
         ServiceLocator::Get().Register<Debug::DebugManager>();
         ServiceLocator::Get().Register<Assets::AssetManager>();
+
+        int workerCount = std::max(1, (int)std::thread::hardware_concurrency() - 1);
+        LOG_CORE(Debug::Trace, "JobManager spinning {0} threads", workerCount);
+        ServiceLocator::Get().Register<JobManager>(1);
 
         // then all modules
         for (auto& [ index, module ] : m_ModuleRegistry)

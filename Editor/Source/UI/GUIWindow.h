@@ -7,7 +7,7 @@ namespace Forgex::Editor::UI
 	{
 	public:
 		GUIWindow(const char* name, bool isActive = false) : m_Name(name), m_IsActive(isActive) {}
-		~GUIWindow() {}
+		virtual ~GUIWindow() = default;
 
         void ToggleWindow() { m_IsActive = !m_IsActive; }
 

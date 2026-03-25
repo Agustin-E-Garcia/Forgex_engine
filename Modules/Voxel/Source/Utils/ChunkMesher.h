@@ -7,13 +7,13 @@ namespace Forgex::Voxel::Utils
     class ChunkMesher
     {
     public:
-        ChunkMesher(Components::Chunk* chunk, TerrainGenerator* generator);
+        ChunkMesher(const Components::Chunk* chunk, TerrainGenerator* generator);
         ~ChunkMesher();
 
         void GenerateMesh(std::vector<float>& vertices, std::vector<int>& indices);
 
     private:
-        Components::Chunk* m_Chunk = nullptr;
+        const Components::Chunk* m_Chunk = nullptr;
         TerrainGenerator* m_Generator = nullptr;
         std::unordered_map<uint64_t, uint32_t> m_VertexToIndexMap;
 

@@ -24,8 +24,6 @@ namespace Forgex::Assets::Files
 
         MeshData();
         ~MeshData();
-        MeshData(const MeshData&) = delete;
-        MeshData& operator=(const MeshData&) = delete;
     };
 
     bool ReadFile(const char* filePath, std::string& buffer);

@@ -7,6 +7,7 @@
 #include "../Source/Registry.h"
 #include "../Source/EngineCore.h"
 #include "../Source/ServiceLocator.h"
+#include "../Source/JobManager.h"
 
 #include "../Source/Components/Transform.h"
 

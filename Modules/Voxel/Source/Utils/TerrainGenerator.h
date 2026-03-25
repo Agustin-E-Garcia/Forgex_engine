@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <FastNoiseLite.h>
 
 namespace Forgex::Voxel::Utils
 {
@@ -13,5 +14,6 @@ namespace Forgex::Voxel::Utils
 
     private:
         int m_Seed;
+        FastNoiseLite m_Noise;
     };
 }

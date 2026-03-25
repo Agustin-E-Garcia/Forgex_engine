@@ -46,8 +46,4 @@ namespace Forgex::Debug
 
         void LogMessage(std::string loggerID, LogLevel level, const std::string& message);
     };
-
-
-//#define LOG_CORE(...)      Forgex::Debug::Log::CoreLog(__VA_ARGS__)
-//#define LOG_CLIENT(...)    Forgex::Debug::Log::ClientLog(__VA_ARGS__)
 }

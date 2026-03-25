@@ -62,8 +62,8 @@ namespace Forgex::Graphics::Systems
 
         bool IsValid(const Components::Renderable& renderable) 
         {
-            return  renderable.m_ShaderAsset->GetShaderID() != -1 &&
-                    renderable.m_MeshAsset->GetIndexBuffer() != -1 &&
+            return  renderable.m_ShaderAsset.IsValid() && renderable.m_ShaderAsset->GetShaderID() != -1 &&
+                    renderable.m_MeshAsset.IsValid() && renderable.m_MeshAsset->GetIndexBuffer() != -1 &&
                     renderable.m_MeshAsset->GetVertexBuffer() != -1;
         }
 

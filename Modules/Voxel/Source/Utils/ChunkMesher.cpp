@@ -6,13 +6,11 @@
 
 namespace Forgex::Voxel::Utils
 {
-    ChunkMesher::ChunkMesher(Components::Chunk* chunk, TerrainGenerator* generator) : m_Chunk(chunk), m_Generator(generator) {}
+    ChunkMesher::ChunkMesher(const Components::Chunk* chunk, TerrainGenerator* generator) : m_Chunk(chunk), m_Generator(generator) {}
     ChunkMesher::~ChunkMesher() {}
 
     void ChunkMesher::GenerateMesh(std::vector<float>& vertices, std::vector<int>& indices)
     {
-        PROFILE_FUNCTION("ChunkMesher::GenerateMesh");
-
         vertices.reserve(m_Chunk->m_Samples.x * m_Chunk->m_Samples.y * m_Chunk->m_Samples.z * 5 * 3 * 6);
         for (int z = 0; z < (int)m_Chunk->m_Samples.z - 1; z++)
         for (int y = 0; y < (int)m_Chunk->m_Samples.y - 1; y++)
