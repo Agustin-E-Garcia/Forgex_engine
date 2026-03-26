@@ -1,5 +1,4 @@
 #pragma once
+#include "../Source/AssetsModule.h"
 #include "../Source/AssetsManager.h"
-#include "../Source/AssetHandle.h"
-
-#include "../Source/Files/FileManager.h"
+#include "../Source/Resources/AssetHandle.h"

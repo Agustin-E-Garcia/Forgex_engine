@@ -1,1 +1,4 @@
-Resources/Shaders/ColorShader.vertex,Resources/Shaders/ColorShader.fragment
+{
+    "Vertex": "Resources/Shaders/ColorShader.vertex",
+    "Fragment": "Resources/Shaders/ColorShader.fragment"
+}

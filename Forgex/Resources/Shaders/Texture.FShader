@@ -1,1 +1,4 @@
-Resources/Shaders/Texture.vertex,Resources/Shaders/Texture.fragment
+{
+    "Vertex": "Resources/Shaders/Texture.vertex",
+    "Fragment": "Resources/Shaders/Texture.fragment"
+}

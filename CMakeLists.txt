@@ -51,15 +51,18 @@ target_include_directories(Debug_Module INTERFACE Modules/Debug/Include)
 target_include_directories(Debug_Module PRIVATE ExternalLibraries/Spdlog/include)
 set_module_properties(Debug_Module)
 
-# Assets_Module
-file(GLOB_RECURSE ASSETS_SRC Modules/Assets/*.cpp Modules/Assets/*.h)
-add_library(Assets_Module SHARED ${ASSETS_SRC})
-target_compile_definitions(Assets_Module PRIVATE ASSETS_DLL)
+# FilesIO_Module
+file(GLOB_RECURSE FILES_SRC Modules/FilesIO/*.cpp Modules/FilesIO/*.h)
+add_library(FilesIO_Module SHARED ${FILES_SRC})
+target_compile_definitions(FilesIO_Module PRIVATE ASSETS_DLL)
 
-target_include_directories(Assets_Module INTERFACE Modules/Assets/Include)
-target_include_directories(Assets_Module SYSTEM PRIVATE ExternalLibraries/STB_Image ExternalLibraries/Tiny_obj_loader)
-target_link_libraries(Assets_Module PUBLIC Debug_Module)
-set_module_properties(Assets_Module)
+target_include_directories(FilesIO_Module INTERFACE Modules/FilesIO/Include)
+target_include_directories(FilesIO_Module SYSTEM PUBLIC ExternalLibraries/Nlohmann)
+target_include_directories(FilesIO_Module SYSTEM PRIVATE
+    ExternalLibraries/STB_Image
+    ExternalLibraries/Tiny_obj_loader
+)
+set_module_properties(FilesIO_Module)
 
 # Core_Module
 file(GLOB_RECURSE CORE_SRC Modules/Core/*.cpp Modules/Core/*.h)
@@ -68,8 +71,17 @@ target_compile_definitions(Core_Module PRIVATE CORE_DLL)
 
 target_include_directories(Core_Module INTERFACE Modules/Core/Include)
 target_include_directories(Core_Module PUBLIC ExternalLibraries/EnTT ExternalLibraries/GLM)
-target_link_libraries(Core_Module PUBLIC Debug_Module Assets_Module)
+target_link_libraries(Core_Module PUBLIC Debug_Module FilesIO_Module)
 set_module_properties(Core_Module)
+
+# Assets_Module
+file(GLOB_RECURSE ASSETS_SRC Modules/Assets/*.cpp Modules/Assets/*.h)
+add_library(Assets_Module SHARED ${ASSETS_SRC})
+target_compile_definitions(Assets_Module PRIVATE ASSETS_DLL)
+
+target_include_directories(Assets_Module INTERFACE Modules/Assets/Include)
+target_link_libraries(Assets_Module PUBLIC Core_Module)
+set_module_properties(Assets_Module)
 
 # Graphics_Module
 file(GLOB_RECURSE GRAPHICS_SRC Modules/Graphics/*.cpp Modules/Graphics/*.h)
@@ -78,7 +90,7 @@ target_compile_definitions(Graphics_Module PRIVATE GRAPHICS_DLL)
 
 target_include_directories(Graphics_Module INTERFACE Modules/Graphics/Include)
 target_link_libraries(Graphics_Module PRIVATE GLEW::GLEW glfw OpenGL::GL OpenGL::GLU)
-target_link_libraries(Graphics_Module PUBLIC Core_Module)
+target_link_libraries(Graphics_Module PUBLIC Core_Module Assets_Module)
 set_module_properties(Graphics_Module)
 
 # Scene_Module
@@ -87,7 +99,7 @@ add_library(Scene_Module SHARED ${SCENE_SRC})
 target_compile_definitions(Scene_Module PRIVATE SCENE_DLL)
 
 target_include_directories(Scene_Module INTERFACE Modules/Scene/Include)
-target_link_libraries(Scene_Module PUBLIC Core_Module)
+target_link_libraries(Scene_Module PUBLIC Core_Module Assets_Module)
 set_module_properties(Scene_Module)
 
 
@@ -98,7 +110,7 @@ target_compile_definitions(Voxel_Module PRIVATE VOXEL_DLL)
 
 target_include_directories(Voxel_Module INTERFACE Modules/Voxel/Include)
 target_include_directories(Voxel_Module PRIVATE ExternalLibraries/FastNoiseLite)
-target_link_libraries(Voxel_Module PUBLIC Core_Module Graphics_Module)
+target_link_libraries(Voxel_Module PUBLIC Graphics_Module)
 set_module_properties(Voxel_Module)
 
 # Engine
@@ -107,7 +119,7 @@ add_library(Forgex_Engine SHARED ${ENGINE_SRC})
 target_compile_definitions(Forgex_Engine PRIVATE ENGINE_DLL)
 
 target_include_directories(Forgex_Engine INTERFACE Engine/Include)
-target_link_libraries(Forgex_Engine PUBLIC Graphics_Module Scene_Module Voxel_Module Core_Module)
+target_link_libraries(Forgex_Engine PUBLIC Graphics_Module Scene_Module Voxel_Module)
 set_module_properties(Forgex_Engine)
 
 # ImGui
@@ -145,3 +157,10 @@ set_target_properties(Forgex_Exec PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BUILD_OU
 if(NOT MSVC)
     target_compile_options(Forgex_Exec PRIVATE -g)
 endif()
+
+add_custom_command(TARGET Forgex_Exec POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/Forgex/Resources
+        $<TARGET_FILE_DIR:Forgex_Exec>/Resources
+    COMMENT "Copying Resources to output directory"
+)

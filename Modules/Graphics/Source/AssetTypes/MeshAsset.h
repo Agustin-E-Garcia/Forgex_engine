@@ -1,12 +1,20 @@
 #pragma once
+#include <json.hpp>
 #include <string>
 #include <ForgexAssets.h>
+#include <ForgexFiles.h>
 #include <ForgexCore.h>
 
 #include "../Utils/BufferManager.h"
 
 namespace Forgex::Graphics
 {
+    struct MeshData
+    {
+        std::vector<float> m_Vertices; // vx, vy, vz, nx, ny, nz, uvx, uvy
+        std::vector<int> m_Indices;
+    };
+
     class MeshAsset : public Assets::Asset
     {
     public:
@@ -21,15 +29,17 @@ namespace Forgex::Graphics
         {
             LOG_CORE(Debug::LogLevel::Info, "Loading MeshAsset: '{0}'", m_Path);
 
-            Assets::Files::MeshData data;
-            if(!Assets::Files::ReadFile(m_Path.c_str(), data))
+            nlohmann::json data;
+            if(!Files::ReadMeshFile(m_Path.c_str(), data))
             {
                 LOG_CORE(Debug::Error, "Failed to load MeshAsset {0}", m_Path);
                 return false;
             }
 
-            GenerateBuffers(data.m_Vertices.data(), data.m_Vertices.size(), data.m_Indices.data(), data.m_Indices.size());
-            m_IndexBufferSize = data.m_Indices.size();
+            std::vector<float> vertices = data["vertices"];
+            std::vector<int> indices = data["indices"];
+            GenerateBuffers(vertices.data(), data["vertexCount"], indices.data(), data["indexCount"]);
+            m_IndexBufferSize = data["indexCount"];
 
             return true;
         }

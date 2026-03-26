@@ -1,1 +1,4 @@
-Resources/Shaders/Skybox.vertex,Resources/Shaders/Skybox.fragment
+{
+    "Vertex": "Resources/Shaders/Skybox.vertex",
+    "Fragment": "Resources/Shaders/Skybox.fragment"
+}

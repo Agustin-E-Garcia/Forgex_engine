@@ -1,6 +1,7 @@
 #pragma once
 #include <ForgexCore.h>
 #include <ForgexAssets.h>
+#include <ForgexFiles.h>
 #include <string>
 
 #include "../Utils/TextureLoader.h"
@@ -31,7 +32,7 @@ namespace Forgex::Graphics
             else
             {
                 std::vector<std::string> texturePaths;
-                if(!Assets::Files::ReadFile(m_Path.c_str(), texturePaths))
+                if(!Files::ReadFile(m_Path.c_str(), texturePaths))
                 {
                     LOG_CORE(Debug::Error, "Invalid TextureAsset of type Cubemap in '{0}': expected texture paths with comma-separated-values", m_Path);
                     return false;
@@ -58,6 +59,6 @@ namespace Forgex::Graphics
         int m_TextureID = -1;
         TextureType m_Type;
 
-        Assets::Files::TextureData m_Data;
+        Files::TextureData m_Data;
     };
 }

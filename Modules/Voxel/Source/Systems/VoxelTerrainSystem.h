@@ -1,12 +1,11 @@
 #pragma once
 #include <ForgexCore.h>
 #include <ForgexGraphics.h>
+#include <ForgexFiles.h>
 
 #include "../Components/VoxelChunk.h"
 #include "../Utils/TerrainGenerator.h"
 #include "../Utils/ChunkMesher.h"
-
-#include <ForgexAssets.h>
 
 namespace Forgex::Voxel::Systems
 {
@@ -25,13 +24,13 @@ namespace Forgex::Voxel::Systems
 
             if(!chunk.m_MeshingFuture.valid())
             {
-                chunk.m_MeshingFuture = GET_SERVICE(Core::JobManager)->Enqueue<Assets::Files::MeshData>([this, &chunk]() { return MeshChunk(chunk); });
+                chunk.m_MeshingFuture = GET_SERVICE(Core::JobManager)->Enqueue<Graphics::MeshData>([this, &chunk]() { return MeshChunk(chunk); });
                 return;
             }
 
             if(chunk.m_MeshingFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
             {
-                Assets::Files::MeshData mesh = chunk.m_MeshingFuture.get();
+                Graphics::MeshData mesh = chunk.m_MeshingFuture.get();
 
                 renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->CreateRuntimeAsset<Graphics::MeshAsset>
                 (
@@ -46,12 +45,12 @@ namespace Forgex::Voxel::Systems
             }
         }
 
-        Assets::Files::MeshData MeshChunk(const Components::Chunk& chunk)
+        Graphics::MeshData MeshChunk(const Components::Chunk& chunk)
         {
             Utils::TerrainGenerator generator = Utils::TerrainGenerator(chunk.m_NoiseSeed);
             Utils::ChunkMesher mesher = Utils::ChunkMesher(&chunk, &generator);
 
-            Assets::Files::MeshData data;
+            Graphics::MeshData data;
             mesher.GenerateMesh(data.m_Vertices, data.m_Indices);
 
             return data;

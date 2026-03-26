@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <ForgexCore.h>
-#include <ForgexAssets.h>
+#include <ForgexFiles.h>
 
 namespace Forgex::Graphics::Utils
 {
@@ -32,14 +32,14 @@ namespace Forgex::Graphics::Utils
         unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
         std::string vertexShaderCode;
-        if(!Assets::Files::ReadFile(vertexShader, vertexShaderCode))
+        if(!Files::ReadFile(vertexShader, vertexShaderCode))
         {
             LOG_CORE(Debug::Error, "Impossible to open '{0}'. File could be missing, check directory", vertexShader);
             return -1;
         }
 
         std::string fragmentShaderCode;
-        if(!Assets::Files::ReadFile(fragmentShader, fragmentShaderCode))
+        if(!Files::ReadFile(fragmentShader, fragmentShaderCode))
         {
             LOG_CORE(Debug::Error, "Impossible to open '{0}'. File could be missing, check directory", fragmentShader);
             return -1;

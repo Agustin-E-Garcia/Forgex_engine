@@ -2,7 +2,7 @@
 #include <future>
 #include <glm/glm.hpp>
 #include <vector>
-#include <ForgexAssets.h>
+#include <ForgexGraphics.h>
 
 namespace Forgex::Voxel::Components
 {
@@ -19,6 +19,6 @@ namespace Forgex::Voxel::Components
 
         bool m_IsDirty = true;
         std::future<std::vector<uint8_t>> m_DensityFuture;
-        std::future<Assets::Files::MeshData> m_MeshingFuture;
+        std::future<Graphics::MeshData> m_MeshingFuture;
     };
 }

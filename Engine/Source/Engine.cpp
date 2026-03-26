@@ -3,6 +3,7 @@
 #include "Input/InputManager.h"
 #include "Input/InputSystem.h"
 
+#include <ForgexAssets.h>
 #include <ForgexGraphics.h>
 #include <ForgexScene.h>
 #include <ForgexVoxel.h>
@@ -12,6 +13,7 @@ namespace Forgex::Engine
     Engine::Engine()
     {
         m_EngineCore = new Core::EngineCore();
+        m_EngineCore->RegisterModule<Assets::AssetsModule>();
         m_EngineCore->RegisterModule<Graphics::GraphicsModule>();
         m_EngineCore->RegisterModule<Scene::SceneModule>();
         m_EngineCore->RegisterModule<Voxel::VoxelModule>();
