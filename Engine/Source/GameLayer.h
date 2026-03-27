@@ -34,7 +34,7 @@ namespace Forgex::Engine
             Core::Components::Transform& transform = activeScene->AddComponent<Core::Components::Transform>(meshEntity);
 
             renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MeshAsset>("Resources/Meshes/Teapot.obj");
-            renderable.m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/ColorShader.FShader");
+            renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Lit.FMaterial");
             renderable.m_ModelMatrix = transform.m_ModelMatrix;
 
             sceneManager->Setup();

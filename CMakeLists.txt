@@ -158,9 +158,9 @@ if(NOT MSVC)
     target_compile_options(Forgex_Exec PRIVATE -g)
 endif()
 
-add_custom_command(TARGET Forgex_Exec POST_BUILD
+add_custom_target(copy_resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/Forgex/Resources
-        $<TARGET_FILE_DIR:Forgex_Exec>/Resources
+        ${BUILD_OUTPUT_DIR}/Forgex/$<CONFIG>/Resources
     COMMENT "Copying Resources to output directory"
 )

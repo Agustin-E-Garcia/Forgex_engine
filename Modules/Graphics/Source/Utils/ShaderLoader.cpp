@@ -45,21 +45,21 @@ namespace Forgex::Graphics::Utils
             return -1;
         }
 
-        LOG_CORE(Debug::Info, "Compiling Shader: '{0}'", vertexShader);
+        LOG_CORE(Debug::Trace, "Compiling Shader: '{0}'", vertexShader);
         char const* vertexSourcePointer = vertexShaderCode.c_str();
         glShaderSource(vertexShaderID, 1, &vertexSourcePointer, NULL);
         glCompileShader(vertexShaderID);
 
         if(!CheckShaderOK(vertexShaderID)) return -1;
 
-        LOG_CORE(Debug::Info, "Compiling Shader: '{0}'", fragmentShader);
+        LOG_CORE(Debug::Trace, "Compiling Shader: '{0}'", fragmentShader);
         char const* fragmentSourcePointer = fragmentShaderCode.c_str();
         glShaderSource(fragmentShaderID, 1, &fragmentSourcePointer, NULL);
         glCompileShader(fragmentShaderID);
 
         if (!CheckShaderOK(fragmentShaderID)) return -1;
 
-        LOG_CORE(Debug::Info, "Linking program");
+        LOG_CORE(Debug::Trace, "Linking program");
         unsigned int programID = glCreateProgram();
         glAttachShader(programID, vertexShaderID);
         glAttachShader(programID, fragmentShaderID);

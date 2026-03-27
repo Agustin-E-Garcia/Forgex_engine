@@ -5,6 +5,7 @@
 #include "Panels/Console.h"
 #include "Panels/AssetInspector.h"
 #include "Panels/Profiler.h"
+#include "Panels/MaterialInspector.h"
 #include "Utils/ForgexToImGui.h"
 #include "imgui.h"
 
@@ -26,9 +27,11 @@ namespace Forgex::Editor::UI
             m_ConsolePanelID = m_WindowManager->AddWindow<Panels::ConsolePanel>();
             m_AssetInspectorID = m_WindowManager->AddWindow<Panels::AssetManagerInspectorPanel>();
             m_ProfilerID = m_WindowManager->AddWindow<Panels::ProfilerPanel>();
+            m_MaterialInspectorID = m_WindowManager->AddWindow<Panels::MaterialInspectorPanel>();
 
-            REGISTER_COMMAND("asset", [this](){ m_WindowManager->GetWindow<Panels::AssetManagerInspectorPanel>(m_AssetInspectorID)->ToggleWindow(); }, "Toggles the asset inspector");
+            REGISTER_COMMAND("assets", [this](){ m_WindowManager->GetWindow<Panels::AssetManagerInspectorPanel>(m_AssetInspectorID)->ToggleWindow(); }, "Toggles the asset inspector");
             REGISTER_COMMAND("profiler", [this]() { m_WindowManager->GetWindow<Panels::ProfilerPanel>(m_ProfilerID)->ToggleWindow(); }, "Toggles the profiler");
+            REGISTER_COMMAND("materials", [this]() { m_WindowManager->GetWindow<Panels::MaterialInspectorPanel>(m_MaterialInspectorID)->ToggleWindow(); }, "Toggles the material inspector");
         }
 
         void OnEnd() override { delete m_WindowManager; }
@@ -70,6 +73,7 @@ namespace Forgex::Editor::UI
         unsigned int m_ConsolePanelID;
         unsigned int m_AssetInspectorID;
         unsigned int m_ProfilerID;
+        unsigned int m_MaterialInspectorID;
 
         bool HandleKeyPressedEvent(Core::Layer::Event::KeyPressedEvent& event)
         {

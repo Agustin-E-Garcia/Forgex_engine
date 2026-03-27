@@ -39,7 +39,7 @@ namespace Forgex::Voxel::Systems
                 chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(1.0f);
                 chunk.m_DensityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);
 
-                renderable.m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/ColorShader.FShader");
+                renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Lit.FMaterial");
 
                 chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<std::vector<uint8_t>>([this, &chunk]() { return SetupChunk(chunk); });
 

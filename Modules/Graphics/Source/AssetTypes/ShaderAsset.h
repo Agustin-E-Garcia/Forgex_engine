@@ -19,9 +19,10 @@ namespace Forgex::Graphics
             LOG_CORE(Debug::LogLevel::Info, "Loading ShaderAsset: '{0}'", m_Path);
 
             nlohmann::json data;
-            if(!Files::ReadFile(m_Path.c_str(), data))
+            std::string errorString;
+            if(!Files::ReadFile(m_Path.c_str(), data, errorString))
             {
-                LOG_CORE(Debug::Error, "Invalid ShaderAsset format in '{0}': expected 'vertex,fragment'", m_Path);
+                LOG_CORE(Debug::Error, "Failed to load '{0}': {1}", m_Path, errorString);
                 return false;
             }
 

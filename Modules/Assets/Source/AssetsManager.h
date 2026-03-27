@@ -2,6 +2,7 @@
 #include "Resources/Asset.h"
 #include <format>
 #include <unordered_map>
+#include <vector>
 #include <string>
 #include <utility>
 
@@ -52,6 +53,20 @@ namespace Forgex::Assets
             m_LoadedAssets[newID] = newAsset;
 
             return AssetHandle<T>(this, newID);
+        }
+
+        template<class T>
+        std::vector<T*> GetAssetsOfType()
+        {
+            static_assert(std::is_base_of<Asset, T>::value, "T must inherit from Asset");
+
+            std::vector<T*> result;
+            for(auto& [id, asset] : m_LoadedAssets)
+            {
+                if(T* typed = dynamic_cast<T*>(asset))
+                    result.push_back(typed);
+            }
+            return result;
         }
 
         void UnloadAsset(int assetID);

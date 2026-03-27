@@ -20,14 +20,14 @@ namespace Forgex::Graphics::Renderers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glDepthMask(GL_FALSE);
-        glUseProgram(renderable.m_ShaderAsset->GetShaderID());
+        glUseProgram(renderable.m_MaterialAsset->GetShaderID());
 
-        const int ProjectionLoc = glGetUniformLocation(renderable.m_ShaderAsset->GetShaderID(), "projection");
+        const int ProjectionLoc = glGetUniformLocation(renderable.m_MaterialAsset->GetShaderID(), "projection");
         if(ProjectionLoc != -1)
             glUniformMatrix4fv(ProjectionLoc, 1, GL_FALSE, &renderView.m_ProjectionMatrix[0][0]);
         else LOG_CORE(Debug::Error, "Failed to find uniform location 'Projection'");
 
-        const int ViewLoc = glGetUniformLocation(renderable.m_ShaderAsset->GetShaderID(), "view");
+        const int ViewLoc = glGetUniformLocation(renderable.m_MaterialAsset->GetShaderID(), "view");
         if(ViewLoc != -1)
         {
             glm::mat4 skyboxView = glm::mat4(glm::mat3(renderView.m_ViewMatrix));
@@ -39,7 +39,8 @@ namespace Forgex::Graphics::Renderers
         glBindBuffer(GL_ARRAY_BUFFER, renderable.m_MeshAsset->GetVertexBuffer());
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-        glBindTexture(GL_TEXTURE_CUBE_MAP, renderable.m_TextureAsset->GetTextureID());
+        auto& textureHandle = std::get<Assets::AssetHandle<TextureAsset>>(renderable.m_MaterialAsset->GetProperties().at("albedoMap"));
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureHandle->GetTextureID());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glDisableVertexAttribArray(0);

@@ -23,9 +23,7 @@ namespace Forgex::Graphics::Systems
             Components::Renderable& renderable = registry.emplace<Components::Renderable>(skyboxEntity);
 
             renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->CreateRuntimeAsset<MeshAsset>("Skybox_Mesh", skybox.m_SkyboxVertices.data(), skybox.m_SkyboxVertices.size());
-
-            renderable.m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::ShaderAsset>("Resources/Shaders/Skybox.FShader");
-            renderable.m_TextureAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::TextureAsset>("Resources/Textures/Skybox.FTexture", Graphics::TextureType::Cubemap);
+            renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<MaterialAsset>("Resources/Materials/Skybox.FMaterial");
         }
 
         void Render(entt::registry& registry) override
@@ -62,8 +60,7 @@ namespace Forgex::Graphics::Systems
 
         bool IsValid(const Components::Renderable& renderable) 
         {
-            return  renderable.m_ShaderAsset.IsValid() && renderable.m_ShaderAsset->GetShaderID() != -1 &&
-                    renderable.m_MeshAsset.IsValid() && renderable.m_MeshAsset->GetIndexBuffer() != -1 &&
+            return  renderable.m_MeshAsset.IsValid() && renderable.m_MeshAsset->GetIndexBuffer() != -1 &&
                     renderable.m_MeshAsset->GetVertexBuffer() != -1;
         }
 

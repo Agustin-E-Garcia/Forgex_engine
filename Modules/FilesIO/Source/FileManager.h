@@ -20,7 +20,7 @@ namespace Forgex::Files
 
     bool WriteFile(const char* filePath, nlohmann::json& data);
 
-    bool ReadFile(const char* filePath, nlohmann::json& data);
+    bool ReadFile(const char* filePath, nlohmann::json& data, std::string& err);
     bool ReadMeshFile(const char* filePath, nlohmann::json& data);
 
     bool ReadFile(const char* filePath, std::string& buffer);

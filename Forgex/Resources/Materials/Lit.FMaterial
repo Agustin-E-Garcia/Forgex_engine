@@ -1,0 +1,7 @@
+{
+    "shader": "Resources/Shaders/Lit.FShader",
+    "properties": 
+    {
+        "albedo":       { "type": "vec3",    "value": [1.0, 0.0, 0.0] }
+    }
+}

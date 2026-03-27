@@ -3,6 +3,8 @@
 
 #include <ForgexCore.h>
 #include <GL/glu.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <type_traits>
 
 namespace Forgex::Graphics::Renderers
 {
@@ -19,27 +21,43 @@ namespace Forgex::Graphics::Renderers
     {
         for (const Components::Renderable& info : *renderInfos)
         {
-            glUseProgram(info.m_ShaderAsset->GetShaderID());
+            glUseProgram(info.m_MaterialAsset->GetShaderID());
 
-            const int modelLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "model");
-            const int viewLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "view");
-            const int projectionLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "projection");
-            const int TextureLoc = glGetUniformLocation(info.m_ShaderAsset->GetShaderID(), "textureSampler");
+            const int modelLoc = glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), "model");
+            const int viewLoc = glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), "view");
+            const int projectionLoc = glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), "projection");
 
             if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info.m_ModelMatrix[0][0]);
             if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
             if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
 
-            PrintGLError("Error after binding uniforms");
-
-            if(TextureLoc != -1)
+            for(const auto& [name, value] : info.m_MaterialAsset->GetProperties())
             {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, info.m_TextureAsset->GetTextureID());
-                glUniform1i(TextureLoc, 0);
+                int loc = glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), name.c_str());
+                if(loc == -1)
+                {
+                    LOG_CORE(Debug::Error, "Unable to find loc '{0}'", name);
+                }
+
+                std::visit([&](auto&& v)
+                {
+                    using T = std::decay_t<decltype(v)>;
+                    if      constexpr (std::is_same_v<T, float>)     glUniform1f(loc, v);
+                    else if constexpr (std::is_same_v<T, int>)       glUniform1i(loc, v);
+                    else if constexpr (std::is_same_v<T, bool>)      glUniform1i(loc, (int)v);
+                    else if constexpr (std::is_same_v<T, glm::vec3>) glUniform3fv(loc, 1, glm::value_ptr(v));
+                    else if constexpr (std::is_same_v<T, glm::vec4>) glUniform4fv(loc, 1, glm::value_ptr(v));
+                    else if constexpr (std::is_same_v<T, Assets::AssetHandle<TextureAsset>>)
+                    {
+                        Assets::AssetHandle<TextureAsset> textureHandle = v;
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, textureHandle->GetTextureID());
+                        glUniform1i(loc, 0);
+                    }
+                }, value);
             }
 
-            PrintGLError("Error after binding texture");
+            PrintGLError("Error after binding uniforms");
 
             int stride = 8 * sizeof(float);
             glBindBuffer(GL_ARRAY_BUFFER, info.m_MeshAsset->GetVertexBuffer());

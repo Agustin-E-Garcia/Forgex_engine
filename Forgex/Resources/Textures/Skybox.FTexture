@@ -1,1 +1,12 @@
-Resources/Textures/right.jpg,Resources/Textures/left.jpg,Resources/Textures/up.jpg,Resources/Textures/down.jpg,Resources/Textures/front.jpg,Resources/Textures/back.jpg
+{
+    "type": "cubemap",
+    "textures":
+    [
+        "Resources/Textures/right.jpg",
+        "Resources/Textures/left.jpg",
+        "Resources/Textures/up.jpg",
+        "Resources/Textures/down.jpg",
+        "Resources/Textures/front.jpg",
+        "Resources/Textures/back.jpg"
+    ]
+}

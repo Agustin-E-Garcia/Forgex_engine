@@ -1,0 +1,7 @@
+{
+    "shader": "Resources/Shaders/Skybox.FShader",
+    "properties": 
+    {
+        "albedoMap":    { "type": "texture",  "value": "Resources/Textures/Skybox.FTexture" }
+    }
+}

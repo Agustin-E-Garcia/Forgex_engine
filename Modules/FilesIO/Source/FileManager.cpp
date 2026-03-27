@@ -22,7 +22,7 @@ namespace Forgex::Files
         return true;
     }
 
-    bool ReadFile(const char* filePath, nlohmann::json& data)
+    bool ReadFile(const char* filePath, nlohmann::json& data, std::string& err)
     {
         try
         {
@@ -30,8 +30,9 @@ namespace Forgex::Files
             data = json::parse(file);
             return true;
         }
-        catch (std::exception e) 
+        catch (const std::exception& e)
         {
+            err = e.what();
             return false;
         }
     }
