@@ -3,8 +3,6 @@
 
 #include <ForgexCore.h>
 #include <GL/glu.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <type_traits>
 
 namespace Forgex::Graphics::Renderers
 {
@@ -31,31 +29,7 @@ namespace Forgex::Graphics::Renderers
             if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
             if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
 
-            for(const auto& [name, value] : info.m_MaterialAsset->GetProperties())
-            {
-                int loc = glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), name.c_str());
-                if(loc == -1)
-                {
-                    LOG_CORE(Debug::Error, "Unable to find loc '{0}'", name);
-                }
-
-                std::visit([&](auto&& v)
-                {
-                    using T = std::decay_t<decltype(v)>;
-                    if      constexpr (std::is_same_v<T, float>)     glUniform1f(loc, v);
-                    else if constexpr (std::is_same_v<T, int>)       glUniform1i(loc, v);
-                    else if constexpr (std::is_same_v<T, bool>)      glUniform1i(loc, (int)v);
-                    else if constexpr (std::is_same_v<T, glm::vec3>) glUniform3fv(loc, 1, glm::value_ptr(v));
-                    else if constexpr (std::is_same_v<T, glm::vec4>) glUniform4fv(loc, 1, glm::value_ptr(v));
-                    else if constexpr (std::is_same_v<T, Assets::AssetHandle<TextureAsset>>)
-                    {
-                        Assets::AssetHandle<TextureAsset> textureHandle = v;
-                        glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(GL_TEXTURE_2D, textureHandle->GetTextureID());
-                        glUniform1i(loc, 0);
-                    }
-                }, value);
-            }
+            info.m_MaterialAsset->SetupProperties();
 
             PrintGLError("Error after binding uniforms");
 

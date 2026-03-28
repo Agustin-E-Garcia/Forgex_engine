@@ -126,8 +126,8 @@ namespace Forgex::Editor::UI::Panels
         {
             switch (level)
             {
-                case Debug::Trace:    return ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
-                case Debug::Info:     return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+                case Debug::Trace:    return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+                case Debug::Info:     return ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
                 case Debug::Warning:  return ImVec4(1.0f, 0.8f, 0.0f, 1.0f);
                 case Debug::Error:    return ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
                 case Debug::Critical: return ImVec4(1.0f, 0.2f, 0.6f, 1.0f);

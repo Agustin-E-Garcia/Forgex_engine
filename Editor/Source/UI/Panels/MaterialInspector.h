@@ -72,7 +72,7 @@ namespace Forgex::Editor::UI::Panels
                             else
                                 ImGui::TextDisabled("(no texture)");
                         }
-                    }, value);
+                    }, value.m_Property);
                 }
             }
             else

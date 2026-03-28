@@ -75,7 +75,7 @@ namespace Forgex::Editor::UI::Panels
         }
 
     private:
-        bool m_ShowRuntimeAssets    = true;
+        bool m_ShowRuntimeAssets    = false;
         bool m_ShowNonRuntimeAssets = true;
     };
 }
