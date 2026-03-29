@@ -42,9 +42,24 @@ The long-term goal is to ship a singleplayer horror demo built on top of this en
 - **Tiny_obj_loader:** OBJ mesh loader
 
 ## How to Build
-1. **Clone the Repository** Pull the latest version of the project
+1. **Clone the Repository** Pull the latest version of the project along with the submodules
+```
+git clone --recurse-submodules https://github.com/Agustin-E-Garcia/Forgex_engine.git
+```
 2. **Generate Build Files** Generate build files using CMake
-3. **Build the Project** Build the project
+```
+cmake -B .
+```
+   > **Note:** If required is possible to add -DGENERATE_COMPILE_COMMANDS=ON to generate and automatically copy the compile_comands.json to the root folder of the project
+3. **Build the Project**
+```
+cmake --build .
+```
+4. **Run the executable** The executable can be found in the generated Build folder
+```
+cd Build/Bin/Forgex
+./Forgex_Exec
+```
    > **Note:** "Main" branch is a stable version of the engine that will compile and run, "Development" is an unstable branch where changes are being made often
 
 ## Goals
