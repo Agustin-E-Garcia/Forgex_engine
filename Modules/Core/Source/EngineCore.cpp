@@ -1,8 +1,9 @@
 #include "EngineCore.h"
-#include "DebugMacros.h"
 #include "Layer/Event/EventList.h"
 #include "ServiceLocator.h"
 #include "JobManager.h"
+#include "Systems/TransformSystem.h"
+
 #include <ForgexDebug.h>
 #include <ForgexFiles.h>
 #include <chrono>
@@ -54,6 +55,8 @@ namespace Forgex::Core
         ServiceLocator::Get().Register<Debug::DebugManager>();
 
         ServiceLocator::Get().Register<JobManager>(1);
+
+        RegisterSystem<Systems::TransformSystem>();
 
         // then all modules
         for (auto& [ index, module ] : m_ModuleRegistry)

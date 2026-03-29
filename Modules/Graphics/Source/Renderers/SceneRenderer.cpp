@@ -1,4 +1,5 @@
 #include "SceneRenderer.h"
+#include "glm/gtc/type_ptr.hpp"
 #include <GL/glew.h>
 
 #include <ForgexCore.h>
@@ -15,9 +16,9 @@ namespace Forgex::Graphics::Renderers
         }
     }
 
-    void SceneRenderer::Render(const Resources::RenderView* renderView, std::vector<Components::Renderable>* renderInfos)
+    void SceneRenderer::Render(const Resources::RenderFrameData& renderFrameData, const std::vector<Components::Renderable>& renderInfos)
     {
-        for (const Components::Renderable& info : *renderInfos)
+        for (const Components::Renderable& info : renderInfos)
         {
             glUseProgram(info.m_MaterialAsset->GetShaderID());
 
@@ -26,12 +27,24 @@ namespace Forgex::Graphics::Renderers
             const int projectionLoc = glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), "projection");
 
             if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info.m_ModelMatrix[0][0]);
-            if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderView->m_ViewMatrix[0][0]);
-            if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderView->m_ProjectionMatrix[0][0]);
+            if(viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &renderFrameData.m_ViewMatrix[0][0]);
+            if(projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &renderFrameData.m_ProjectionMatrix[0][0]);
 
             info.m_MaterialAsset->SetupProperties();
 
             PrintGLError("Error after binding uniforms");
+
+            // Setup the lights array
+            int lightCount = renderFrameData.m_Lights.size();
+            for (int i = 0; i < lightCount; i++)
+            {
+                std::string base = "lightData[" + std::to_string(i) + "].";
+                glUniform3fv(glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), (base + "pos").c_str()), 1, glm::value_ptr(renderFrameData.m_Lights[i].m_WorldPosition));
+                glUniform3fv(glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), (base + "color").c_str()), 1, glm::value_ptr(renderFrameData.m_Lights[i].m_Light.color));
+                glUniform1f(glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), (base + "intensity").c_str()), renderFrameData.m_Lights[i].m_Light.intensity);
+                glUniform1f(glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), (base + "radius").c_str()), renderFrameData.m_Lights[i].m_Light.radius);
+            }
+            glUniform1i(glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), "lightCount"), lightCount);
 
             int stride = 8 * sizeof(float);
             glBindBuffer(GL_ARRAY_BUFFER, info.m_MeshAsset->GetVertexBuffer());

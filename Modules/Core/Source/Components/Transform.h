@@ -20,5 +20,7 @@ namespace Forgex::Core::Components
         glm::mat4 m_LocationMatrix = glm::mat4(1.0f);
         glm::mat4 m_ScaleMatrix = glm::mat4(1.0f);
         glm::mat4 m_RotationMatrix = glm::mat4(1.0f);
+
+        bool m_Dirty = false;
     };
 }

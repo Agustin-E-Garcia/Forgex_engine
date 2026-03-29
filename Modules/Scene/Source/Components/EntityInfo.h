@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Forgex::Scene
+namespace Forgex::Scene::Components
 {
     struct EntityInfo
     {

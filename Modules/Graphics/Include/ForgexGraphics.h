@@ -6,3 +6,4 @@
 
 #include "../Source/Components/Renderable.h"
 #include "../Source/Components/Camera.h"
+#include "../Source/Components/PointLight.h"

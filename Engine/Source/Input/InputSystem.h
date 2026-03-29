@@ -30,9 +30,6 @@ namespace Forgex::Engine::Input
                 glm::quat pitchRot = glm::angleAxis(glm::radians(-playerInput.m_Pitch), glm::vec3(1.0f, 0.0f, 0.0f));
 
                 transform.m_RotationQuat   = glm::normalize(yawRot * pitchRot);
-                transform.m_Forward        = glm::normalize(transform.m_RotationQuat * glm::vec3(0.0f, 0.0f, -1.0f));
-                transform.m_Right          = glm::normalize(transform.m_RotationQuat * glm::vec3(1.0f, 0.0f, 0.0f));
-                transform.m_RotationMatrix = glm::mat4_cast(transform.m_RotationQuat);
             }
 
             // Translation
@@ -48,7 +45,7 @@ namespace Forgex::Engine::Input
                 direction = glm::normalize(direction);
 
             transform.m_Position     += direction * playerInput.m_MovementSpeed * deltaTime;
-            transform.m_LocationMatrix = glm::translate(glm::mat4(1.0f), transform.m_Position);
+            transform.m_Dirty = true;
         }
 
         const char* GetName() override { return "InputSystem"; }

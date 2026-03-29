@@ -6,7 +6,7 @@
 
 namespace Forgex::Graphics::Renderers
 {
-    void SkyboxRenderer::Render(const Resources::RenderView& renderView, const Components::Renderable& renderable)
+    void SkyboxRenderer::Render(const Resources::RenderFrameData& renderView, const Components::Renderable& renderable)
     {
 
         int width, height;

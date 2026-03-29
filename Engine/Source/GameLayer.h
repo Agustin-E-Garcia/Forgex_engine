@@ -1,6 +1,7 @@
 #pragma once
 #include "Input/InputManager.h"
 #include "Input/PlayerInput.h"
+#include "glm/fwd.hpp"
 
 #include <ForgexCore.h>
 #include <ForgexScene.h>
@@ -32,10 +33,16 @@ namespace Forgex::Engine
             int meshEntity = activeScene->CreateEntity("Mesh Entity");
             Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(meshEntity);
             Core::Components::Transform& transform = activeScene->AddComponent<Core::Components::Transform>(meshEntity);
-
             renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MeshAsset>("Resources/Meshes/Teapot.obj");
             renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Lit.FMaterial");
             renderable.m_ModelMatrix = transform.m_ModelMatrix;
+
+            int lightEntity = activeScene->CreateEntity("Light Entity");
+            activeScene->AddComponent<Graphics::Components::PointLight>(lightEntity);
+            Core::Components::Transform& lightTransform = activeScene->AddComponent<Core::Components::Transform>(lightEntity);
+
+            lightTransform.m_Position = glm::vec3(0.0f, 20.0f, 0.0f);
+            lightTransform.m_Dirty = true;
 
             sceneManager->Setup();
         }

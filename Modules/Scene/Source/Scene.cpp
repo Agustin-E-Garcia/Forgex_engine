@@ -9,7 +9,7 @@ namespace Forgex::Scene
     int Scene::CreateEntity(const char* EntityName)
     {
         entt::entity entity = m_Registry.create();
-        m_Registry.emplace<EntityInfo>(entity, EntityName);
+        m_Registry.emplace<Components::EntityInfo>(entity, EntityName);
         return (int)entity;
     }
 

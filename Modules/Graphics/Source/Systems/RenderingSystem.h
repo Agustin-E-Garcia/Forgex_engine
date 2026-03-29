@@ -1,7 +1,7 @@
 #pragma once
 #include <ForgexCore.h>
 
-#include "../Resources/RenderView.h"
+#include "../Resources/RenderFrameData.h"
 #include "../Renderers/SceneRenderer.h"
 #include "../Renderers/SkyboxRenderer.h"
 
@@ -28,7 +28,7 @@ namespace Forgex::Graphics::Systems
 
         void Render(entt::registry& registry) override
         {
-            Resources::RenderView renderView;
+            Resources::RenderFrameData renderFrameData;
             auto view_camera = registry.view<Components::Camera, Core::Components::Transform>();
             for (entt::entity entity : view_camera)
             {
@@ -36,15 +36,24 @@ namespace Forgex::Graphics::Systems
                 if(!camera.m_IsActiveCamera) continue;
 
                 const Core::Components::Transform& transform = view_camera.get<Core::Components::Transform>(entity);
-                renderView.m_ViewMatrix = glm::lookAt(transform.m_Position, transform.m_Position + transform.m_Forward, glm::vec3(0.0f, 1.0f, 0.0f));
-                renderView.m_ProjectionMatrix = glm::perspective(glm::radians(camera.m_FieldOfView), (camera.m_AspectRatio.x / camera.m_AspectRatio.y), camera.m_NearPlane, camera.m_FarPlane);
+                renderFrameData.m_ViewMatrix = glm::lookAt(transform.m_Position, transform.m_Position + transform.m_Forward, glm::vec3(0.0f, 1.0f, 0.0f));
+                renderFrameData.m_ProjectionMatrix = glm::perspective(glm::radians(camera.m_FieldOfView), (camera.m_AspectRatio.x / camera.m_AspectRatio.y), camera.m_NearPlane, camera.m_FarPlane);
+            }
+
+            auto view_light = registry.view<Components::PointLight, Core::Components::Transform>();
+            for (entt::entity entity : view_light)
+            {
+                const Core::Components::Transform& transform = view_light.get<Core::Components::Transform>(entity);
+                const Components::PointLight& light = view_light.get<Components::PointLight>(entity);
+
+                renderFrameData.m_Lights.emplace_back(light, glm::vec3(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix));
             }
 
             Renderers::SkyboxRenderer skybox_renderer;
             auto view_skybox = registry.view<Components::Skybox, Components::Renderable>();
             for(entt::entity entity : view_skybox)
             {
-                skybox_renderer.Render(renderView, view_skybox.get<Components::Renderable>(entity));
+                skybox_renderer.Render(renderFrameData, view_skybox.get<Components::Renderable>(entity));
             }
 
             Renderers::SceneRenderer scene_renderer;
@@ -55,7 +64,7 @@ namespace Forgex::Graphics::Systems
                 Components::Renderable& renderable = view_renderable.get<Components::Renderable>(entity);
                 if(IsValid(renderable)) renderables.push_back(renderable);
             }
-            scene_renderer.Render(&renderView, &renderables);
+            scene_renderer.Render(renderFrameData, renderables);
         }
 
         bool IsValid(const Components::Renderable& renderable) 
