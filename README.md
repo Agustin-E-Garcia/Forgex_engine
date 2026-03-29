@@ -38,7 +38,8 @@ The long-term goal is to ship a singleplayer horror demo built on top of this en
 - **SPDlog:** Console logging
 - **GLFW/GLEW:** Windowing and OpenGL extensions
 - **STBImage:** Image loading
-- **NoiseFastLite** Noise generation
+- **NoiseFastLite:** Noise generation
+- **Tiny_obj_loader:** OBJ mesh loader
 
 ## How to Build
 1. **Clone the Repository** Pull the latest version of the project
