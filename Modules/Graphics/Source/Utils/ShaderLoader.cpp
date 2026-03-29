@@ -1,4 +1,5 @@
 #include "ShaderLoader.h"
+#include "../Resources/ShaderHeaders.h"
 #include <GL/glew.h>
 #include <string>
 #include <vector>
@@ -37,6 +38,7 @@ namespace Forgex::Graphics::Utils
             LOG_CORE(Debug::Error, "Impossible to open '{0}'. File could be missing, check directory", vertexShader);
             return -1;
         }
+        vertexShaderCode = Resources::CommonHeader + Resources::VertexHeader + vertexShaderCode;
 
         std::string fragmentShaderCode;
         if(!Files::ReadFile(fragmentShader, fragmentShaderCode))
@@ -44,6 +46,7 @@ namespace Forgex::Graphics::Utils
             LOG_CORE(Debug::Error, "Impossible to open '{0}'. File could be missing, check directory", fragmentShader);
             return -1;
         }
+        fragmentShaderCode = Resources::CommonHeader + Resources::FragmentHeader + fragmentShaderCode;
 
         LOG_CORE(Debug::Info, "Compiling Shader: '{0}'", vertexShader);
         char const* vertexSourcePointer = vertexShaderCode.c_str();

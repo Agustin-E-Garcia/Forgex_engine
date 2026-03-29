@@ -6,6 +6,7 @@
 
 #include "../Components/VoxelMap.h"
 #include "../Utils/TerrainGenerator.h"
+#include "glm/fwd.hpp"
 
 namespace Forgex::Voxel::Systems
 {
@@ -26,6 +27,7 @@ namespace Forgex::Voxel::Systems
             for(int x = 0; x < chunks.x; x++)
             {
                 entt::entity ent = registry.create();
+                Core::Components::Transform& transform = registry.emplace<Core::Components::Transform>(ent);
                 Graphics::Components::Renderable& renderable = registry.emplace<Graphics::Components::Renderable>(ent);
 
                 Components::Chunk& chunk = registry.emplace<Components::Chunk>(ent);
@@ -34,7 +36,8 @@ namespace Forgex::Voxel::Systems
                 chunk.m_SampleDensity = map.m_SampleDensity;
                 chunk.m_Cutoff = map.m_Cutoff;
 
-                renderable.m_ModelMatrix = glm::translate(glm::mat4(1.0f), (chunk.m_Position * chunk.m_Size));
+                transform.m_Position = glm::vec3(x, y, z) * map.m_ChunkSize;
+                transform.m_Dirty = true;
 
                 chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(1.0f);
                 chunk.m_DensityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);

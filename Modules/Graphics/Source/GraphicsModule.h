@@ -13,5 +13,6 @@ namespace Forgex::Graphics
 
     private:
         int m_VertexBufferObjectID;
+        int m_UniformBufferObjectID;
     };
 }

@@ -1,9 +1,8 @@
 #include "BufferManager.h"
-#include <GL/glew.h>
 
-namespace Forgex::Graphics::Utils
+namespace Forgex::Graphics::Utils::Buffers
 {
-    int BufferManager::GenerateBuffer(BufferType type, int size, const void* data)
+    int GenerateBuffer(GLuint type, int size, const void* data)
     {
         unsigned int buffer;
         glGenBuffers(1, &buffer);
@@ -12,16 +11,27 @@ namespace Forgex::Graphics::Utils
         return buffer;
     }
 
-    void BufferManager::DeleteBuffer(unsigned bufferID)
+    void DeleteBuffer(unsigned bufferID)
     {
         glDeleteBuffers(1, &bufferID);
     }
 
-    int BufferManager::GenerateVAO()
+    int GenerateVAO()
     {
         unsigned int VAO;
         glGenVertexArrays(1, &VAO);
         glBindVertexArray(VAO);
         return VAO;
+    }
+
+    int GenerateUBO(int size)
+    {
+        unsigned int UBO;
+        glGenBuffers(1, &UBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+        glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, UBO);
+
+        return UBO;
     }
 }

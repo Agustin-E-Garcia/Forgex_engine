@@ -26,15 +26,15 @@ namespace Forgex::Graphics
 
     void MeshAsset::GenerateBuffers(const float* vertexData, int vertexSize, const int* indexData, int indexSize)
     {
-        if(vertexData) m_VertexBufferID = Utils::BufferManager::GenerateBuffer(Utils::BufferType::VertexBuffer, vertexSize * sizeof(float), vertexData);
-        if(indexData)  m_IndexBufferID = Utils::BufferManager::GenerateBuffer(Utils::BufferType::IndexBuffer, indexSize * sizeof(int), indexData);
+        if(vertexData) m_VertexBufferID = Utils::Buffers::GenerateBuffer(GL_ARRAY_BUFFER, vertexSize * sizeof(float), vertexData);
+        if(indexData)  m_IndexBufferID = Utils::Buffers::GenerateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexSize * sizeof(int), indexData);
 
         m_GPUSize = vertexSize * sizeof(float) + indexSize * sizeof(int);
     }
 
     void MeshAsset::Unload()
     {
-        Utils::BufferManager::DeleteBuffer(m_IndexBufferID);
-        Utils::BufferManager::DeleteBuffer(m_VertexBufferID);
+        Utils::Buffers::DeleteBuffer(m_IndexBufferID);
+        Utils::Buffers::DeleteBuffer(m_VertexBufferID);
     }
 }

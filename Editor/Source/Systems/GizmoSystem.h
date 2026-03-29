@@ -2,6 +2,7 @@
 #include <ForgexCore.h>
 #include <ForgexGraphics.h>
 #include <ForgexScene.h>
+#include <ForgexVoxel.h>
 #include <imgui.h>
 
 namespace Forgex::Editor::Systems

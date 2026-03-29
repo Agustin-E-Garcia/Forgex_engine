@@ -6,9 +6,8 @@
 
 namespace Forgex::Graphics::Renderers
 {
-    void SkyboxRenderer::Render(const Resources::RenderFrameData& renderView, const Components::Renderable& renderable)
+    void SkyboxRenderer::Render(const Resources::RenderFrameData& renderFrameData, const Components::Renderable& renderable)
     {
-
         int width, height;
         glfwGetWindowSize(glfwGetCurrentContext(), &width, &height);
         glViewport(0, 0, width, height);
@@ -19,21 +18,10 @@ namespace Forgex::Graphics::Renderers
         glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Resources::RenderFrameData), &renderFrameData);
+
         glDepthMask(GL_FALSE);
         glUseProgram(renderable.m_MaterialAsset->GetShaderID());
-
-        const int ProjectionLoc = glGetUniformLocation(renderable.m_MaterialAsset->GetShaderID(), "projection");
-        if(ProjectionLoc != -1)
-            glUniformMatrix4fv(ProjectionLoc, 1, GL_FALSE, &renderView.m_ProjectionMatrix[0][0]);
-        else LOG_CORE(Debug::Error, "Failed to find uniform location 'Projection'");
-
-        const int ViewLoc = glGetUniformLocation(renderable.m_MaterialAsset->GetShaderID(), "view");
-        if(ViewLoc != -1)
-        {
-            glm::mat4 skyboxView = glm::mat4(glm::mat3(renderView.m_ViewMatrix));
-            glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &skyboxView[0][0]);
-        }
-        else LOG_CORE(Debug::Error, "Failed to find uniform location 'View'");
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, renderable.m_MeshAsset->GetVertexBuffer());

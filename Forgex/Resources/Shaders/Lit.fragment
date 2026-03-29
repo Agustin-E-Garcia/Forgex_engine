@@ -1,21 +1,5 @@
-#version 330 core
-struct Light
-{
-    vec3 pos;
-    vec3 color;
-    float radius;
-    float intensity;
-};
-
-uniform Light lightData[16]; // We allow up to 16 lights for now
-uniform int lightCount;
-
-uniform vec3 albedo;
-
 in vec3 fragWorldPos;
 in vec3 fragNormal;
-
-out vec4 FragColor;
 
 void main()
 {
@@ -26,7 +10,7 @@ void main()
     float sunDiffuse = max(dot(normal, sunDir), 0.0);
     vec3 lighting = vec3(ambient + sunDiffuse * 0.5);
 
-    for (int i = 0; i < lightCount; i++)
+    for (int i = 0; i < pointLightCount; i++)
     {
         vec3 toLight = lightData[i].pos - fragWorldPos;
         float dist = length(toLight);

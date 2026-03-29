@@ -37,16 +37,29 @@ namespace Forgex::Graphics::Systems
 
                 const Core::Components::Transform& transform = view_camera.get<Core::Components::Transform>(entity);
                 renderFrameData.m_ViewMatrix = glm::lookAt(transform.m_Position, transform.m_Position + transform.m_Forward, glm::vec3(0.0f, 1.0f, 0.0f));
-                renderFrameData.m_ProjectionMatrix = glm::perspective(glm::radians(camera.m_FieldOfView), (camera.m_AspectRatio.x / camera.m_AspectRatio.y), camera.m_NearPlane, camera.m_FarPlane);
+                renderFrameData.m_ProjectionMatrix = glm::perspective
+                (
+                    glm::radians(camera.m_FieldOfView),
+                    (camera.m_AspectRatio.x / camera.m_AspectRatio.y),
+                    camera.m_NearPlane,
+                    camera.m_FarPlane
+                );
+
+                renderFrameData.m_CameraPosition = glm::vec3(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix);
             }
 
             auto view_light = registry.view<Components::PointLight, Core::Components::Transform>();
+            int index = 0;
             for (entt::entity entity : view_light)
             {
+                if(index >= 16) break;
+
                 const Core::Components::Transform& transform = view_light.get<Core::Components::Transform>(entity);
                 const Components::PointLight& light = view_light.get<Components::PointLight>(entity);
 
-                renderFrameData.m_Lights.emplace_back(light, glm::vec3(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix));
+                renderFrameData.m_Lights[index] = Resources::LightData(light, glm::vec3(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix));
+                renderFrameData.m_LightCount += 1;
+                index++;
             }
 
             Renderers::SkyboxRenderer skybox_renderer;
@@ -57,11 +70,11 @@ namespace Forgex::Graphics::Systems
             }
 
             Renderers::SceneRenderer scene_renderer;
-            auto view_renderable = registry.view<Components::Renderable>();
+            auto view_renderable = registry.view<Components::Renderable, Core::Components::Transform>();
             std::vector<Components::Renderable> renderables;
-            for(entt::entity entity : view_renderable)
+            for(auto&& [entity, renderable, transform] : view_renderable.each())
             {
-                Components::Renderable& renderable = view_renderable.get<Components::Renderable>(entity);
+                renderable.m_ModelMatrix = transform.m_ModelMatrix;
                 if(IsValid(renderable)) renderables.push_back(renderable);
             }
             scene_renderer.Render(renderFrameData, renderables);

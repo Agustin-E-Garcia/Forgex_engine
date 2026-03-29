@@ -25,10 +25,10 @@ The long-term goal is to ship a singleplayer horror demo built on top of this en
 ## Features
 - **Modular Architecture:** Engine functionality split into independently compiled libraries (Core, Graphics, Scene, Voxel, Debug, Assets), linked into a single executable
 - **Entity Component System:** Built on EnTT, with a clean separation between update systems and render systems
-Marching Cubes Terrain: Smooth voxel mesh generation from a scalar density field using Simplex Brownian Motion noise, with flat shading for a low-poly aesthetic
-- **Chunk System:** Terrain divided into 64x64x64 chunks, each independently generated and meshable for future destruction support
+- **Marching Cubes Terrain:** Smooth voxel mesh generation from a scalar density field using Simplex Brownian Motion noise, with flat shading for a low-poly aesthetic
+- **Chunk System:** Terrain divided into 32x32x32 chunks, each independently generated and meshable for future destruction support
 - **Asset Manager:** Centralized asset loading and management with path-based deduplication
-- **Debug Tooling:** In-engine developer console (F1) with command system, system profiler, entity inspector, and asset inspector
+- **Debug Tooling:** In-engine developer console (F1) with command system, system profiler, entity inspector, material inspector and asset manager inspector
 
 ## Libraries Used
 - **OpenGL:** Rendering
@@ -49,11 +49,12 @@ Marching Cubes Terrain: Smooth voxel mesh generation from a scalar density field
 ## Goals
 ### Short-Term Goals
 - Terrain destruction modifying the density field at runtime and remeshing affected chunks
-- Forward rendering lighting system with dynamic point lights
-- Mesh loading and rendering with AssetHandles using the AssetManager
+- Particle System with inspector window to change parameters in realtime
+- Adding back Windows Build support
+- Sample scene showing the capacity of the engine at the moment
 
 ### Long-Term Goals
-- Render thread and chunk generation thread for multithreaded architecture
+- Loading complex meshes with hierarchy using Assimp
 - Game DLL loading — separate game code from engine runtime
 - Singleplayer horror demo built on top of the engine
 

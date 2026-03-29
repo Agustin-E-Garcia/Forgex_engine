@@ -1,6 +1,7 @@
 #include "GraphicsModule.h"
 #include "Window.h"
 #include "Systems/RenderingSystem.h"
+#include "Resources/RenderFrameData.h"
 #include "Utils/BufferManager.h"
 #include <GL/glew.h>
 
@@ -18,7 +19,8 @@ namespace Forgex::Graphics
             LOG_CORE(Debug::LogLevel::Critical, "Failed to initialize GLEW: {0}", error);
         }
 
-        m_VertexBufferObjectID = Utils::BufferManager::GenerateVAO();
+        m_VertexBufferObjectID = Utils::Buffers::GenerateVAO();
+        m_UniformBufferObjectID = Utils::Buffers::GenerateUBO(sizeof(Resources::RenderFrameData));
 
         core.RegisterSystem<Systems::RenderingSystem>();
     }

@@ -123,9 +123,9 @@ namespace Forgex::Editor::UI::Panels
             {
                 auto& light = registry.get<Graphics::Components::PointLight>(m_SelectedEntity);
 
-                ImGui::ColorEdit3("Color",     glm::value_ptr(light.color));
-                ImGui::DragFloat("Radius",     &light.radius,    0.1f, 0.0f, 1000.0f);
-                ImGui::DragFloat("Intensity",  &light.intensity, 0.01f, 0.0f, 10.0f);
+                ImGui::ColorEdit3("Color",     glm::value_ptr(light.m_Color));
+                ImGui::DragFloat("Radius",     &light.m_Radius,    0.1f, 0.0f, 1000.0f);
+                ImGui::DragFloat("Intensity",  &light.m_Intensity, 0.01f, 0.0f, 10.0f);
             }
         }
 
