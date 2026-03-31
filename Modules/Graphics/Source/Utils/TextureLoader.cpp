@@ -41,7 +41,8 @@ namespace Forgex::Graphics::Utils
             return -1;
         }
 
-        unsigned int textureID = GenerateTexture(data, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+        unsigned int format = (data.m_Channels == 4) ? GL_RGBA : GL_RGB;
+        unsigned int textureID = GenerateTexture(data, format, format, GL_UNSIGNED_BYTE);
         return textureID;
     }
 

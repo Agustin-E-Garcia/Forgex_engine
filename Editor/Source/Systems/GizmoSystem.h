@@ -25,7 +25,7 @@ namespace Forgex::Editor::Systems
             ImGuiIO& io = ImGui::GetIO();
             ImDrawList* dl = ImGui::GetBackgroundDrawList(); // always behind all ImGui windows
 
-            auto lightView = registry.view<Scene::Components::EntityInfo, Core::Components::Transform, Graphics::Components::PointLight>();
+            auto lightView = registry.view<Scene::Components::EntityInfo, Core::Components::Transform, Graphics::Components::DirectionalLight>();
             for (const auto [entity, info, transform, light] : lightView.each())
             {
                 glm::vec4 clip = viewProj * glm::vec4(transform.m_Position, 1.0f);
@@ -36,6 +36,34 @@ namespace Forgex::Editor::Systems
                 dl->AddCircleFilled(screen, 8.0f, IM_COL32(255, 220, 80, 200));
                 dl->AddCircle(screen, 8.0f, IM_COL32(255, 255, 255, 180), 12, 1.5f);
                 dl->AddText({ screen.x + 12, screen.y - 7 }, IM_COL32(255, 255, 255, 200), info.m_EntityName);
+
+                // Arrow along m_Forward
+                constexpr float arrowLength  = 1.5f;
+                constexpr float headLength   = 0.3f;
+                constexpr float headHalfWidth = 0.12f;
+                const ImU32 arrowColor = IM_COL32(255, 220, 80, 220);
+
+                glm::vec3 tipWorld  = transform.m_Position + transform.m_Forward * arrowLength;
+                glm::vec3 baseWorld = transform.m_Position + transform.m_Forward * (arrowLength - headLength);
+
+                // Two side points of the arrowhead, offset perpendicular to forward
+                glm::vec3 right = glm::normalize(glm::cross(transform.m_Forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+                if (glm::length(right) < 0.001f)
+                    right = glm::normalize(glm::cross(transform.m_Forward, glm::vec3(1.0f, 0.0f, 0.0f)));
+
+                glm::vec3 leftWorld  = baseWorld - right * headHalfWidth;
+                glm::vec3 rightWorld = baseWorld + right * headHalfWidth;
+
+                glm::vec4 tipClip = viewProj * glm::vec4(tipWorld, 1.0f);
+                if (tipClip.w <= 0.0f) continue;
+
+                ImVec2 originScreen = screen;
+                ImVec2 tipScreen    = WorldToScreen(tipWorld,   viewProj, io.DisplaySize);
+                ImVec2 leftScreen   = WorldToScreen(leftWorld,  viewProj, io.DisplaySize);
+                ImVec2 rightScreen  = WorldToScreen(rightWorld, viewProj, io.DisplaySize);
+
+                dl->AddLine(originScreen, tipScreen, arrowColor, 2.0f);
+                dl->AddTriangleFilled(tipScreen, leftScreen, rightScreen, arrowColor);
             }
         }
 

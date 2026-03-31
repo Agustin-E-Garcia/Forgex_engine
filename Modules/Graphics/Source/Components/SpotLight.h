@@ -3,12 +3,9 @@
 
 namespace Forgex::Graphics::Components
 {
-    struct PointLight
+    struct SpotLight
     {
         glm::vec3 m_Color = glm::vec3(1.0f);
-
-        float m_Constant = 1.0f;
-        float m_Linear = 0.09f;
-        float m_Quadratic = 0.032f;
+        float m_CutOff = glm::cos(glm::radians(12.5f));
     };
 }

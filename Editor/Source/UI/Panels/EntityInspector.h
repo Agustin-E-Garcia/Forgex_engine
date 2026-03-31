@@ -64,7 +64,9 @@ namespace Forgex::Editor::UI::Panels
 
                 DrawTransform(registry);
                 DrawCamera(registry);
+                DrawDirectionalLight(registry);
                 DrawPointLight(registry);
+                DrawSpotLight(registry);
                 DrawRenderable(registry);
             }
             else
@@ -114,6 +116,19 @@ namespace Forgex::Editor::UI::Panels
             }
         }
 
+        void DrawDirectionalLight(entt::registry& registry)
+        {
+            if (!registry.all_of<Graphics::Components::DirectionalLight>(m_SelectedEntity))
+                return;
+
+            if (ImGui::CollapsingHeader("Directional Light", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                auto& light = registry.get<Graphics::Components::DirectionalLight>(m_SelectedEntity);
+
+                ImGui::ColorEdit3("Color",     glm::value_ptr(light.m_Color));
+            }
+        }
+
         void DrawPointLight(entt::registry& registry)
         {
             if (!registry.all_of<Graphics::Components::PointLight>(m_SelectedEntity))
@@ -124,8 +139,23 @@ namespace Forgex::Editor::UI::Panels
                 auto& light = registry.get<Graphics::Components::PointLight>(m_SelectedEntity);
 
                 ImGui::ColorEdit3("Color",     glm::value_ptr(light.m_Color));
-                ImGui::DragFloat("Radius",     &light.m_Radius,    0.1f, 0.0f, 1000.0f);
-                ImGui::DragFloat("Intensity",  &light.m_Intensity, 0.01f, 0.0f, 10.0f);
+                ImGui::DragFloat("Constant",   &light.m_Constant, 0.1f, 0.0f, 1000.0f);
+                ImGui::DragFloat("Linear",     &light.m_Linear, 0.1f, 0.0f, 1000.0f);
+                ImGui::DragFloat("Quadratic",  &light.m_Quadratic, 0.1f, 0.0f, 1000.0f);
+            }
+        }
+
+        void DrawSpotLight(entt::registry& registry)
+        {
+            if (!registry.all_of<Graphics::Components::SpotLight>(m_SelectedEntity))
+                return;
+
+            if (ImGui::CollapsingHeader("Point Light", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                auto& light = registry.get<Graphics::Components::SpotLight>(m_SelectedEntity);
+
+                ImGui::ColorEdit3("Color",     glm::value_ptr(light.m_Color));
+                ImGui::DragFloat("Cutoff",     &light.m_CutOff, 0.1f, 0.0f, 1000.0f);
             }
         }
 

@@ -32,17 +32,17 @@ namespace Forgex::Engine
 
             int meshEntity = activeScene->CreateEntity("Mesh Entity");
             Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(meshEntity);
-            Core::Components::Transform& transform = activeScene->AddComponent<Core::Components::Transform>(meshEntity);
+            activeScene->AddComponent<Core::Components::Transform>(meshEntity);
             renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MeshAsset>("Resources/Meshes/Teapot.obj");
-            renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Lit.FMaterial");
-            renderable.m_ModelMatrix = transform.m_ModelMatrix;
+            renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Texture.FMaterial");
 
-            int lightEntity = activeScene->CreateEntity("Light Entity");
-            activeScene->AddComponent<Graphics::Components::PointLight>(lightEntity);
-            Core::Components::Transform& lightTransform = activeScene->AddComponent<Core::Components::Transform>(lightEntity);
+            int directionalLight = activeScene->CreateEntity("Directional Light");
+            activeScene->AddComponent<Graphics::Components::DirectionalLight>(directionalLight);
+            activeScene->AddComponent<Core::Components::Transform>(directionalLight);
 
-            lightTransform.m_Position = glm::vec3(0.0f, 20.0f, 0.0f);
-            lightTransform.m_Dirty = true;
+            int pointLight = activeScene->CreateEntity("Point Light");
+            activeScene->AddComponent<Graphics::Components::PointLight>(pointLight);
+            activeScene->AddComponent<Core::Components::Transform>(pointLight);
 
             sceneManager->Setup();
         }
@@ -51,7 +51,7 @@ namespace Forgex::Engine
 
         void OnUpdate(float deltaTime) override
         {
-            Core::ServiceLocator::Get().Fetch<Scene::SceneManager>()->Update(deltaTime);
+            GET_SERVICE(Scene::SceneManager)->Update(deltaTime);
             GET_SERVICE(Input::InputManager)->ResetMouseDelta();
         }
 
@@ -64,7 +64,7 @@ namespace Forgex::Engine
             dispatcher.Dispatch<Core::Layer::Event::MousePositionEvent>(BIND_EVENT_FUNCTION(GameLayer::HandleMousePositionEvent));
         }
 
-        void OnRender() override { Core::ServiceLocator::Get().Fetch<Scene::SceneManager>()->Render(); }
+        void OnRender() override { GET_SERVICE(Scene::SceneManager)->Render(); }
 
     private:
         bool HandleKeyPressedEvent(Core::Layer::Event::KeyPressedEvent& event)

@@ -45,20 +45,39 @@ namespace Forgex::Graphics::Systems
                     camera.m_FarPlane
                 );
 
-                renderFrameData.m_CameraPosition = glm::vec3(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix);
+                renderFrameData.m_CameraPosition = glm::vec4(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix);
             }
 
-            auto view_light = registry.view<Components::PointLight, Core::Components::Transform>();
+            auto view_directionalLight = registry.view<Components::DirectionalLight, Core::Components::Transform>();
             int index = 0;
-            for (entt::entity entity : view_light)
+            for (const auto&& [entity, light, transform] : view_directionalLight.each())
             {
-                if(index >= 16) break;
+                if(index >= 5) break;
 
-                const Core::Components::Transform& transform = view_light.get<Core::Components::Transform>(entity);
-                const Components::PointLight& light = view_light.get<Components::PointLight>(entity);
+                renderFrameData.m_DirectionalLights[index] = Resources::DirectionalLightData(light, transform.m_Forward);
+                renderFrameData.m_DirectionalLightsCount += 1;
+                index++;
+            }
 
-                renderFrameData.m_Lights[index] = Resources::LightData(light, glm::vec3(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix));
-                renderFrameData.m_LightCount += 1;
+            auto view_pointLight = registry.view<Components::PointLight, Core::Components::Transform>();
+            index = 0;
+            for (const auto&& [entity, light, transform] : view_pointLight.each())
+            {
+                if(index >= 5) break;
+
+                renderFrameData.m_PointLights[index] = Resources::PointLightData(light, glm::vec3(glm::vec4(transform.m_Position, 1.0f) * transform.m_ModelMatrix));
+                renderFrameData.m_PointLightsCount += 1;
+                index++;
+            }
+
+            auto view_spotLight = registry.view<Components::SpotLight, Core::Components::Transform>();
+            index = 0;
+            for (auto&& [entity, light, transform] : view_spotLight.each())
+            {
+                if(index >= 5) break;
+
+                renderFrameData.m_SpotLights[index] = Resources::SpotLightData(light, glm::vec4(transform.m_Position, 1.0f) * transform.m_ModelMatrix, transform.m_Forward);
+                renderFrameData.m_SpotLightsCount += 1;
                 index++;
             }
 

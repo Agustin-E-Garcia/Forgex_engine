@@ -16,7 +16,7 @@ namespace Forgex::Engine
         m_EngineCore->RegisterModule<Assets::AssetsModule>();
         m_EngineCore->RegisterModule<Graphics::GraphicsModule>();
         m_EngineCore->RegisterModule<Scene::SceneModule>();
-        m_EngineCore->RegisterModule<Voxel::VoxelModule>();
+        //m_EngineCore->RegisterModule<Voxel::VoxelModule>();
 
         Core::ServiceLocator::Get().Register<Input::InputManager>();
         m_EngineCore->RegisterSystem<Input::InputSystem>();

@@ -2,6 +2,7 @@
 #include "ShaderAsset.h"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <string>
 #include <type_traits>
 #include <GL/glew.h>
 #include <variant>
@@ -29,7 +30,8 @@ namespace Forgex::Graphics
             const std::string& type = entry["type"];
             const auto& val = entry["value"];
 
-            int location = glGetUniformLocation(m_ShaderAsset->GetShaderID(), name.c_str());
+            std::string fullName("material." + name);
+            int location = glGetUniformLocation(m_ShaderAsset->GetShaderID(), fullName.c_str());
             std::variant<float, int, bool, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> property;
 
             if      (type == "float")       property = val.get<float>();

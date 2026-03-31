@@ -1,0 +1,7 @@
+{
+    "shader": "Resources/Shaders/Unlit.FShader",
+    "properties": 
+    {
+        "albedo":       { "type": "vec3",    "value": [0.0, 0.0, 1.0] }
+    }
+}

@@ -2,6 +2,7 @@
 #include "../Utils/TextureLoader.h"
 
 #include <ForgexFiles.h>
+#include <string>
 
 namespace Forgex::Graphics
 {
@@ -22,7 +23,8 @@ namespace Forgex::Graphics
         Files::TextureData texture;
         if(m_Type == TextureType::Default)
         {
-            m_TextureID = Utils::TextureLoader::LoadTexture(data["texture"], texture);
+            std::string path = data["texture"];
+            m_TextureID = Utils::TextureLoader::LoadTexture(path.c_str(), texture);
             m_GPUSize = texture.m_Width * texture.m_Height * texture.m_Channels;
         }
         else

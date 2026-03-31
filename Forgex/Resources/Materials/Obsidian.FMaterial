@@ -1,0 +1,10 @@
+{
+    "shader": "Resources/Shaders/Lit.FShader",
+    "properties":
+    {
+        "diffuse":      { "type": "vec3",    "value": [0.18275, 0.17, 0.22525] },
+        "diffuseMap":   { "type": "texture",  "value": "" },
+        "specular":     { "type": "vec3",    "value": [0.332741, 0.328634, 0.346435] },
+        "shininess":    { "type": "float",   "value": 0.3 }
+    }
+}
