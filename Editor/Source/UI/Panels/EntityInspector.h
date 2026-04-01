@@ -62,6 +62,7 @@ namespace Forgex::Editor::UI::Panels
                 ImGui::Text("Entity: %s", info.m_EntityName);
                 ImGui::Separator();
 
+                DrawInfo(registry);
                 DrawTransform(registry);
                 DrawCamera(registry);
                 DrawDirectionalLight(registry);
@@ -79,6 +80,21 @@ namespace Forgex::Editor::UI::Panels
 
     private:
         entt::entity m_SelectedEntity = entt::null;
+
+        void DrawInfo(entt::registry& registry)
+        {
+            if(!registry.all_of<Scene::Components::EntityInfo>(m_SelectedEntity))
+                return;
+
+            if (ImGui::CollapsingHeader("Info", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                auto& t = registry.get<Scene::Components::EntityInfo>(m_SelectedEntity);
+
+                ImGui::Checkbox("Active",      &t.m_IsActive);
+                ImGui::Checkbox("Draw Gizmo",  &t.m_DrawGizmo);
+                ImGui::ColorEdit3("Gizmo Color", glm::value_ptr(t.m_GizmoColor));
+            }
+        }
 
         void DrawTransform(entt::registry& registry)
         {

@@ -25,15 +25,18 @@ namespace Forgex::Editor::Systems
             ImGuiIO& io = ImGui::GetIO();
             ImDrawList* dl = ImGui::GetBackgroundDrawList(); // always behind all ImGui windows
 
-            auto lightView = registry.view<Scene::Components::EntityInfo, Core::Components::Transform, Graphics::Components::PointLight>();
-            for (const auto [entity, info, transform, light] : lightView.each())
+            auto lightView = registry.view<Scene::Components::EntityInfo, Core::Components::Transform>();
+            for (const auto [entity, info, transform] : lightView.each())
             {
+                if(!info.m_DrawGizmo) continue;
+
                 glm::vec4 clip = viewProj * glm::vec4(transform.m_Position, 1.0f);
                 if (clip.w <= 0.0f) continue;
 
                 ImVec2 screen = WorldToScreen(transform.m_Position, viewProj, io.DisplaySize);
 
-                dl->AddCircleFilled(screen, 8.0f, IM_COL32(255, 220, 80, 200));
+                glm::vec3 color = info.m_GizmoColor * glm::vec3(255.0f);
+                dl->AddCircleFilled(screen, 8.0f, IM_COL32(color.x, color.y, color.z, 200));
                 dl->AddCircle(screen, 8.0f, IM_COL32(255, 255, 255, 180), 12, 1.5f);
                 dl->AddText({ screen.x + 12, screen.y - 7 }, IM_COL32(255, 255, 255, 200), info.m_EntityName);
 
@@ -41,7 +44,7 @@ namespace Forgex::Editor::Systems
                 constexpr float arrowLength  = 1.5f;
                 constexpr float headLength   = 0.3f;
                 constexpr float headHalfWidth = 0.12f;
-                const ImU32 arrowColor = IM_COL32(255, 220, 80, 220);
+                const ImU32 arrowColor = IM_COL32(color.x, color.y, color.z, 220);
 
                 glm::vec3 tipWorld  = transform.m_Position + transform.m_Forward * arrowLength;
                 glm::vec3 baseWorld = transform.m_Position + transform.m_Forward * (arrowLength - headLength);
