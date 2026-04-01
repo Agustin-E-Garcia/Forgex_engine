@@ -22,6 +22,8 @@ namespace Forgex::Graphics
 
         int GetTextureID() { return m_TextureID; }
 
+        static int GetDefaultWhiteTextureID();
+
     private:
         int m_TextureID = -1;
         TextureType m_Type;

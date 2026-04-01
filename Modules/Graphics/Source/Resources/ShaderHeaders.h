@@ -26,7 +26,8 @@ struct SpotLight
     vec4 position;
     vec3 direction;
     float cutOff;
-    vec4 color;
+    vec3 color;
+    float outerCutOff;
 };
 
 layout(std140, binding = 0) uniform FrameBlock
@@ -40,9 +41,11 @@ layout(std140, binding = 0) uniform FrameBlock
     int pointLightCount;
     int spotLightCount;
 
+    vec4 ambientColor;
+
     DirectionalLight directionalLights[5];
-    PointLight pointLights[5];
     SpotLight spotLights[5];
+    PointLight pointLights[5];
 };
 )";
 

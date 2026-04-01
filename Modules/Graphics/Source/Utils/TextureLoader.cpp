@@ -15,6 +15,21 @@ namespace Forgex::Graphics::Utils
         unsigned int m_Type;
     };
 
+    int TextureLoader::LoadDefaultTexture()
+    {
+        static int s_DefaultTextureID = -1;
+        if(s_DefaultTextureID == -1)
+        {
+            unsigned char whitePixel[4] = { 255, 255, 255, 255 };
+            glGenTextures(1, (GLuint*)&s_DefaultTextureID);
+            glBindTexture(GL_TEXTURE_2D, s_DefaultTextureID);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whitePixel);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        return s_DefaultTextureID;
+    }
+
     unsigned int GenerateTexture(Files::TextureData& data, int internalFormat, unsigned int format, int dataType)
     {
         unsigned int textureID;

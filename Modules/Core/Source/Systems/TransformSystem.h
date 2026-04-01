@@ -29,9 +29,10 @@ namespace Forgex::Core::Systems
 
         void UpdateRotation(Components::Transform& transform)
         {
-            glm::quat qX = glm::angleAxis(transform.m_Rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            glm::quat qY = glm::angleAxis(transform.m_Rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::quat qZ = glm::angleAxis(transform.m_Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            glm::vec3 radians = glm::radians(transform.m_Rotation);
+            glm::quat qX = glm::angleAxis(radians.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            glm::quat qY = glm::angleAxis(radians.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            glm::quat qZ = glm::angleAxis(radians.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
             transform.m_RotationQuat = qZ * qY * qX;
             transform.m_RotationMatrix = glm::mat4_cast(transform.m_RotationQuat);

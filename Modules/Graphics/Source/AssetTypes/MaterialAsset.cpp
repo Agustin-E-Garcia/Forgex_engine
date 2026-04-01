@@ -39,7 +39,14 @@ namespace Forgex::Graphics
             else if (type == "bool")        property = val.get<bool>();
             else if (type == "vec3")        property = glm::vec3(val[0], val[1], val[2]);
             else if (type == "vec4")        property = glm::vec4(val[0], val[1], val[2], val[3]);
-            else if (type == "texture")     property = GET_SERVICE(Assets::AssetManager)->LoadAsset<TextureAsset>(val.get<std::string>());
+            else if (type == "texture")
+            {
+                if(val.get<std::string>().empty())
+                {
+                    property = Assets::AssetHandle<TextureAsset>{};
+                }
+                else property = GET_SERVICE(Assets::AssetManager)->LoadAsset<TextureAsset>(val.get<std::string>());
+            }
 
             m_Properties[name] = { location, property };
         }
@@ -68,9 +75,9 @@ namespace Forgex::Graphics
                 else if constexpr (std::is_same_v<T, glm::vec4>) glUniform4fv(loc, 1, glm::value_ptr(v));
                 else if constexpr (std::is_same_v<T, Assets::AssetHandle<TextureAsset>>)
                 {
-                    Assets::AssetHandle<TextureAsset> textureHandle = v;
+                    int textureID = v.IsValid() ? v->GetTextureID() : TextureAsset::GetDefaultWhiteTextureID();
                     glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, textureHandle->GetTextureID());
+                    glBindTexture(GL_TEXTURE_2D, textureID);
                     glUniform1i(loc, 0);
                 }
             }, value.m_Property);

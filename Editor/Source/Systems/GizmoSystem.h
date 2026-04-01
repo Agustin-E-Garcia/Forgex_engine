@@ -25,7 +25,7 @@ namespace Forgex::Editor::Systems
             ImGuiIO& io = ImGui::GetIO();
             ImDrawList* dl = ImGui::GetBackgroundDrawList(); // always behind all ImGui windows
 
-            auto lightView = registry.view<Scene::Components::EntityInfo, Core::Components::Transform, Graphics::Components::DirectionalLight>();
+            auto lightView = registry.view<Scene::Components::EntityInfo, Core::Components::Transform, Graphics::Components::PointLight>();
             for (const auto [entity, info, transform, light] : lightView.each())
             {
                 glm::vec4 clip = viewProj * glm::vec4(transform.m_Position, 1.0f);

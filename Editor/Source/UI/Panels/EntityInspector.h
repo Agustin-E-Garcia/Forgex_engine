@@ -150,12 +150,13 @@ namespace Forgex::Editor::UI::Panels
             if (!registry.all_of<Graphics::Components::SpotLight>(m_SelectedEntity))
                 return;
 
-            if (ImGui::CollapsingHeader("Point Light", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader("Spot Light", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 auto& light = registry.get<Graphics::Components::SpotLight>(m_SelectedEntity);
 
-                ImGui::ColorEdit3("Color",     glm::value_ptr(light.m_Color));
-                ImGui::DragFloat("Cutoff",     &light.m_CutOff, 0.1f, 0.0f, 1000.0f);
+                ImGui::ColorEdit3("Color",          glm::value_ptr(light.m_Color));
+                ImGui::DragFloat("Cutoff",          &light.m_CutOff, 0.1f, 0.0f, 1000.0f);
+                ImGui::DragFloat("Outer Cutoff",    &light.m_OuterCutOff, 0.1f, 0.0f, 1000.0f);
             }
         }
 

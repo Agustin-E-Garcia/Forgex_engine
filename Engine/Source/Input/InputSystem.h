@@ -18,10 +18,10 @@ namespace Forgex::Engine::Input
             glm::dvec2 mouseDelta = input->GetMouseDelta();
             if (mouseDelta.x != 0.0 || mouseDelta.y != 0.0)
             {
-                transform.m_Rotation.y -= glm::radians((float)mouseDelta.x * playerInput.m_RotationSpeed);
-                transform.m_Rotation.x  = glm::clamp(transform.m_Rotation.x + glm::radians((float)mouseDelta.y * playerInput.m_RotationSpeed),
-                                                      glm::radians(-playerInput.m_PitchLimit),
-                                                      glm::radians( playerInput.m_PitchLimit));
+                transform.m_Rotation.y -= (float)mouseDelta.x * playerInput.m_RotationSpeed;
+                transform.m_Rotation.x  = glm::clamp(transform.m_Rotation.x + (float)mouseDelta.y * playerInput.m_RotationSpeed,
+                                                      -playerInput.m_PitchLimit,
+                                                       playerInput.m_PitchLimit);
             }
 
             // Translation

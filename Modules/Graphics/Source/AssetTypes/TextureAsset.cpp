@@ -38,4 +38,6 @@ namespace Forgex::Graphics
     }
 
     void TextureAsset::Unload() { Graphics::Utils::TextureLoader::UnloadTexture(m_TextureID); }
+
+    int TextureAsset::GetDefaultWhiteTextureID() { return Graphics::Utils::TextureLoader::LoadDefaultTexture(); }
 }

@@ -29,20 +29,21 @@ namespace Forgex::Engine
             activeScene->AddComponent<Graphics::Components::Camera>(cameraEntity);
             activeScene->AddComponent<Core::Components::Transform>(cameraEntity);
             activeScene->AddComponent<Input::PlayerInput>(cameraEntity);
+            activeScene->AddComponent<Graphics::Components::SpotLight>(cameraEntity);
 
             int meshEntity = activeScene->CreateEntity("Mesh Entity");
             Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(meshEntity);
             activeScene->AddComponent<Core::Components::Transform>(meshEntity);
             renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MeshAsset>("Resources/Meshes/Teapot.obj");
-            renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Texture.FMaterial");
+            renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Obsidian.FMaterial");
 
             int directionalLight = activeScene->CreateEntity("Directional Light");
             activeScene->AddComponent<Graphics::Components::DirectionalLight>(directionalLight);
             activeScene->AddComponent<Core::Components::Transform>(directionalLight);
 
-            int pointLight = activeScene->CreateEntity("Point Light");
-            activeScene->AddComponent<Graphics::Components::PointLight>(pointLight);
-            activeScene->AddComponent<Core::Components::Transform>(pointLight);
+            //int pointLight = activeScene->CreateEntity("Point Light");
+            //activeScene->AddComponent<Graphics::Components::PointLight>(pointLight);
+            //activeScene->AddComponent<Core::Components::Transform>(pointLight);
 
             sceneManager->Setup();
         }

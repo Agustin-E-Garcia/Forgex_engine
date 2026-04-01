@@ -45,7 +45,7 @@ namespace Forgex::Graphics::Systems
                     camera.m_FarPlane
                 );
 
-                renderFrameData.m_CameraPosition = glm::vec4(glm::vec4(transform.m_Position, 1.0) * transform.m_ModelMatrix);
+                renderFrameData.m_CameraPosition = glm::vec4(transform.m_Position, 1.0f);
             }
 
             auto view_directionalLight = registry.view<Components::DirectionalLight, Core::Components::Transform>();
@@ -65,7 +65,7 @@ namespace Forgex::Graphics::Systems
             {
                 if(index >= 5) break;
 
-                renderFrameData.m_PointLights[index] = Resources::PointLightData(light, glm::vec3(glm::vec4(transform.m_Position, 1.0f) * transform.m_ModelMatrix));
+                renderFrameData.m_PointLights[index] = Resources::PointLightData(light, glm::vec3(transform.m_Position));
                 renderFrameData.m_PointLightsCount += 1;
                 index++;
             }
@@ -76,7 +76,12 @@ namespace Forgex::Graphics::Systems
             {
                 if(index >= 5) break;
 
-                renderFrameData.m_SpotLights[index] = Resources::SpotLightData(light, glm::vec4(transform.m_Position, 1.0f) * transform.m_ModelMatrix, transform.m_Forward);
+                renderFrameData.m_SpotLights[index] = Resources::SpotLightData
+                    (
+                        light,
+                        transform.m_Position,
+                        transform.m_Forward
+                    );
                 renderFrameData.m_SpotLightsCount += 1;
                 index++;
             }
