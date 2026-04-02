@@ -19,7 +19,7 @@ namespace Forgex::Voxel::Utils
 
         uint32_t GetOrAddVertexIndex(std::vector<float>& vertices, glm::vec3 posA, glm::vec3 posB);
         glm::vec3 CalculateSampleGradientNormal(glm::vec3 vertexLocalPos);
-        glm::vec3 Interpolate(glm::vec3 posA, glm::vec3 posB, uint8_t valA, uint8_t valB);
+        glm::vec3 Interpolate(glm::vec3 posA, glm::vec3 posB, int8_t valA, int8_t valB);
         uint64_t GetSampleID(glm::vec3 position);
         uint32_t PushVertex(std::vector<float>& vertices, glm::vec3 vertex, glm::vec3 normal);
     };

@@ -23,7 +23,7 @@ namespace Forgex::Voxel::Systems
             map.m_Chunks.reserve(chunkCount);
 
             for(int z = 0; z < chunks.z; z++)
-            for(int y = 0; y < chunks.y; y++)
+            for(int y = -(chunks.y *0.5f); y < chunks.y * 0.5f; y++)
             for(int x = 0; x < chunks.x; x++)
             {
                 entt::entity ent = registry.create();
@@ -42,19 +42,19 @@ namespace Forgex::Voxel::Systems
                 chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(1.0f);
                 chunk.m_DensityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);
 
-                renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Jade.FMaterial");
+                renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Terrain.FMaterial");
 
-                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<std::vector<uint8_t>>([this, &chunk]() { return SetupChunk(chunk); });
+                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<std::vector<int8_t>>([this, &chunk]() { return SetupChunk(chunk); });
 
                 map.m_Chunks.push_back(&chunk);
             }
         }
 
-        std::vector<uint8_t> SetupChunk(Components::Chunk& chunk)
+        std::vector<int8_t> SetupChunk(Components::Chunk& chunk)
         {
             Utils::TerrainGenerator generator = Utils::TerrainGenerator(chunk.m_NoiseSeed);
 
-            std::vector<uint8_t> densityValues;
+            std::vector<int8_t> densityValues;
             densityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);
 
             glm::vec3 worldOffset = chunk.m_Position * chunk.m_Size;

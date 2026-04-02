@@ -1,10 +1,12 @@
 #pragma once
 #include "../GUIWindow.h"
+#include "glm/fwd.hpp"
 #include "imgui.h"
 #include <ForgexCore.h>
 #include <ForgexAssets.h>
 #include <ForgexGraphics.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <type_traits>
 
 namespace Forgex::Editor::UI::Panels
 {
@@ -58,6 +60,7 @@ namespace Forgex::Editor::UI::Panels
                         if      constexpr (std::is_same_v<ValueType, float>)     ImGui::DragFloat(name.c_str(), &v, 0.01f);
                         else if constexpr (std::is_same_v<ValueType, int>)       ImGui::DragInt(name.c_str(), &v);
                         else if constexpr (std::is_same_v<ValueType, bool>)      ImGui::Checkbox(name.c_str(), &v);
+                        else if constexpr (std::is_same_v<ValueType, glm::vec2>) ImGui::DragFloat2(name.c_str(), glm::value_ptr(v));
                         else if constexpr (std::is_same_v<ValueType, glm::vec3>) ImGui::ColorEdit3(name.c_str(), glm::value_ptr(v));
                         else if constexpr (std::is_same_v<ValueType, glm::vec4>) ImGui::ColorEdit4(name.c_str(), glm::value_ptr(v));
                         else if constexpr (std::is_same_v<ValueType, Assets::AssetHandle<Graphics::TextureAsset>>)

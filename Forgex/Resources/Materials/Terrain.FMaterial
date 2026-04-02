@@ -1,0 +1,19 @@
+{
+    "shader": "Resources/Shaders/Terrain.FShader",
+    "properties":
+    {
+        "diffuse":      { "type": "vec3",    "value": [1.0, 1.0, 1.0] },
+        "diffuseMap":   { "type": "texture", "value": "" },
+        "specular":     { "type": "vec3",    "value": [0.0, 0.0, 0.0] },
+        "shininess":    { "type": "float",   "value": 0.01 }
+    },
+    "uniforms":
+    {
+        "terrainData[0].color": { "type": "vec3", "value": [0.125, 0.373, 0.008] },
+        "terrainData[0].range": { "type": "vec2", "value": [0.0, 20.0] },
+        "terrainData[1].color": { "type": "vec3", "value": [0.239, 0.200, 0.149] },
+        "terrainData[1].range": { "type": "vec2", "value": [20.0, 45.0] },
+        "terrainData[2].color": { "type": "vec3", "value": [0.902, 0.902, 0.902] },
+        "terrainData[2].range": { "type": "vec2", "value": [45.0, 255.0] }
+    }
+}

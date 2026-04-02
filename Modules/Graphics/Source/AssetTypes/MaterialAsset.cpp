@@ -25,31 +25,40 @@ namespace Forgex::Graphics
 
         m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<ShaderAsset>(data["shader"]);
 
-        for(auto& [name, entry] : data["properties"].items())
+        auto parseProperty = [&](const std::string& uniformName, const std::string& name, const nlohmann::json& entry)
         {
             const std::string& type = entry["type"];
             const auto& val = entry["value"];
 
-            std::string fullName("material." + name);
-            int location = glGetUniformLocation(m_ShaderAsset->GetShaderID(), fullName.c_str());
-            std::variant<float, int, bool, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> property;
+            int location = glGetUniformLocation(m_ShaderAsset->GetShaderID(), uniformName.c_str());
+            std::variant<float, int, bool, glm::vec2, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> property;
 
-            if      (type == "float")       property = val.get<float>();
-            else if (type == "int")         property = val.get<int>();
-            else if (type == "bool")        property = val.get<bool>();
-            else if (type == "vec3")        property = glm::vec3(val[0], val[1], val[2]);
-            else if (type == "vec4")        property = glm::vec4(val[0], val[1], val[2], val[3]);
+            if      (type == "float")   property = val.get<float>();
+            else if (type == "int")     property = val.get<int>();
+            else if (type == "bool")    property = val.get<bool>();
+            else if (type == "vec2")    property = glm::vec2(val[0], val[1]);
+            else if (type == "vec3")    property = glm::vec3(val[0], val[1], val[2]);
+            else if (type == "vec4")    property = glm::vec4(val[0], val[1], val[2], val[3]);
             else if (type == "texture")
             {
                 if(val.get<std::string>().empty())
-                {
                     property = Assets::AssetHandle<TextureAsset>{};
-                }
-                else property = GET_SERVICE(Assets::AssetManager)->LoadAsset<TextureAsset>(val.get<std::string>());
+                else
+                    property = GET_SERVICE(Assets::AssetManager)->LoadAsset<TextureAsset>(val.get<std::string>());
             }
 
             m_Properties[name] = { location, property };
+        };
+
+        for(auto& [name, entry] : data["properties"].items())
+            parseProperty("material." + name, name, entry);
+
+        if(data.contains("uniforms"))
+        {
+            for(auto& [name, entry] : data["uniforms"].items())
+                parseProperty(name, name, entry);
         }
+
         return true;
     }
 
@@ -71,6 +80,7 @@ namespace Forgex::Graphics
                 if      constexpr (std::is_same_v<T, float>)     glUniform1f(loc, v);
                 else if constexpr (std::is_same_v<T, int>)       glUniform1i(loc, v);
                 else if constexpr (std::is_same_v<T, bool>)      glUniform1i(loc, (int)v);
+                else if constexpr (std::is_same_v<T, glm::vec2>) glUniform2fv(loc, 1, glm::value_ptr(v));
                 else if constexpr (std::is_same_v<T, glm::vec3>) glUniform3fv(loc, 1, glm::value_ptr(v));
                 else if constexpr (std::is_same_v<T, glm::vec4>) glUniform4fv(loc, 1, glm::value_ptr(v));
                 else if constexpr (std::is_same_v<T, Assets::AssetHandle<TextureAsset>>)

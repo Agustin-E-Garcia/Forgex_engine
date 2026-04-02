@@ -12,7 +12,7 @@ namespace Forgex::Graphics
     struct MaterialProperty
     {
         int m_Location;
-        std::variant<float, int, bool, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> m_Property;
+        std::variant<float, int, bool, glm::vec2, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> m_Property;
     };
 
     class MaterialAsset : public Assets::Asset

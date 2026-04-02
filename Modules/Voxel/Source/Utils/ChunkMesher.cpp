@@ -121,7 +121,7 @@ namespace Forgex::Voxel::Utils
     glm::vec3 ChunkMesher::CalculateSampleGradientNormal(glm::vec3 vertexLocalPos)
     {
         glm::vec3 worldPos = (m_Chunk->m_Position * m_Chunk->m_Size) + (vertexLocalPos * m_Chunk->m_SampleDensity);
-        float delta = 0.5f;
+        float delta = 127 * 0.05f;
         float surfaceHeight;
 
         float dx = m_Generator->GetDensityValueAtPoint
@@ -146,7 +146,7 @@ namespace Forgex::Voxel::Utils
         return glm::normalize(-glm::vec3(dx, dy, dz));
     }
 
-    glm::vec3 ChunkMesher::Interpolate(glm::vec3 posA, glm::vec3 posB, uint8_t valA, uint8_t valB)
+    glm::vec3 ChunkMesher::Interpolate(glm::vec3 posA, glm::vec3 posB, int8_t valA, int8_t valB)
     {
         float t = (m_Chunk->m_Cutoff - valA) / (float)(valB - valA);
         return posA + t * (posB - posA);

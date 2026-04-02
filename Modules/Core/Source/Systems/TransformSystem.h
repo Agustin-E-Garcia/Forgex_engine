@@ -19,7 +19,7 @@ namespace Forgex::Core::Systems
             UpdateRotation(transform);
             UpdateScale(transform);
 
-            transform.m_ModelMatrix = transform.m_ScaleMatrix * transform.m_RotationMatrix * transform.m_LocationMatrix;
+            transform.m_ModelMatrix = transform.m_LocationMatrix * transform.m_RotationMatrix * transform.m_ScaleMatrix;
         }
 
         void UpdateLocation(Components::Transform& transform) 

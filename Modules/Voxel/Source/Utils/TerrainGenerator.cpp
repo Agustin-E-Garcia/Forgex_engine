@@ -7,14 +7,20 @@ namespace Forgex::Voxel::Utils
         m_Noise.SetSeed(m_Seed);
         m_Noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
         m_Noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+        m_Noise.SetFrequency(0.003f);
     }
     TerrainGenerator::~TerrainGenerator() {}
 
-    uint8_t TerrainGenerator::GetDensityValueAtPoint(glm::vec3 position, float topHeight, float* surfaceHeight)
+    int8_t TerrainGenerator::GetDensityValueAtPoint(glm::vec3 position, float topHeight, float* surfaceHeight)
     {
-        float n = m_Noise.GetNoise(position.x, position.z);
-        *surfaceHeight = (n + 1.0f) / 2.0f * topHeight;
-        float density = (*surfaceHeight - position.y) / topHeight * 255.0f;
-        return glm::clamp(density + 127.0f, 0.0f, 255.0f);
+        topHeight = 127;
+
+        float noise = m_Noise.GetNoise(position.x, position.z);
+        float normalizedNoise = (noise + 1.0f) * 0.5f;
+
+        float curve = glm::pow(noise, 2.0f);
+
+        float density = -position.y + curve * topHeight;
+        return glm::clamp(density, -128.0f, 127.0f);
     }
 }
