@@ -69,10 +69,7 @@ namespace Forgex::Graphics
         for(const auto& [name, value] : m_Properties)
         {
             int loc = value.m_Location;
-            if(loc == -1)
-            {
-                LOG_CORE(Debug::Error, "Unable to find loc '{0}'", name);
-            }
+            if(loc == -1) continue;
 
             std::visit([&](auto&& v)
             {

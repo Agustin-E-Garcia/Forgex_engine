@@ -23,12 +23,12 @@ namespace Forgex::Graphics::Renderers
         glDepthMask(GL_FALSE);
         glUseProgram(renderable.m_MaterialAsset->GetShaderID());
 
+        renderable.m_MaterialAsset->SetupProperties();
+
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, renderable.m_MeshAsset->GetVertexBuffer());
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-        auto& textureHandle = std::get<Assets::AssetHandle<TextureAsset>>(renderable.m_MaterialAsset->GetProperties().at("albedoMap").m_Property);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureHandle->GetTextureID());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glDisableVertexAttribArray(0);

@@ -1,7 +1,7 @@
-out vec3 TexCoords;
+out vec3 fragPos;
 
 void main()
 {
-    TexCoords = aPos;
     gl_Position = projection * mat4(mat3(view)) * vec4(aPos, 1.0);
+    fragPos = aPos;
 }

@@ -1,7 +1,40 @@
-in vec3 TexCoords;
-uniform samplerCube skybox;
+uniform vec3 horizonColor;
+uniform vec3 nightColor;
+
+uniform float starDensity;
+uniform float starThreshold;
+
+uniform vec3 moonDirection;
+uniform float moonSize;
+uniform vec3 moonColor;
+
+in vec3 fragPos;
 
 void main()
 {
-    FragColor = texture(skybox, TexCoords);
+    vec3 dir = normalize(fragPos);
+
+    float horizon = max(dir.y, 0.0);
+    vec3 skyColor = mix(horizonColor, nightColor, horizon);
+
+    vec3 starCell = floor(dir * starDensity);
+    vec3 starFract = fract(dir * starDensity);
+
+    float star = fract(sin(dot(starCell, vec3(127.1, 311.7, 74.4))) * 43758.5453);
+    star = step(starThreshold, star);
+
+    vec2 cellCenter = vec2(0.5) - starFract.xy;
+    float dist = length(cellCenter);
+    float glow = smoothstep(0.5, 0.0, dist);
+
+    float starFade = smoothstep(0.0, 0.2, dir.y);
+    skyColor += vec3(star * glow) * 0.8 * starFade;
+
+    vec3 moonDir = normalize(moonDirection);
+    float moonDist = distance(dir, moonDir);
+    float moon = smoothstep(moonSize, 0.0, moonDist);
+    float moonGlow = smoothstep(0.3, 0.0, moonDist) * 0.1;
+    skyColor += moonColor * (moon + moonGlow);
+
+    FragColor = vec4(skyColor, 1.0);
 }
