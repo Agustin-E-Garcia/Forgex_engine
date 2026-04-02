@@ -31,11 +31,11 @@ namespace Forgex::Engine
             activeScene->AddComponent<Input::PlayerInput>(cameraEntity);
 
             int meshEntity = activeScene->CreateEntity("Mesh");
-            Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(meshEntity);
+            //Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(meshEntity);
             activeScene->AddComponent<Core::Components::Transform>(meshEntity);
             activeScene->AddComponent<Graphics::Components::PointLight>(meshEntity);
-            renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MeshAsset>("Resources/Meshes/Teapot.obj");
-            renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Obsidian.FMaterial");
+            //renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MeshAsset>("Resources/Meshes/Teapot.obj");
+            //renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Obsidian.FMaterial");
 
             int directionalLight = activeScene->CreateEntity("Directional Light");
             activeScene->AddComponent<Graphics::Components::DirectionalLight>(directionalLight);

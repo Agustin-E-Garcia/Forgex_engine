@@ -155,9 +155,9 @@ namespace Forgex::Editor::UI::Panels
                 auto& light = registry.get<Graphics::Components::PointLight>(m_SelectedEntity);
 
                 ImGui::ColorEdit3("Color",     glm::value_ptr(light.m_Color));
-                ImGui::DragFloat("Constant",   &light.m_Constant, 0.1f, 0.0f, 1000.0f);
-                ImGui::DragFloat("Linear",     &light.m_Linear, 0.1f, 0.0f, 1000.0f);
-                ImGui::DragFloat("Quadratic",  &light.m_Quadratic, 0.1f, 0.0f, 1000.0f);
+                ImGui::DragFloat("Constant",   &light.m_Constant,  0.01f,   0.0f, 1.0f);
+                ImGui::DragFloat("Linear",     &light.m_Linear,    0.001f,  0.0f, 1.0f);
+                ImGui::DragFloat("Quadratic",  &light.m_Quadratic, 0.0001f, 0.0f, 1.0f);
             }
         }
 
