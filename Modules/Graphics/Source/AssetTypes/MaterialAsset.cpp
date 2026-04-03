@@ -11,6 +11,44 @@
 
 namespace Forgex::Graphics
 {
+    void ParseProperty(int shaderID, const std::string& uniformName, const nlohmann::json& entry, std::unordered_map<std::string, MaterialProperty>& out)
+    {
+        const std::string& type = entry["type"];
+        const auto& val = entry["value"];
+
+        if (type == "array")
+        {
+            for(auto& [valueName, elem] : val.items())
+                ParseProperty(shaderID, uniformName + "[" + valueName + "]", elem, out);
+            return;
+        }
+        else if (type == "struct")
+        {
+            for(auto& [valueName, elem] : val.items())
+                ParseProperty(shaderID, uniformName + "." + valueName, elem, out);
+            return;
+        }
+
+        std::variant<float, int, bool, glm::vec2, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> property;
+
+        if      (type == "float")   property = val.get<float>();
+        else if (type == "int")     property = val.get<int>();
+        else if (type == "bool")    property = val.get<bool>();
+        else if (type == "vec2")    property = glm::vec2(val[0], val[1]);
+        else if (type == "vec3")    property = glm::vec3(val[0], val[1], val[2]);
+        else if (type == "vec4")    property = glm::vec4(val[0], val[1], val[2], val[3]);
+        else if (type == "texture")
+        {
+            if(val.get<std::string>().empty())
+                property = Assets::AssetHandle<TextureAsset>{};
+            else
+                property = GET_SERVICE(Assets::AssetManager)->LoadAsset<TextureAsset>(val.get<std::string>());
+        }
+
+        int location = glGetUniformLocation(shaderID, uniformName.c_str());
+        out[uniformName] = { location, property };
+    }
+
     bool MaterialAsset::Load()
     {
         LOG_CORE(Debug::Trace, "Loading MaterialAsset {0}", m_Path);
@@ -25,38 +63,13 @@ namespace Forgex::Graphics
 
         m_ShaderAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<ShaderAsset>(data["shader"]);
 
-        auto parseProperty = [&](const std::string& uniformName, const std::string& name, const nlohmann::json& entry)
-        {
-            const std::string& type = entry["type"];
-            const auto& val = entry["value"];
-
-            int location = glGetUniformLocation(m_ShaderAsset->GetShaderID(), uniformName.c_str());
-            std::variant<float, int, bool, glm::vec2, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> property;
-
-            if      (type == "float")   property = val.get<float>();
-            else if (type == "int")     property = val.get<int>();
-            else if (type == "bool")    property = val.get<bool>();
-            else if (type == "vec2")    property = glm::vec2(val[0], val[1]);
-            else if (type == "vec3")    property = glm::vec3(val[0], val[1], val[2]);
-            else if (type == "vec4")    property = glm::vec4(val[0], val[1], val[2], val[3]);
-            else if (type == "texture")
-            {
-                if(val.get<std::string>().empty())
-                    property = Assets::AssetHandle<TextureAsset>{};
-                else
-                    property = GET_SERVICE(Assets::AssetManager)->LoadAsset<TextureAsset>(val.get<std::string>());
-            }
-
-            m_Properties[name] = { location, property };
-        };
-
         for(auto& [name, entry] : data["properties"].items())
-            parseProperty("material." + name, name, entry);
+            ParseProperty(GetShaderID(), "material." + name, entry, m_Properties);
 
         if(data.contains("uniforms"))
         {
             for(auto& [name, entry] : data["uniforms"].items())
-                parseProperty(name, name, entry);
+                ParseProperty(GetShaderID(), name, entry, m_Uniforms);
         }
 
         return true;
@@ -66,10 +79,10 @@ namespace Forgex::Graphics
 
     void MaterialAsset::SetupProperties()
     {
-        for(const auto& [name, value] : m_Properties)
+        auto uploadProperty = [](const MaterialProperty& value)
         {
             int loc = value.m_Location;
-            if(loc == -1) continue;
+            if(loc == -1) return;
 
             std::visit([&](auto&& v)
             {
@@ -88,6 +101,12 @@ namespace Forgex::Graphics
                     glUniform1i(loc, 0);
                 }
             }, value.m_Property);
-        }
+        };
+
+        for(const auto& [name, value] : m_Properties)
+            uploadProperty(value);
+
+        for(const auto& [name, value] : m_Uniforms)
+            uploadProperty(value);
     }
 }

@@ -7,6 +7,7 @@
 #include <ForgexGraphics.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <type_traits>
+#include <unordered_map>
 
 namespace Forgex::Editor::UI::Panels
 {
@@ -50,33 +51,9 @@ namespace Forgex::Editor::UI::Panels
                 ImGui::Text("Material: %s", m_SelectedMaterial->GetPath().c_str());
                 ImGui::Separator();
 
-                auto& properties = m_SelectedMaterial->GetProperties();
-                for(auto& [name, value] : properties)
-                {
-                    std::visit([&](auto& v)
-                    {
-                        using ValueType = std::decay_t<decltype(v)>;
-
-                        if      constexpr (std::is_same_v<ValueType, float>)     ImGui::DragFloat(name.c_str(), &v, 0.01f);
-                        else if constexpr (std::is_same_v<ValueType, int>)       ImGui::DragInt(name.c_str(), &v);
-                        else if constexpr (std::is_same_v<ValueType, bool>)      ImGui::Checkbox(name.c_str(), &v);
-                        else if constexpr (std::is_same_v<ValueType, glm::vec2>) ImGui::DragFloat2(name.c_str(), glm::value_ptr(v));
-                        else if constexpr (std::is_same_v<ValueType, glm::vec3>) ImGui::ColorEdit3(name.c_str(), glm::value_ptr(v));
-                        else if constexpr (std::is_same_v<ValueType, glm::vec4>) ImGui::ColorEdit4(name.c_str(), glm::value_ptr(v));
-                        else if constexpr (std::is_same_v<ValueType, Assets::AssetHandle<Graphics::TextureAsset>>)
-                        {
-                            ImGui::Text("%s", name.c_str());
-                            Assets::AssetHandle<Graphics::TextureAsset> assetHandle = v;
-                            if(assetHandle.IsValid() && assetHandle->GetTextureID() != -1)
-                            {
-                                //ImGui::Image((ImTextureID)(intptr_t)v->GetTextureID(), ImVec2(64, 64));
-                                ImGui::Text("%s", assetHandle->GetPath().c_str());
-                            }
-                            else
-                                ImGui::TextDisabled("(no texture)");
-                        }
-                    }, value.m_Property);
-                }
+                DrawProperties(m_SelectedMaterial->GetProperties());
+                ImGui::Separator();
+                DrawProperties(m_SelectedMaterial->GetUniforms());
             }
             else
             {
@@ -84,6 +61,36 @@ namespace Forgex::Editor::UI::Panels
             }
 
             ImGui::EndChild();
+        }
+
+        void DrawProperties(std::unordered_map<std::string, Graphics::MaterialProperty>& map)
+        {
+            for(auto& [name, value] : map)
+            {
+                std::visit([&](auto& v)
+                {
+                    using ValueType = std::decay_t<decltype(v)>;
+
+                    if      constexpr (std::is_same_v<ValueType, float>)     ImGui::DragFloat(name.c_str(), &v, 0.01f);
+                    else if constexpr (std::is_same_v<ValueType, int>)       ImGui::DragInt(name.c_str(), &v);
+                    else if constexpr (std::is_same_v<ValueType, bool>)      ImGui::Checkbox(name.c_str(), &v);
+                    else if constexpr (std::is_same_v<ValueType, glm::vec2>) ImGui::DragFloat2(name.c_str(), glm::value_ptr(v));
+                    else if constexpr (std::is_same_v<ValueType, glm::vec3>) ImGui::ColorEdit3(name.c_str(), glm::value_ptr(v));
+                    else if constexpr (std::is_same_v<ValueType, glm::vec4>) ImGui::ColorEdit4(name.c_str(), glm::value_ptr(v));
+                    else if constexpr (std::is_same_v<ValueType, Assets::AssetHandle<Graphics::TextureAsset>>)
+                    {
+                        ImGui::Text("%s", name.c_str());
+                        Assets::AssetHandle<Graphics::TextureAsset> assetHandle = v;
+                        if(assetHandle.IsValid() && assetHandle->GetTextureID() != -1)
+                        {
+                            //ImGui::Image((ImTextureID)(intptr_t)v->GetTextureID(), ImVec2(64, 64));
+                            ImGui::Text("%s", assetHandle->GetPath().c_str());
+                        }
+                        else
+                            ImGui::TextDisabled("(no texture)");
+                    }
+                }, value.m_Property);
+            }
         }
 
     private:

@@ -30,8 +30,13 @@ namespace Forgex::Graphics
         const std::unordered_map<std::string, MaterialProperty>& GetProperties() const { return m_Properties; }
         std::unordered_map<std::string, MaterialProperty>& GetProperties() { return m_Properties; }
 
+        const std::unordered_map<std::string, MaterialProperty>& GetUniforms() const { return m_Uniforms; }
+        std::unordered_map<std::string, MaterialProperty>& GetUniforms() { return m_Uniforms; }
+
+
     private:
         Assets::AssetHandle<ShaderAsset> m_ShaderAsset;
         std::unordered_map<std::string, MaterialProperty> m_Properties;
+        std::unordered_map<std::string, MaterialProperty> m_Uniforms;
     };
 }
