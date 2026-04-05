@@ -11,10 +11,15 @@ namespace Forgex::Voxel::Utils
 
     void ChunkMesher::GenerateMesh(std::vector<float>& vertices, std::vector<int>& indices)
     {
-        vertices.reserve(m_Chunk->m_Samples.x * m_Chunk->m_Samples.y * m_Chunk->m_Samples.z * 5 * 3 * 6);
-        for (int z = 0; z < (int)m_Chunk->m_Samples.z - 1; z++)
-        for (int y = 0; y < (int)m_Chunk->m_Samples.y - 1; y++)
-        for (int x = 0; x < (int)m_Chunk->m_Samples.x - 1; x++)
+        // We calculate the worst case upper bound
+        // - 5: max number of triangles per cube
+        // - 3: vertices per triangle
+        // - 8: floats per vertex (3 position, 3 normal, 2 uv)
+        vertices.reserve(m_Chunk->m_Samples.x * m_Chunk->m_Samples.y * m_Chunk->m_Samples.z * 5 * 3 * 8);
+
+        for (int z = 1; z < (int)m_Chunk->m_Samples.z - 1; z++)
+        for (int x = 1; x < (int)m_Chunk->m_Samples.x - 1; x++)
+        for (int y = 1; y < (int)m_Chunk->m_Samples.y - 1; y++)
         {
             // We need the vectors to adhere to this order:
             //    4----5
@@ -24,16 +29,17 @@ namespace Forgex::Voxel::Utils
             //  |/   |/
             //  3----2
 
+            int lx = x - 1, ly = y - 1, lz = z - 1;
             glm::vec3 cornerPositions[8] =
             {
-                glm::vec3(x    , y    , z + 1), // 0
-                glm::vec3(x + 1, y    , z + 1), // 1
-                glm::vec3(x + 1, y    , z    ), // 2
-                glm::vec3(x    , y    , z    ), // 3
-                glm::vec3(x    , y + 1, z + 1), // 4
-                glm::vec3(x + 1, y + 1, z + 1), // 5
-                glm::vec3(x + 1, y + 1, z    ), // 6
-                glm::vec3(x    , y + 1, z    ), // 7
+                glm::vec3(lx    , ly    , lz + 1), // 0
+                glm::vec3(lx + 1, ly    , lz + 1), // 1
+                glm::vec3(lx + 1, ly    , lz    ), // 2
+                glm::vec3(lx    , ly    , lz    ), // 3
+                glm::vec3(lx    , ly + 1, lz + 1), // 4
+                glm::vec3(lx + 1, ly + 1, lz + 1), // 5
+                glm::vec3(lx + 1, ly + 1, lz    ), // 6
+                glm::vec3(lx    , ly + 1, lz    ), // 7
             };
 
             int cornerDensityValues[8] = 
@@ -122,25 +128,24 @@ namespace Forgex::Voxel::Utils
     {
         glm::vec3 worldPos = (m_Chunk->m_Position * m_Chunk->m_Size) + (vertexLocalPos * m_Chunk->m_SampleDensity);
         float delta = 127 * 0.05f;
-        float surfaceHeight;
 
         float dx = m_Generator->GetDensityValueAtPoint
             (
                 worldPos + 
-                glm::vec3(delta, 0, 0), m_Chunk->m_Size.y, &surfaceHeight) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(delta, 0, 0), m_Chunk->m_Size.y, &surfaceHeight
+                glm::vec3(delta, 0, 0), m_Chunk->m_Size.y, 0) -
+                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(delta, 0, 0), m_Chunk->m_Size.y, 0
             );
         float dy = m_Generator->GetDensityValueAtPoint
             (
                 worldPos + 
-                glm::vec3(0, delta, 0), m_Chunk->m_Size.y, &surfaceHeight) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, delta, 0), m_Chunk->m_Size.y, &surfaceHeight
+                glm::vec3(0, delta, 0), m_Chunk->m_Size.y, 0) -
+                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, delta, 0), m_Chunk->m_Size.y, 0
             );
         float dz = m_Generator->GetDensityValueAtPoint
             (
                 worldPos + 
-                glm::vec3(0, 0, delta), m_Chunk->m_Size.y, &surfaceHeight) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, 0, delta), m_Chunk->m_Size.y, &surfaceHeight
+                glm::vec3(0, 0, delta), m_Chunk->m_Size.y, 0) -
+                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, 0, delta), m_Chunk->m_Size.y, 0
             );
 
         return glm::normalize(-glm::vec3(dx, dy, dz));
@@ -154,7 +159,7 @@ namespace Forgex::Voxel::Utils
 
     uint64_t ChunkMesher::GetSampleID(glm::vec3 position)
     {
-        return position.x + (position.y * m_Chunk->m_Samples.x) + (position.z * m_Chunk->m_Samples.x * m_Chunk->m_Samples.y);
+        return position.y + (position.x * m_Chunk->m_Samples.y) + (position.z * m_Chunk->m_Samples.y * m_Chunk->m_Samples.x);
     }
 
     uint32_t ChunkMesher::PushVertex(std::vector<float>& vertices, glm::vec3 vertex, glm::vec3 normal)

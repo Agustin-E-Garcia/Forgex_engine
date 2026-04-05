@@ -10,7 +10,8 @@ namespace Forgex::Voxel::Utils
         TerrainGenerator(int seed);
         ~TerrainGenerator();
 
-        int8_t GetDensityValueAtPoint(glm::vec3 position, float topHeight, float* surfaceHeight);
+        float GetNoiseAtXZ(float x, float z);
+        int8_t GetDensityValueAtPoint(glm::vec3 position, float topHeight, float noise);
 
     private:
         int m_Seed;

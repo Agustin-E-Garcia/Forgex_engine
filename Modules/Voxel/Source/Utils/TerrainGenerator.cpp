@@ -11,12 +11,17 @@ namespace Forgex::Voxel::Utils
     }
     TerrainGenerator::~TerrainGenerator() {}
 
-    int8_t TerrainGenerator::GetDensityValueAtPoint(glm::vec3 position, float topHeight, float* surfaceHeight)
+    float TerrainGenerator::GetNoiseAtXZ(float x, float z)
+    {
+        return m_Noise.GetNoise(x, z);
+    }
+
+    int8_t TerrainGenerator::GetDensityValueAtPoint(glm::vec3 position, float topHeight, float noise)
     {
         topHeight = 127;
 
-        float noise = m_Noise.GetNoise(position.x, position.z);
-        float normalizedNoise = (noise + 1.0f) * 0.5f;
+        //float noise = m_Noise.GetNoise(position.x, position.z);
+        //float normalizedNoise = (noise + 1.0f) * 0.5f;
 
         float curve = glm::pow(noise, 2.0f);
 

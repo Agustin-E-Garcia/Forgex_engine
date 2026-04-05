@@ -39,44 +39,42 @@ namespace Forgex::Voxel::Systems
                 transform.m_Position = glm::vec3(x, y, z) * map.m_ChunkSize;
                 transform.m_Dirty = true;
 
-                chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(1.0f);
-                chunk.m_DensityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);
+                chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(2.0f);
+                chunk.m_DensityValues.reserve((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z);
 
                 renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Terrain.FMaterial");
 
-                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<std::vector<int8_t>>([this, &chunk]() { return SetupChunk(chunk); });
+                //chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<std::vector<int8_t>>([this, &chunk]() { return SetupChunk(chunk); });
+
+                {
+                    PROFILE_FUNCTION("SetupChunk()");
+                    SetupChunk(chunk);
+                    chunk.m_IsDirty = true;
+                }
 
                 map.m_Chunks.push_back(&chunk);
             }
         }
 
-        std::vector<int8_t> SetupChunk(Components::Chunk& chunk)
+        void SetupChunk(Components::Chunk& chunk)
         {
             Utils::TerrainGenerator generator = Utils::TerrainGenerator(chunk.m_NoiseSeed);
 
-            std::vector<int8_t> densityValues;
-            densityValues.resize((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z, 255);
-
             glm::vec3 worldOffset = chunk.m_Position * chunk.m_Size;
-            for(int i = 0; i < chunk.m_DensityValues.size(); i++)
+
+            for(int z = 0; z < chunk.m_Samples.z; z++)
+            for(int x = 0; x < chunk.m_Samples.x; x++)
             {
-                glm::vec3 worldPosition = worldOffset + GetSamplePosition(chunk, i);
-                float surfaceHeight;
-                densityValues[i] = generator.GetDensityValueAtPoint(worldPosition, chunk.m_Size.y, &surfaceHeight);
+                float noiseValue = generator.GetNoiseAtXZ(worldOffset.x + x, worldOffset.z + z);
+
+                for(int y = 0; y < chunk.m_Samples.y; y++)
+                {
+                    glm::vec3 worldPosition = worldOffset + glm::vec3(x, y, z);
+                    chunk.m_DensityValues.push_back(generator.GetDensityValueAtPoint(worldPosition, 127, noiseValue));
+                }
             }
-
-            return densityValues;
         }
 
-        glm::vec3 GetSamplePosition(Components::Chunk& chunk, int sampleID)
-        {
-            int x = sampleID % chunk.m_Samples.x;
-            int y = (sampleID / chunk.m_Samples.x) % chunk.m_Samples.y;
-            int z = sampleID / (chunk.m_Samples.x * chunk.m_Samples.y);
-
-            return glm::vec3(x, y, z) * chunk.m_SampleDensity;
-        }
- 
         const char* GetName() override { return "VoxelMapSetupSystem"; }
     };
 }
