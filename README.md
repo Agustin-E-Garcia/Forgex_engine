@@ -64,13 +64,18 @@ cd Build/Bin/Forgex
 
 ## Goals
 ### Short-Term Goals
-- Terrain destruction modifying the density field at runtime and remeshing affected chunks
-- Particle System with inspector window to change parameters in realtime
+- Worm-based cave generation
+- Mesh smoothing pass (vertex shader)
+- Day-night cycle
+- Player lantern (point light attached to player)
+- Crosshair UI
+- Sample scene showcasing engine capabilities
 - Adding back Windows Build support
-- Sample scene showing the capacity of the engine at the moment
-
+  
 ### Long-Term Goals
-- Loading complex meshes with hierarchy using Assimp
+- Particle system
+- Terrain destruction: modifying density field at runtime and remeshing affected chunks
+- Project Manager: separate engine build from project/game build
 - Game DLL loading — separate game code from engine runtime
 - Singleplayer horror demo built on top of the engine
 
