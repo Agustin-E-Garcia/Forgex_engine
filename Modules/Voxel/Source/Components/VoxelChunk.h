@@ -18,7 +18,7 @@ namespace Forgex::Voxel::Components
         std::vector<int8_t> m_DensityValues;
 
         bool m_IsDirty = true;
-        std::future<std::vector<int8_t>> m_DensityFuture;
+        std::future<void> m_DensityFuture;
         std::future<Graphics::MeshData> m_MeshingFuture;
     };
 }

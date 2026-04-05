@@ -16,7 +16,6 @@ namespace Forgex::Voxel::Systems
         {
             if(chunk.m_DensityFuture.valid() && chunk.m_DensityFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
             {
-                chunk.m_DensityValues = std::move(chunk.m_DensityFuture.get());
                 chunk.m_IsDirty = true;
             }
 
@@ -24,20 +23,7 @@ namespace Forgex::Voxel::Systems
 
             if(!chunk.m_MeshingFuture.valid())
             {
-                //chunk.m_MeshingFuture = GET_SERVICE(Core::JobManager)->Enqueue<Graphics::MeshData>([this, &chunk]() { return MeshChunk(chunk); });
-
-                PROFILE_FUNCTION("MeshAsset()");
-                Graphics::MeshData data = MeshChunk(chunk);
-                renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->CreateRuntimeAsset<Graphics::MeshAsset>
-                (
-                    "ChunkMesh",
-                    data.m_Vertices.data(),
-                    data.m_Vertices.size(),
-                    data.m_Indices.data(),
-                    data.m_Indices.size()
-                );
-
-                chunk.m_IsDirty = false;
+                chunk.m_MeshingFuture = GET_SERVICE(Core::JobManager)->Enqueue<Graphics::MeshData>([this, &chunk]() { return MeshChunk(chunk); });
                 return;
             }
 

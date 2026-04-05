@@ -132,20 +132,20 @@ namespace Forgex::Voxel::Utils
         float dx = m_Generator->GetDensityValueAtPoint
             (
                 worldPos + 
-                glm::vec3(delta, 0, 0), m_Chunk->m_Size.y, 0) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(delta, 0, 0), m_Chunk->m_Size.y, 0
+                glm::vec3(delta, 0, 0), m_Chunk->m_Size.y) -
+                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(delta, 0, 0), m_Chunk->m_Size.y
             );
         float dy = m_Generator->GetDensityValueAtPoint
             (
                 worldPos + 
-                glm::vec3(0, delta, 0), m_Chunk->m_Size.y, 0) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, delta, 0), m_Chunk->m_Size.y, 0
+                glm::vec3(0, delta, 0), m_Chunk->m_Size.y) -
+                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, delta, 0), m_Chunk->m_Size.y
             );
         float dz = m_Generator->GetDensityValueAtPoint
             (
                 worldPos + 
-                glm::vec3(0, 0, delta), m_Chunk->m_Size.y, 0) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, 0, delta), m_Chunk->m_Size.y, 0
+                glm::vec3(0, 0, delta), m_Chunk->m_Size.y) -
+                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, 0, delta), m_Chunk->m_Size.y
             );
 
         return glm::normalize(-glm::vec3(dx, dy, dz));

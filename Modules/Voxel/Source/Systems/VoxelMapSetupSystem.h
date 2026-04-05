@@ -18,13 +18,13 @@ namespace Forgex::Voxel::Systems
             entt::entity entity = registry.create();
             Components::VoxelMap& map = registry.emplace<Components::VoxelMap>(entity);
 
-            glm::vec3 chunks = map.m_MapArea / map.m_ChunkSize;
+            glm::vec3 chunks = (map.m_MapArea / map.m_ChunkSize) * 0.5f;
             int chunkCount = chunks.x * chunks.y * chunks.z;
             map.m_Chunks.reserve(chunkCount);
 
-            for(int z = 0; z < chunks.z; z++)
-            for(int y = -(chunks.y *0.5f); y < chunks.y * 0.5f; y++)
-            for(int x = 0; x < chunks.x; x++)
+            for(int z = -chunks.z; z < chunks.z; z++)
+            for(int y = -chunks.y; y < chunks.y; y++)
+            for(int x = -chunks.x; x < chunks.x; x++)
             {
                 entt::entity ent = registry.create();
                 Core::Components::Transform& transform = registry.emplace<Core::Components::Transform>(ent);
@@ -35,6 +35,7 @@ namespace Forgex::Voxel::Systems
                 chunk.m_Size = map.m_ChunkSize;
                 chunk.m_SampleDensity = map.m_SampleDensity;
                 chunk.m_Cutoff = map.m_Cutoff;
+                chunk.m_NoiseSeed = map.m_Seed;
 
                 transform.m_Position = glm::vec3(x, y, z) * map.m_ChunkSize;
                 transform.m_Dirty = true;
@@ -44,13 +45,7 @@ namespace Forgex::Voxel::Systems
 
                 renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Terrain.FMaterial");
 
-                //chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<std::vector<int8_t>>([this, &chunk]() { return SetupChunk(chunk); });
-
-                {
-                    PROFILE_FUNCTION("SetupChunk()");
-                    SetupChunk(chunk);
-                    chunk.m_IsDirty = true;
-                }
+                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<void>([this, &chunk]() { return SetupChunk(chunk); });
 
                 map.m_Chunks.push_back(&chunk);
             }

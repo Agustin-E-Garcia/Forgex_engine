@@ -11,6 +11,7 @@ namespace Forgex::Voxel::Utils
         ~TerrainGenerator();
 
         float GetNoiseAtXZ(float x, float z);
+        int8_t GetDensityValueAtPoint(glm::vec3 position, float topHeight);
         int8_t GetDensityValueAtPoint(glm::vec3 position, float topHeight, float noise);
 
     private:
