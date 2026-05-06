@@ -1,9 +1,10 @@
 #pragma once
+#include "../GraphicsExports.h"
 #include <glm/glm.hpp>
 
 namespace Forgex::Graphics::Components
 {
-    struct Camera
+    struct GRAPHICS_API Camera
     {
         bool m_IsActiveCamera = true;
         float m_FieldOfView = 80.0f;

@@ -1,10 +1,11 @@
 #pragma once
+#include "SceneExports.h"
 #include <ForgexCore.h>
 #include "Scene.h"
 
 namespace Forgex::Scene
 {
-    class SceneManager
+    class SCENE_API SceneManager
     {
     public:
         SceneManager(Core::Registry<Core::Interfaces::ISystem>& systemRegistry);

@@ -1,9 +1,10 @@
 #pragma once
+#include "SceneExports.h"
 #include <ForgexCore.h>
 
 namespace Forgex::Scene
 {
-    class SceneModule : public Core::Interfaces::IModule
+    class SCENE_API SceneModule : public Core::Interfaces::IModule
     {
     public:
         void Init(Core::EngineCore& core) override;

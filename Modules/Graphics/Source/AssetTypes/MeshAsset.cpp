@@ -2,6 +2,7 @@
 #include "../Utils/BufferManager.h"
 
 #include <ForgexFiles.h>
+#include <GL/glew.h>
 
 namespace Forgex::Graphics
 {

@@ -1,9 +1,10 @@
 #pragma once
+#include "EngineExports.h"
 #include <ForgexCore.h>
 
 namespace Forgex::Engine
 {
-    class Engine
+    class ENGINE_API Engine
     {
     public:
         Engine();

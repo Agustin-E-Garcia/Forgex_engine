@@ -1,4 +1,5 @@
 #pragma once
+#include "../DebugExports.h"
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -11,7 +12,7 @@ namespace Forgex::Debug
         std::string m_Description;
     };
 
-    class CommandHandler
+    class DEBUG_API CommandHandler
     {
     public:
         CommandHandler();

@@ -1,8 +1,9 @@
 #pragma once
+#include "EditorExports.h"
 
 namespace Forgex::Editor
 {
-    class Editor
+    class EDITOR_API Editor
     {
     public:
         Editor();

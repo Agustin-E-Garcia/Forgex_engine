@@ -1,4 +1,5 @@
 #pragma once
+#include "../DebugExports.h"
 #include <memory>
 #include <string>
 #include <format>
@@ -16,7 +17,7 @@ namespace Forgex::Debug
         Critical
     };
 
-    class LogManager
+    class DEBUG_API LogManager
     {
     public:
         LogManager();

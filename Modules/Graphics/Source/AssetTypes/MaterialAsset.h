@@ -1,4 +1,5 @@
 #pragma once
+#include "../GraphicsExports.h"
 #include <ForgexAssets.h>
 #include <string>
 #include <unordered_map>
@@ -15,7 +16,7 @@ namespace Forgex::Graphics
         std::variant<float, int, bool, glm::vec2, glm::vec3, glm::vec4, Assets::AssetHandle<TextureAsset>> m_Property;
     };
 
-    class MaterialAsset : public Assets::Asset
+    class GRAPHICS_API MaterialAsset : public Assets::Asset
     {
     public:
         MaterialAsset(std::string assetPath) : Assets::Asset(assetPath) {}

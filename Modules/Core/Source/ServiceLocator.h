@@ -1,4 +1,5 @@
 #pragma once
+#include "CoreExports.h"
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
@@ -7,7 +8,7 @@ namespace Forgex::Core
 {
     class EngineCore;
 
-    class ServiceLocator
+    class CORE_API ServiceLocator
     {
     public:
         static ServiceLocator& Get();

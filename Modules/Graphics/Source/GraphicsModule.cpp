@@ -18,6 +18,10 @@ namespace Forgex::Graphics
             const char* error = (const char*)glewGetErrorString(result);
             LOG_CORE(Debug::LogLevel::Critical, "Failed to initialize GLEW: {0}", error);
         }
+        else
+        {
+            LOG_CORE(Debug::LogLevel::Info, "GLEW initialized successfully");
+        }
 
         m_VertexBufferObjectID = Utils::Buffers::GenerateVAO();
         m_UniformBufferObjectID = Utils::Buffers::GenerateUBO(sizeof(Resources::RenderFrameData));

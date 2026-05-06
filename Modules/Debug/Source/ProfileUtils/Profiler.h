@@ -1,4 +1,5 @@
 #pragma once
+#include "../DebugExports.h"
 #include <chrono>
 #include <string>
 #include <unordered_map>
@@ -11,7 +12,7 @@ namespace Forgex::Debug
         int m_Samples = 0;
     };
 
-    class Profiler
+    class DEBUG_API Profiler
     {
     public:
         Profiler();
@@ -25,7 +26,7 @@ namespace Forgex::Debug
         std::unordered_map<std::string, ProfileResult> m_Results;
     };
 
-    class ProfileGatherer
+    class DEBUG_API ProfileGatherer
     {
     public:
         ProfileGatherer(Profiler* profiler, const std::string& name);

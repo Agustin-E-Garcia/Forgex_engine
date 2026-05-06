@@ -1,4 +1,5 @@
 #pragma once
+#include "AssetsExports.h"
 #include "Resources/Asset.h"
 #include <format>
 #include <unordered_map>
@@ -10,7 +11,7 @@ namespace Forgex::Assets
 {
     template<class T> class AssetHandle;
 
-    class AssetManager
+    class ASSETS_API AssetManager
     {
     public:
         AssetManager();

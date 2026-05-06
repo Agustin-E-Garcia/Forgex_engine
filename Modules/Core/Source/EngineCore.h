@@ -1,4 +1,5 @@
 #pragma once
+#include "CoreExports.h"
 #include "Layer/Event/EventList.h"
 #include "Registry.h"
 #include "Interfaces/IWindow.h"
@@ -8,7 +9,7 @@
 
 namespace Forgex::Core
 {
-    class EngineCore
+    class CORE_API EngineCore
     {
     public:
         void Run();

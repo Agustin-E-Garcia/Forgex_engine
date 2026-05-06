@@ -12,7 +12,7 @@ namespace Forgex::Graphics
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
-        //glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
         m_Window = glfwCreateWindow(width, height, title, NULL, NULL);
         if (m_Window == NULL) LOG_CORE(Debug::LogLevel::Critical, "Failed to open GLFW window");

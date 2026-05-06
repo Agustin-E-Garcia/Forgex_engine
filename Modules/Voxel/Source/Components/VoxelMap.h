@@ -1,11 +1,12 @@
 #pragma once
+#include "../VoxelExports.h"
 #include "VoxelChunk.h"
 #include <glm/glm.hpp>
 #include <vector>
 
 namespace Forgex::Voxel::Components
 {
-    struct VoxelMap
+    struct VOXEL_API VoxelMap
     {
         glm::vec3 m_MapArea = glm::vec3(256.0f);
         glm::vec3 m_ChunkSize = glm::vec3(32.0f);

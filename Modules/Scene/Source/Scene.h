@@ -1,10 +1,11 @@
 #pragma once
+#include "SceneExports.h"
 #include <ForgexCore.h>
 #include <entt.hpp>
 
 namespace Forgex::Scene
 {
-    class Scene
+    class SCENE_API Scene
     {
     public:
         Scene(const char* name);

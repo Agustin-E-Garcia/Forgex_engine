@@ -1,4 +1,5 @@
 #include <ForgexEditor.h>
+#include <iostream>
 
 int main()
 {

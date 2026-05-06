@@ -1,4 +1,5 @@
 #pragma once
+#include "../GraphicsExports.h"
 #include <ForgexAssets.h>
 #include <string>
 
@@ -10,7 +11,7 @@ namespace Forgex::Graphics
         Cubemap = 1
     };
 
-    class TextureAsset : public Assets::Asset
+    class GRAPHICS_API TextureAsset : public Assets::Asset
     {
     public:
         TextureAsset(std::string assetPath) : Assets::Asset(assetPath), m_TextureID(-1) {}

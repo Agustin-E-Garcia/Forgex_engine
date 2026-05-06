@@ -1,4 +1,5 @@
 #pragma once
+#include "../GraphicsExports.h"
 #include <string>
 #include <ForgexAssets.h>
 
@@ -10,7 +11,7 @@ namespace Forgex::Graphics
         std::vector<int> m_Indices;
     };
 
-    class MeshAsset : public Assets::Asset
+    class GRAPHICS_API MeshAsset : public Assets::Asset
     {
     public:
         MeshAsset(std::string assetPath) : Assets::Asset(assetPath) {}

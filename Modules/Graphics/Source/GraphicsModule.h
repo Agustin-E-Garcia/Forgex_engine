@@ -1,9 +1,10 @@
 #pragma once
+#include "GraphicsExports.h"
 #include <ForgexCore.h>
 
 namespace Forgex::Graphics
 {
-    class GraphicsModule : public Core::Interfaces::IModule
+    class GRAPHICS_API GraphicsModule : public Core::Interfaces::IModule
     {
     public:
         void Init(Core::EngineCore& core) override;

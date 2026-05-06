@@ -1,8 +1,9 @@
 #include "BufferManager.h"
+#include <GL/glew.h>
 
 namespace Forgex::Graphics::Utils::Buffers
 {
-    int GenerateBuffer(GLuint type, int size, const void* data)
+    int GenerateBuffer(unsigned int type, int size, const void* data)
     {
         unsigned int buffer;
         glGenBuffers(1, &buffer);
@@ -11,7 +12,7 @@ namespace Forgex::Graphics::Utils::Buffers
         return buffer;
     }
 
-    void DeleteBuffer(unsigned bufferID)
+    void DeleteBuffer(unsigned int bufferID)
     {
         glDeleteBuffers(1, &bufferID);
     }

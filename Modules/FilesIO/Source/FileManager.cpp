@@ -7,8 +7,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
+//#define TINYOBJLOADER_IMPLEMENTATION
+//#include <tiny_obj_loader.h>
 
 using json = nlohmann::json;
 
@@ -38,7 +38,7 @@ namespace Forgex::Files
     }
 
     bool ReadMeshFile(const char* filePath, nlohmann::json& data)
-    {
+    {/*
         tinyobj::ObjReader reader;
 
         if(!reader.ParseFromFile(std::string(filePath))) return false;
@@ -90,8 +90,8 @@ namespace Forgex::Files
         data["vertexCount"] = vertices.size();
         data["indices"] = indices;
         data["indexCount"] = indices.size();
-
-        return true;
+        */
+        return false;
     }
 
     bool ReadFile(const char* filePath, std::string& buffer)

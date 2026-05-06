@@ -1,4 +1,9 @@
 #include "SceneRenderer.h"
+
+#ifdef _WIN32
+    #include <Windows.h>
+#endif
+
 #include <GL/glew.h>
 
 #include <ForgexCore.h>

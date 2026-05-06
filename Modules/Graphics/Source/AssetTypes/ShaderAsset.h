@@ -1,10 +1,11 @@
 #pragma once
+#include "../GraphicsExports.h"
 #include <string>
 #include <ForgexAssets.h>
 
 namespace Forgex::Graphics
 {
-    class ShaderAsset : public Assets::Asset
+    class GRAPHICS_API ShaderAsset : public Assets::Asset
     {
     public:
         ShaderAsset(std::string assetPath) : Assets::Asset(assetPath) {}
