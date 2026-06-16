@@ -3,11 +3,15 @@
 #include "../Source/Interfaces/IModule.h"
 #include "../Source/Interfaces/ISystem.h"
 #include "../Source/Interfaces/ILayer.h"
+#include "../Source/Interfaces/IPipelineStep.h"
+#include "../Source/Interfaces/ISettings.h"
 
 #include "../Source/Registry.h"
 #include "../Source/EngineCore.h"
 #include "../Source/ServiceLocator.h"
 #include "../Source/JobManager.h"
+#include "../Source/Settings/ProjectSettings.h"
+#include "../Source/Pipeline.h"
 
 #include "../Source/Components/Transform.h"
 

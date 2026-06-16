@@ -3,6 +3,7 @@
 #include "ServiceLocator.h"
 #include "JobManager.h"
 #include "Systems/TransformSystem.h"
+#include "Settings/ProjectSettings.h"
 
 #include <ForgexDebug.h>
 #include <ForgexFiles.h>
@@ -52,8 +53,8 @@ namespace Forgex::Core
 
     void EngineCore::Init()
     {
+        ServiceLocator::Get().Register<Settings::ProjectSettings>();
         ServiceLocator::Get().Register<Debug::DebugManager>();
-
         ServiceLocator::Get().Register<JobManager>(1);
 
         RegisterSystem<Systems::TransformSystem>();

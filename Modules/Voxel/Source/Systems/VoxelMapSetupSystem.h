@@ -2,10 +2,10 @@
 #include <ForgexCore.h>
 #include <ForgexGraphics.h>
 #include <ForgexAssets.h>
-#include <cstdint>
 
 #include "../Components/VoxelMap.h"
-#include "../Utils/TerrainGenerator.h"
+#include "../VoxelSettings.h"
+
 #include "glm/fwd.hpp"
 
 namespace Forgex::Voxel::Systems
@@ -45,31 +45,16 @@ namespace Forgex::Voxel::Systems
 
                 renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Terrain.FMaterial");
 
-                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<void>([this, &chunk]() { return SetupChunk(chunk); });
+                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<void>([this, &chunk] 
+                    {
+                        return GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>()->GetVoxelPipeline().Execute(chunk);
+                    }
+                );
 
                 map.m_Chunks.push_back(&chunk);
             }
         }
 
-        void SetupChunk(Components::Chunk& chunk)
-        {
-            Utils::TerrainGenerator generator = Utils::TerrainGenerator(chunk.m_NoiseSeed);
-
-            glm::vec3 worldOffset = chunk.m_Position * chunk.m_Size;
-
-            for(int z = 0; z < chunk.m_Samples.z; z++)
-            for(int x = 0; x < chunk.m_Samples.x; x++)
-            {
-                float noiseValue = generator.GetNoiseAtXZ(worldOffset.x + x, worldOffset.z + z);
-
-                for(int y = 0; y < chunk.m_Samples.y; y++)
-                {
-                    glm::vec3 worldPosition = worldOffset + glm::vec3(x, y, z);
-                    chunk.m_DensityValues.push_back(generator.GetDensityValueAtPoint(worldPosition, 127, noiseValue));
-                }
-            }
-        }
-
-        const char* GetName() override { return "VoxelMapSetupSystem"; }
+       const char* GetName() override { return "VoxelMapSetupSystem"; }
     };
 }

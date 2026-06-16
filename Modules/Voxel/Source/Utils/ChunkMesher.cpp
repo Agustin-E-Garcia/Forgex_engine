@@ -6,7 +6,7 @@
 
 namespace Forgex::Voxel::Utils
 {
-    ChunkMesher::ChunkMesher(const Components::Chunk* chunk, TerrainGenerator* generator) : m_Chunk(chunk), m_Generator(generator) {}
+    ChunkMesher::ChunkMesher(const Components::Chunk* chunk) : m_Chunk(chunk) {}
     ChunkMesher::~ChunkMesher() {}
 
     void ChunkMesher::GenerateMesh(std::vector<float>& vertices, std::vector<int>& indices)
@@ -124,32 +124,45 @@ namespace Forgex::Voxel::Utils
         return vertexIndex;
     }
 
+    // TODO: Claude wrote this, for now I leave it to test other stuff, but I need to still check this code and make sure I understand what's happening here
     glm::vec3 ChunkMesher::CalculateSampleGradientNormal(glm::vec3 vertexLocalPos)
     {
-        glm::vec3 worldPos = (m_Chunk->m_Position * m_Chunk->m_Size) + (vertexLocalPos * m_Chunk->m_SampleDensity);
-        float delta = 127 * 0.05f;
-
-        float dx = m_Generator->GetDensityValueAtPoint
-            (
-                worldPos + 
-                glm::vec3(delta, 0, 0), m_Chunk->m_Size.y) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(delta, 0, 0), m_Chunk->m_Size.y
-            );
-        float dy = m_Generator->GetDensityValueAtPoint
-            (
-                worldPos + 
-                glm::vec3(0, delta, 0), m_Chunk->m_Size.y) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, delta, 0), m_Chunk->m_Size.y
-            );
-        float dz = m_Generator->GetDensityValueAtPoint
-            (
-                worldPos + 
-                glm::vec3(0, 0, delta), m_Chunk->m_Size.y) -
-                m_Generator->GetDensityValueAtPoint(worldPos - glm::vec3(0, 0, delta), m_Chunk->m_Size.y
-            );
+        // Central differences over the chunk's density grid. The vertex usually sits between
+        // samples, so we trilinearly interpolate the density field at each offset.
+        float dx = SampleDensity(vertexLocalPos + glm::vec3(1, 0, 0)) - SampleDensity(vertexLocalPos - glm::vec3(1, 0, 0));
+        float dy = SampleDensity(vertexLocalPos + glm::vec3(0, 1, 0)) - SampleDensity(vertexLocalPos - glm::vec3(0, 1, 0));
+        float dz = SampleDensity(vertexLocalPos + glm::vec3(0, 0, 1)) - SampleDensity(vertexLocalPos - glm::vec3(0, 0, 1));
 
         return glm::normalize(-glm::vec3(dx, dy, dz));
     }
+
+    float ChunkMesher::SampleDensity(glm::vec3 localPos)
+    {
+        // Clamp to the valid sample range so neighbour lookups never go out of bounds.
+        glm::vec3 maxPos = glm::vec3(m_Chunk->m_Samples) - glm::vec3(1.0f);
+        localPos = glm::clamp(localPos, glm::vec3(0.0f), maxPos);
+
+        glm::ivec3 p0 = glm::ivec3(glm::floor(localPos));
+        glm::ivec3 p1 = glm::min(p0 + 1, glm::ivec3(maxPos));
+        glm::vec3 f = localPos - glm::vec3(p0);
+
+        auto d = [&](int x, int y, int z)
+        {
+            return (float)m_Chunk->m_DensityValues[GetSampleID(glm::vec3(x, y, z))];
+        };
+
+        // Trilinear interpolation between the eight surrounding samples.
+        float c00 = glm::mix(d(p0.x, p0.y, p0.z), d(p1.x, p0.y, p0.z), f.x);
+        float c10 = glm::mix(d(p0.x, p1.y, p0.z), d(p1.x, p1.y, p0.z), f.x);
+        float c01 = glm::mix(d(p0.x, p0.y, p1.z), d(p1.x, p0.y, p1.z), f.x);
+        float c11 = glm::mix(d(p0.x, p1.y, p1.z), d(p1.x, p1.y, p1.z), f.x);
+
+        float c0 = glm::mix(c00, c10, f.y);
+        float c1 = glm::mix(c01, c11, f.y);
+
+        return glm::mix(c0, c1, f.z);
+    }
+    // TODO
 
     glm::vec3 ChunkMesher::Interpolate(glm::vec3 posA, glm::vec3 posB, int8_t valA, int8_t valB)
     {

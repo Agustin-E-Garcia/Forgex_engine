@@ -4,7 +4,6 @@
 #include <ForgexFiles.h>
 
 #include "../Components/VoxelChunk.h"
-#include "../Utils/TerrainGenerator.h"
 #include "../Utils/ChunkMesher.h"
 
 namespace Forgex::Voxel::Systems
@@ -46,8 +45,7 @@ namespace Forgex::Voxel::Systems
 
         Graphics::MeshData MeshChunk(const Components::Chunk& chunk)
         {
-            Utils::TerrainGenerator generator = Utils::TerrainGenerator(chunk.m_NoiseSeed);
-            Utils::ChunkMesher mesher = Utils::ChunkMesher(&chunk, &generator);
+            Utils::ChunkMesher mesher = Utils::ChunkMesher(&chunk);
 
             Graphics::MeshData data;
             mesher.GenerateMesh(data.m_Vertices, data.m_Indices);
