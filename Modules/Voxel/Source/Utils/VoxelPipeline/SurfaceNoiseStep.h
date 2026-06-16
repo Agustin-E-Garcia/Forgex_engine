@@ -1,12 +1,13 @@
 #pragma once
 #include <ForgexCore.h>
 #include <FastNoiseLite.h>
+#include "../../VoxelExports.h"
 
 namespace Forgex::Voxel::Components { class Chunk; }
 
 namespace Forgex::Voxel::Utils::TerrainSteps
 {
-    class SurfaceNoiseStep : public Core::Interfaces::IPipelineStep<Components::Chunk>
+    class VOXEL_API SurfaceNoiseStep : public Core::Interfaces::IPipelineStep<Components::Chunk>
     {
     public:
         SurfaceNoiseStep(int seed);

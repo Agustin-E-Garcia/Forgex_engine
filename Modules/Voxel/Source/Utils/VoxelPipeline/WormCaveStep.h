@@ -2,6 +2,7 @@
 #include <ForgexCore.h>
 #include <vector>
 #include <glm/glm.hpp>
+#include "../../VoxelExports.h"
 
 namespace Forgex::Voxel::Components { class Chunk; }
 
@@ -13,7 +14,7 @@ namespace Forgex::Voxel::Utils::TerrainSteps
         float m_Radius;
     };
 
-    class WormCaveStep : public Core::Interfaces::IPipelineStep<Components::Chunk>
+    class VOXEL_API WormCaveStep : public Core::Interfaces::IPipelineStep<Components::Chunk>
     {
     public:
         WormCaveStep();
