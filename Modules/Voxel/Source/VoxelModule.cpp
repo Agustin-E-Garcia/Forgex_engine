@@ -2,7 +2,7 @@
 #include <ForgexCore.h>
 
 #include "VoxelSettings.h"
-#include "Systems/VoxelMapSetupSystem.h"
+#include "Systems/ChunkManagementSystem.h"
 #include "Systems/VoxelTerrainSystem.h"
 
 namespace Forgex::Voxel
@@ -11,7 +11,7 @@ namespace Forgex::Voxel
     {
         GET_SERVICE(Core::Settings::ProjectSettings)->RegisterSettings<VoxelSettings>();
 
-        core.RegisterSystem<Systems::VoxelMapSetupSystem>();
+        core.RegisterSystem<Systems::ChunkManagementSystem>();
         core.RegisterSystem<Systems::VoxelTerrainSystem>();
     }
 

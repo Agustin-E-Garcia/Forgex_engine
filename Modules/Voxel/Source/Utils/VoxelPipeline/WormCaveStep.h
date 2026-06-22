@@ -17,7 +17,7 @@ namespace Forgex::Voxel::Utils::TerrainSteps
     class VOXEL_API WormCaveStep : public Core::Interfaces::IPipelineStep<Components::Chunk>
     {
     public:
-        WormCaveStep();
+        WormCaveStep(glm::vec3 mapArea);
         void Execute(Components::Chunk& chunk) override;
 
     private:

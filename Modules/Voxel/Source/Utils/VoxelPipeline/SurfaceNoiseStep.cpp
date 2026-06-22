@@ -31,11 +31,11 @@ namespace Forgex::Voxel::Utils::TerrainSteps
         for(int z = 0; z < chunk.m_Samples.z; z++)
         for(int x = 0; x < chunk.m_Samples.x; x++)
         {
-            float noiseValue = m_Noise.GetNoise(worldOffset.x + x, worldOffset.z + z);
+            float noiseValue = m_Noise.GetNoise(worldOffset.x + x * chunk.m_SampleDensity, worldOffset.z + z * chunk.m_SampleDensity);
 
             for(int y = 0; y < chunk.m_Samples.y; y++)
             {
-                glm::vec3 worldPosition = worldOffset + glm::vec3(x, y, z);
+                glm::vec3 worldPosition = worldOffset + glm::vec3(x, y, z) * chunk.m_SampleDensity;
                 chunk.m_DensityValues.push_back(GetDensityValueAtPoint(worldPosition, 127, noiseValue));
             }
         }

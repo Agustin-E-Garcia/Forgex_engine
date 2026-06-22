@@ -10,7 +10,7 @@
 
 namespace Forgex::Voxel::Systems
 {
-    class VoxelMapSetupSystem : public Core::Interfaces::ISystem
+    class ChunkManagementSystem : public Core::Interfaces::ISystem
     {
     public:
         void Setup(entt::registry &registry) override
@@ -53,6 +53,10 @@ namespace Forgex::Voxel::Systems
 
                 map.m_Chunks.push_back(&chunk);
             }
+        }
+
+        void Update(entt::registry& registry, float deltaTime) override
+        {
         }
 
        const char* GetName() override { return "VoxelMapSetupSystem"; }

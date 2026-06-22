@@ -14,7 +14,7 @@ namespace Forgex::Voxel
         VoxelSettings()
         {
             m_VoxelPipeline.RegisterStep<Utils::TerrainSteps::SurfaceNoiseStep>(m_NoiseSeed);
-            m_VoxelPipeline.RegisterStep<Utils::TerrainSteps::WormCaveStep>();
+            //m_VoxelPipeline.RegisterStep<Utils::TerrainSteps::WormCaveStep>(glm::vec3(256.0f));
         }
 
         const Core::Pipeline<Components::Chunk>& GetVoxelPipeline() { return m_VoxelPipeline; }

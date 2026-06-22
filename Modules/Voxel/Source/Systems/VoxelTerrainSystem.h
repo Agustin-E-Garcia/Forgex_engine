@@ -15,6 +15,7 @@ namespace Forgex::Voxel::Systems
         {
             if(chunk.m_DensityFuture.valid() && chunk.m_DensityFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
             {
+                chunk.m_DensityFuture.get();
                 chunk.m_IsDirty = true;
             }
 
