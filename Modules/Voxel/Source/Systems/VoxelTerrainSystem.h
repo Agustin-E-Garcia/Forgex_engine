@@ -2,8 +2,9 @@
 #include <ForgexCore.h>
 #include <ForgexGraphics.h>
 #include <ForgexFiles.h>
+#include <algorithm>
 
-#include "../Components/VoxelChunk.h"
+#include "../Components/Chunk.h"
 #include "../Utils/ChunkMesher.h"
 
 namespace Forgex::Voxel::Systems
@@ -15,7 +16,7 @@ namespace Forgex::Voxel::Systems
         {
             if(chunk.m_DensityFuture.valid() && chunk.m_DensityFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
             {
-                chunk.m_DensityFuture.get();
+                chunk.m_Data = chunk.m_DensityFuture.get();
                 chunk.m_IsDirty = true;
             }
 
@@ -23,7 +24,7 @@ namespace Forgex::Voxel::Systems
 
             if(!chunk.m_MeshingFuture.valid())
             {
-                chunk.m_MeshingFuture = GET_SERVICE(Core::JobManager)->Enqueue<Graphics::MeshData>([this, &chunk]() { return MeshChunk(chunk); });
+                chunk.m_MeshingFuture = GET_SERVICE(Core::JobManager)->Enqueue<Graphics::MeshData>([this, data = chunk.m_Data]() { return MeshChunk(data); });
                 return;
             }
 
@@ -44,9 +45,9 @@ namespace Forgex::Voxel::Systems
             }
         }
 
-        Graphics::MeshData MeshChunk(const Components::Chunk& chunk)
+        Graphics::MeshData MeshChunk(const Components::ChunkData chunk)
         {
-            Utils::ChunkMesher mesher = Utils::ChunkMesher(&chunk);
+            Utils::ChunkMesher mesher = Utils::ChunkMesher(chunk);
 
             Graphics::MeshData data;
             mesher.GenerateMesh(data.m_Vertices, data.m_Indices);
@@ -54,6 +55,6 @@ namespace Forgex::Voxel::Systems
             return data;
         }
 
-        const char* GetName() override { return "VoxelTErrainSystem"; }
+        const char* GetName() override { return "VoxelTerrainSystem"; }
     };
 }

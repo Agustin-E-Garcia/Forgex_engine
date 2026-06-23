@@ -1,4 +1,5 @@
 #include "ChunkMesher.h"
+#include "../VoxelSettings.h"
 #include "../Resources/MarchingCubesTable.h"
 
 #include <ForgexCore.h>
@@ -6,20 +7,25 @@
 
 namespace Forgex::Voxel::Utils
 {
-    ChunkMesher::ChunkMesher(const Components::Chunk* chunk) : m_Chunk(chunk) {}
+    ChunkMesher::ChunkMesher(const Components::ChunkData& chunk) : m_Chunk(chunk)
+    {
+        m_Samples = GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>()->GetChunkSampleCount() + glm::vec3(2.0f);
+    }
     ChunkMesher::~ChunkMesher() {}
 
     void ChunkMesher::GenerateMesh(std::vector<float>& vertices, std::vector<int>& indices)
     {
+        const VoxelSettings* settings = GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>();
+
         // We calculate the worst case upper bound
         // - 5: max number of triangles per cube
         // - 3: vertices per triangle
         // - 8: floats per vertex (3 position, 3 normal, 2 uv)
-        vertices.reserve(m_Chunk->m_Samples.x * m_Chunk->m_Samples.y * m_Chunk->m_Samples.z * 5 * 3 * 8);
+        vertices.reserve(m_Samples.x * m_Samples.y * m_Samples.z * 5 * 3 * 8);
 
-        for (int z = 1; z < (int)m_Chunk->m_Samples.z - 1; z++)
-        for (int x = 1; x < (int)m_Chunk->m_Samples.x - 1; x++)
-        for (int y = 1; y < (int)m_Chunk->m_Samples.y - 1; y++)
+        for (int z = 1; z < (int)m_Samples.z - 1; z++)
+        for (int x = 1; x < (int)m_Samples.x - 1; x++)
+        for (int y = 1; y < (int)m_Samples.y - 1; y++)
         {
             // We need the vectors to adhere to this order:
             //    4----5
@@ -44,20 +50,20 @@ namespace Forgex::Voxel::Utils
 
             int cornerDensityValues[8] = 
             {
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[0])], // 0
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[1])], // 1
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[2])], // 2
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[3])], // 3
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[4])], // 4
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[5])], // 5
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[6])], // 6
-                m_Chunk->m_DensityValues[GetSampleID(cornerPositions[7])], // 7
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[0])], // 0
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[1])], // 1
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[2])], // 2
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[3])], // 3
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[4])], // 4
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[5])], // 5
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[6])], // 6
+                m_Chunk.m_DensityValues[GetSampleID(cornerPositions[7])], // 7
             };
 
             int caseID = 0;
             for (int i = 0; i < 8; i++)
             {
-                if(cornerDensityValues[i] < m_Chunk->m_Cutoff) continue;
+                if(cornerDensityValues[i] < settings->GetMapSurfaceCutoff()) continue;
                 caseID |= (1 << i);
             }
 
@@ -116,9 +122,9 @@ namespace Forgex::Voxel::Utils
         if(m_VertexToIndexMap.contains(mapKey))
             return m_VertexToIndexMap[mapKey];
 
-        glm::vec3 vertex = Interpolate(posA, posB, m_Chunk->m_DensityValues[idA], m_Chunk->m_DensityValues[idB]);
+        glm::vec3 vertex = Interpolate(posA, posB, m_Chunk.m_DensityValues[idA], m_Chunk.m_DensityValues[idB]);
         glm::vec3 normal = CalculateSampleGradientNormal(vertex);
-        uint32_t vertexIndex = PushVertex(vertices, vertex * m_Chunk->m_SampleDensity, normal);
+        uint32_t vertexIndex = PushVertex(vertices, vertex * GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>()->GetChunkSampleDensity(), normal);
         m_VertexToIndexMap[mapKey] = vertexIndex;
 
         return vertexIndex;
@@ -139,7 +145,7 @@ namespace Forgex::Voxel::Utils
     float ChunkMesher::SampleDensity(glm::vec3 localPos)
     {
         // Clamp to the valid sample range so neighbour lookups never go out of bounds.
-        glm::vec3 maxPos = glm::vec3(m_Chunk->m_Samples) - glm::vec3(1.0f);
+        glm::vec3 maxPos = glm::vec3(m_Samples) - glm::vec3(1.0f);
         localPos = glm::clamp(localPos, glm::vec3(0.0f), maxPos);
 
         glm::ivec3 p0 = glm::ivec3(glm::floor(localPos));
@@ -148,7 +154,7 @@ namespace Forgex::Voxel::Utils
 
         auto d = [&](int x, int y, int z)
         {
-            return (float)m_Chunk->m_DensityValues[GetSampleID(glm::vec3(x, y, z))];
+            return (float)m_Chunk.m_DensityValues[GetSampleID(glm::vec3(x, y, z))];
         };
 
         // Trilinear interpolation between the eight surrounding samples.
@@ -166,13 +172,13 @@ namespace Forgex::Voxel::Utils
 
     glm::vec3 ChunkMesher::Interpolate(glm::vec3 posA, glm::vec3 posB, int8_t valA, int8_t valB)
     {
-        float t = (m_Chunk->m_Cutoff - valA) / (float)(valB - valA);
+        float t = (GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>()->GetMapSurfaceCutoff() - valA) / (float)(valB - valA);
         return posA + t * (posB - posA);
     }
 
     uint64_t ChunkMesher::GetSampleID(glm::vec3 position)
     {
-        return position.y + (position.x * m_Chunk->m_Samples.y) + (position.z * m_Chunk->m_Samples.y * m_Chunk->m_Samples.x);
+        return position.y + (position.x * m_Samples.y) + (position.z * m_Samples.y * m_Samples.x);
     }
 
     uint32_t ChunkMesher::PushVertex(std::vector<float>& vertices, glm::vec3 vertex, glm::vec3 normal)

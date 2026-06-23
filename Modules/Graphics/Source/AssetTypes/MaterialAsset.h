@@ -28,6 +28,8 @@ namespace Forgex::Graphics
         int GetShaderID();
         void SetupProperties();
 
+        const int GetModelMatrixLocation() { return m_ModelMatrixLocation; }
+
         const std::unordered_map<std::string, MaterialProperty>& GetProperties() const { return m_Properties; }
         std::unordered_map<std::string, MaterialProperty>& GetProperties() { return m_Properties; }
 
@@ -37,6 +39,7 @@ namespace Forgex::Graphics
 
     private:
         Assets::AssetHandle<ShaderAsset> m_ShaderAsset;
+        int m_ModelMatrixLocation = -1;
         std::unordered_map<std::string, MaterialProperty> m_Properties;
         std::unordered_map<std::string, MaterialProperty> m_Uniforms;
     };

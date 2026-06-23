@@ -3,60 +3,79 @@
 #include <ForgexGraphics.h>
 #include <ForgexAssets.h>
 
-#include "../Components/VoxelMap.h"
+#include "../Components/ChunkManager.h"
 #include "../VoxelSettings.h"
-
-#include "glm/fwd.hpp"
+#include "glm/geometric.hpp"
 
 namespace Forgex::Voxel::Systems
 {
     class ChunkManagementSystem : public Core::Interfaces::ISystem
     {
     public:
-        void Setup(entt::registry &registry) override
-        {
-            entt::entity entity = registry.create();
-            Components::VoxelMap& map = registry.emplace<Components::VoxelMap>(entity);
-
-            glm::vec3 chunks = (map.m_MapArea / map.m_ChunkSize) * 0.5f;
-            int chunkCount = chunks.x * chunks.y * chunks.z;
-            map.m_Chunks.reserve(chunkCount);
-
-            for(int z = -chunks.z; z < chunks.z; z++)
-            for(int y = -chunks.y; y < chunks.y; y++)
-            for(int x = -chunks.x; x < chunks.x; x++)
-            {
-                entt::entity ent = registry.create();
-                Core::Components::Transform& transform = registry.emplace<Core::Components::Transform>(ent);
-                Graphics::Components::Renderable& renderable = registry.emplace<Graphics::Components::Renderable>(ent);
-
-                Components::Chunk& chunk = registry.emplace<Components::Chunk>(ent);
-                chunk.m_Position = glm::vec3(x, y, z);
-                chunk.m_Size = map.m_ChunkSize;
-                chunk.m_SampleDensity = map.m_SampleDensity;
-                chunk.m_Cutoff = map.m_Cutoff;
-                chunk.m_NoiseSeed = map.m_Seed;
-
-                transform.m_Position = glm::vec3(x, y, z) * map.m_ChunkSize;
-                transform.m_Dirty = true;
-
-                chunk.m_Samples = (chunk.m_Size / glm::vec3(chunk.m_SampleDensity)) + glm::vec3(2.0f);
-                chunk.m_DensityValues.reserve((int)chunk.m_Samples.x * (int)chunk.m_Samples.y * (int)chunk.m_Samples.z);
-
-                renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Terrain.FMaterial");
-
-                chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<void>([this, &chunk] 
-                    {
-                        return GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>()->GetVoxelPipeline().Execute(chunk);
-                    }
-                );
-
-                map.m_Chunks.push_back(&chunk);
-            }
-        }
-
         void Update(entt::registry& registry, float deltaTime) override
         {
+            auto view = registry.view<Components::ChunkManager>();
+            for (entt::entity entity : view)
+            {
+                Components::ChunkManager& manager = view.get<Components::ChunkManager>(entity);
+                Core::Components::Transform* centerTransform = registry.try_get<Core::Components::Transform>(manager.m_CenterEntity);
+
+                if(centerTransform == nullptr) continue;
+
+                const VoxelSettings* settings = GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>();
+                glm::vec3 chunkSize = settings->GetChunkSampleCount() * settings->GetChunkSampleDensity();
+
+                glm::vec3 centerChunk = glm::floor(centerTransform->m_Position / chunkSize);
+                int range = manager.m_ViewRange;
+
+                for (auto it = manager.m_ChunkEntityCollection.begin(); it != manager.m_ChunkEntityCollection.end();)
+                {
+                    glm::vec3 distance = it->first - centerChunk;
+                    if(glm::length(distance) <= (float)range)
+                    {
+                        ++it;
+                        continue;
+                    }
+
+                    registry.destroy(it->second);
+                    it = manager.m_ChunkEntityCollection.erase(it);
+                }
+
+                for (int z = -range; z <= range; z++)
+                for (int y = -range * 0.5f; y <= range * 0.5f; y++)
+                for (int x = -range; x <= range; x++)
+                {
+                    glm::vec3 offset = glm::vec3(x, y, z);
+                    if (glm::length(offset) > (float)range) continue;
+
+                    glm::vec3 chunkPosition = centerChunk + offset;
+
+                    if(manager.m_ChunkEntityCollection.contains(chunkPosition)) continue;
+
+                    entt::entity entity = registry.create();
+                    Graphics::Components::Renderable& renderable = registry.emplace<Graphics::Components::Renderable>(entity);
+
+                    Core::Components::Transform& transform = registry.emplace<Core::Components::Transform>(entity);
+                    transform.m_Position = chunkPosition * chunkSize;
+                    transform.m_Dirty = true;
+
+                    Components::Chunk& chunk = registry.emplace<Components::Chunk>(entity);
+                    chunk.m_Data.m_MapPosition = chunkPosition;
+                    glm::vec3 samples = settings->GetChunkSampleCount() + glm::vec3(2.0f);
+                    chunk.m_Data.m_DensityValues.reserve((int)samples.x * (int)samples.y * (int)samples.z);
+
+                    renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Terrain.FMaterial");
+
+                    chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<Components::ChunkData>([this, data = chunk.m_Data]() mutable
+                        {
+                            GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>()->GetVoxelPipeline().Execute(data);
+                            return data;
+                        }
+                    );
+
+                    manager.m_ChunkEntityCollection[chunkPosition] = entity;
+                }
+            }
         }
 
        const char* GetName() override { return "VoxelMapSetupSystem"; }

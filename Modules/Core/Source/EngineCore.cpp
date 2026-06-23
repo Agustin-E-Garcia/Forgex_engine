@@ -4,6 +4,7 @@
 #include "JobManager.h"
 #include "Systems/TransformSystem.h"
 #include "Settings/ProjectSettings.h"
+#include "DebugMacros.h"
 
 #include <ForgexDebug.h>
 #include <ForgexFiles.h>
@@ -34,15 +35,18 @@ namespace Forgex::Core
 
         while (!m_Window->ShouldClose())
         {
-            float deltaTime = deltaTimeHandler.Update();
+            {
+                PROFILE_FUNCTION("FPS");
+                float deltaTime = deltaTimeHandler.Update();
 
-            for(Interfaces::ILayer* layer : m_LayerStack)
-                layer->OnUpdate(deltaTime);
+                for(Interfaces::ILayer* layer : m_LayerStack)
+                    layer->OnUpdate(deltaTime);
 
-            for(Interfaces::ILayer* layer : m_LayerStack)
-                layer->OnRender();
+                for(Interfaces::ILayer* layer : m_LayerStack)
+                    layer->OnRender();
 
-            m_Window->Update();
+                m_Window->Update();
+            }
         }
 
         for(Interfaces::ILayer* layer : m_LayerStack)
@@ -55,7 +59,7 @@ namespace Forgex::Core
     {
         ServiceLocator::Get().Register<Settings::ProjectSettings>();
         ServiceLocator::Get().Register<Debug::DebugManager>();
-        ServiceLocator::Get().Register<JobManager>(1);
+        ServiceLocator::Get().Register<JobManager>(std::thread::hardware_concurrency() * 0.5f);
 
         RegisterSystem<Systems::TransformSystem>();
 

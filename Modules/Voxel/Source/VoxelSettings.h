@@ -1,10 +1,9 @@
 #pragma once
 #include <ForgexCore.h>
-#include "Components/VoxelChunk.h"
+#include "Components/Chunk.h"
 #include "VoxelExports.h"
 
 #include "Utils/VoxelPipeline/SurfaceNoiseStep.h"
-#include "Utils/VoxelPipeline/WormCaveStep.h"
 
 namespace Forgex::Voxel
 {
@@ -14,13 +13,20 @@ namespace Forgex::Voxel
         VoxelSettings()
         {
             m_VoxelPipeline.RegisterStep<Utils::TerrainSteps::SurfaceNoiseStep>(m_NoiseSeed);
-            //m_VoxelPipeline.RegisterStep<Utils::TerrainSteps::WormCaveStep>(glm::vec3(256.0f));
         }
 
-        const Core::Pipeline<Components::Chunk>& GetVoxelPipeline() { return m_VoxelPipeline; }
+        const Core::Pipeline<Components::ChunkData>& GetVoxelPipeline() const { return m_VoxelPipeline; }
+        const glm::vec3 GetChunkSampleCount() const { return m_ChunkSampleCount; }
+        const float GetChunkSampleDensity() const { return m_ChunkSampleDensity; }
+        const float GetMapSurfaceCutoff() const { return m_SurfaceCutoff; }
 
     private:
         int m_NoiseSeed = 23523; //Hardcoded for now
-        Core::Pipeline<Components::Chunk> m_VoxelPipeline;
+        Core::Pipeline<Components::ChunkData> m_VoxelPipeline;
+
+        glm::vec3 m_ChunkSampleCount = glm::vec3(32.0f);
+        float m_ChunkSampleDensity = 1.0f;
+
+        float m_SurfaceCutoff = 0;
     };
 }

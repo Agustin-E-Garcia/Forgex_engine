@@ -1,18 +1,23 @@
 #pragma once
-#include "../Components/VoxelChunk.h"
+#include "../Components/Chunk.h"
+#include <cstdint>
+#include <vector>
 
 namespace Forgex::Voxel::Utils
 {
     class ChunkMesher
     {
     public:
-        ChunkMesher(const Components::Chunk* chunk);
+        // Operates on a caller-owned copy of the density values so the live chunk
+        // can be moved or destroyed while the mesh is being generated on a worker thread.
+        ChunkMesher(const Components::ChunkData& chunk);
         ~ChunkMesher();
 
         void GenerateMesh(std::vector<float>& vertices, std::vector<int>& indices);
 
     private:
-        const Components::Chunk* m_Chunk = nullptr;
+        const Components::ChunkData& m_Chunk;
+        glm::vec3 m_Samples = glm::vec3(0);
         std::unordered_map<uint64_t, uint32_t> m_VertexToIndexMap;
 
         uint32_t GetOrAddVertexIndex(std::vector<float>& vertices, glm::vec3 posA, glm::vec3 posB);

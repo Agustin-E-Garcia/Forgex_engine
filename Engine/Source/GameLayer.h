@@ -6,6 +6,7 @@
 #include <ForgexCore.h>
 #include <ForgexScene.h>
 #include <ForgexGraphics.h>
+#include <ForgexVoxel.h>
 
 namespace Forgex::Engine
 {
@@ -21,27 +22,31 @@ namespace Forgex::Engine
         void OnBegin() override
         {
             Scene::SceneManager* sceneManager = Core::ServiceLocator::Get().Fetch<Scene::SceneManager>();
-            
+
             sceneManager->LoadScene(new Scene::Scene("Default Scene"));
             Scene::Scene* activeScene = sceneManager->GetActiveScene();
-            
+
             int cameraEntity = activeScene->CreateEntity("Main Camera");
             activeScene->AddComponent<Graphics::Components::Camera>(cameraEntity);
             activeScene->AddComponent<Core::Components::Transform>(cameraEntity);
             activeScene->AddComponent<Input::PlayerInput>(cameraEntity);
-            
+
             //int meshEntity = activeScene->CreateEntity("Mesh");
             //Graphics::Components::Renderable& renderable = activeScene->AddComponent<Graphics::Components::Renderable>(meshEntity);
             //activeScene->AddComponent<Core::Components::Transform>(meshEntity);
             //renderable.m_MeshAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MeshAsset>("Resources/Meshes/Teapot.obj");
             //renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Obsidian.FMaterial");
-            
+
             int directionalLight = activeScene->CreateEntity("Directional Light");
             activeScene->AddComponent<Graphics::Components::DirectionalLight>(directionalLight);
             Core::Components::Transform& transform = activeScene->AddComponent<Core::Components::Transform>(directionalLight);
             transform.m_Rotation = glm::vec3(20.0f, 0.0f, 0.0f);
             transform.m_Dirty = true;
-            
+
+            int chunkManager = activeScene->CreateEntity("ChunkManager");
+            Voxel::Components::ChunkManager& manager = activeScene->AddComponent<Voxel::Components::ChunkManager>(chunkManager);
+            manager.m_CenterEntity = (entt::entity)cameraEntity;
+
             sceneManager->Setup();
         }
 

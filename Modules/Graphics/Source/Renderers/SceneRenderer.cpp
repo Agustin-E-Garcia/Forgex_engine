@@ -26,7 +26,7 @@ namespace Forgex::Graphics::Renderers
         {
             glUseProgram(info.m_MaterialAsset->GetShaderID());
 
-            const int modelLoc = glGetUniformLocation(info.m_MaterialAsset->GetShaderID(), "model");
+            const int modelLoc = info.m_MaterialAsset->GetModelMatrixLocation();
             if(modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &info.m_ModelMatrix[0][0]);
 
             info.m_MaterialAsset->SetupProperties();

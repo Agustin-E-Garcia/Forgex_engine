@@ -72,6 +72,8 @@ namespace Forgex::Graphics
                 ParseProperty(GetShaderID(), name, entry, m_Uniforms);
         }
 
+        m_ModelMatrixLocation = glGetUniformLocation(GetShaderID(), "model");
+
         return true;
     }
 

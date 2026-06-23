@@ -1,9 +1,7 @@
 #pragma once
 #include "../Components/Transform.h"
 #include "../Interfaces/ISystem.h"
-#include "glm/common.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/quaternion_trigonometric.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/quaternion.hpp"
 
@@ -11,30 +9,32 @@ namespace Forgex::Core::Systems
 {
     class TransformSystem : public Interfaces::PerEntitySystem<Components::Transform>
     {
-        void OnUpdate(float deltaTime, const entt::entity& entity, Components::Transform& transform) override
+        void OnUpdate(float deltatime, const entt::entity& entity, Components::Transform& transform) override
         {
             if(!transform.m_Dirty) return;
 
-            UpdateLocation(transform);
-            UpdateRotation(transform);
-            UpdateScale(transform);
+            updatelocation(transform);
+            updaterotation(transform);
+            updatescale(transform);
 
             transform.m_ModelMatrix = transform.m_LocationMatrix * transform.m_RotationMatrix * transform.m_ScaleMatrix;
+
+            transform.m_Dirty = false;
         }
 
-        void UpdateLocation(Components::Transform& transform) 
+        void updatelocation(Components::Transform& transform)
         {
             transform.m_LocationMatrix = glm::translate(glm::mat4(1.0f), transform.m_Position);
         }
 
-        void UpdateRotation(Components::Transform& transform)
+        void updaterotation(Components::Transform& transform)
         {
             glm::vec3 radians = glm::radians(transform.m_Rotation);
-            glm::quat qX = glm::angleAxis(radians.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            glm::quat qY = glm::angleAxis(radians.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::quat qZ = glm::angleAxis(radians.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            glm::quat qx = glm::angleAxis(radians.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            glm::quat qy = glm::angleAxis(radians.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            glm::quat qz = glm::angleAxis(radians.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
-            transform.m_RotationQuat = qZ * qY * qX;
+            transform.m_RotationQuat = qz * qy * qx;
             transform.m_RotationMatrix = glm::mat4_cast(transform.m_RotationQuat);
 
             transform.m_Forward = glm::vec3(transform.m_RotationMatrix[2]);
@@ -42,7 +42,7 @@ namespace Forgex::Core::Systems
             transform.m_Right = glm::vec3(transform.m_RotationMatrix[0]);
         }
 
-        void UpdateScale(Components::Transform& transform)
+        void updatescale(Components::Transform& transform)
         {
             transform.m_ScaleMatrix = glm::scale(glm::mat4(1.0f), transform.m_Scale);
         }

@@ -1,19 +1,14 @@
 #include "SurfaceNoiseStep.h"
-#include "../../Components/VoxelChunk.h"
+#include "../../Components/Chunk.h"
+#include "../../VoxelSettings.h"
 
 namespace Forgex::Voxel::Utils::TerrainSteps
 {
     int8_t GetDensityValueAtPoint(glm::vec3 position, float topHeight, float noise)
     {
-        topHeight = 127;
+        float surfaceHeight = 0 + (noise * topHeight);
 
-        //float noise = m_Noise.GetNoise(position.x, position.z);
-        //float normalizedNoise = (noise + 1.0f) * 0.5f;
-
-        float curve = glm::pow(noise, 2.0f);
-
-        float density = -position.y + curve * topHeight;
-        return glm::clamp(density, -128.0f, 127.0f);
+        return position.y < surfaceHeight ? (int8_t)255 : 0;
     }
 
     SurfaceNoiseStep::SurfaceNoiseStep(int seed)
@@ -24,19 +19,24 @@ namespace Forgex::Voxel::Utils::TerrainSteps
         m_Noise.SetFrequency(0.003f);
     }
 
-    void SurfaceNoiseStep::Execute(Components::Chunk& chunk) 
+    void SurfaceNoiseStep::Execute(Components::ChunkData& chunk)
     {
-        glm::vec3 worldOffset = chunk.m_Position * chunk.m_Size;
+        const VoxelSettings* settings = GET_SERVICE(Core::Settings::ProjectSettings)->GetSettings<VoxelSettings>();
+        glm::vec3 worldOffset = chunk.m_MapPosition * settings->GetChunkSampleCount();
+        glm::vec3 samples = settings->GetChunkSampleCount() + glm::vec3(2.0f);
 
-        for(int z = 0; z < chunk.m_Samples.z; z++)
-        for(int x = 0; x < chunk.m_Samples.x; x++)
+        for(int z = 0; z < samples.z; z++)
+        for(int x = 0; x < samples.x; x++)
         {
-            float noiseValue = m_Noise.GetNoise(worldOffset.x + x * chunk.m_SampleDensity, worldOffset.z + z * chunk.m_SampleDensity);
+            float noiseValue = m_Noise.GetNoise(worldOffset.x + x * settings->GetChunkSampleDensity(), worldOffset.z + z * settings->GetChunkSampleDensity());
+            noiseValue = (noiseValue + 1) * 0.5f;
 
-            for(int y = 0; y < chunk.m_Samples.y; y++)
+            for(int y = 0; y < samples.y; y++)
             {
-                glm::vec3 worldPosition = worldOffset + glm::vec3(x, y, z) * chunk.m_SampleDensity;
-                chunk.m_DensityValues.push_back(GetDensityValueAtPoint(worldPosition, 127, noiseValue));
+                glm::vec3 worldPosition = worldOffset + glm::vec3(x, y, z) * settings->GetChunkSampleDensity();
+                float surfaceHeight = 0 + (noiseValue * 30); // 30 is top height
+
+                chunk.m_DensityValues.push_back(worldPosition.y < surfaceHeight ? (int8_t)255 : 0); // if under the surface, then it's solid, else it's air
             }
         }
     }
