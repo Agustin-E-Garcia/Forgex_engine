@@ -10,6 +10,8 @@ namespace Forgex::Engine::Input
     class InputSystem : public Core::Interfaces::PerEntitySystem<Core::Components::Transform, PlayerInput>
     {
     public:
+        bool RunUpdate() override { return true; }
+
         void OnUpdate(float deltaTime, const entt::entity &entity, Core::Components::Transform& transform, PlayerInput& playerInput) override
         {
             InputManager* input = GET_SERVICE(InputManager);

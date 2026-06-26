@@ -24,7 +24,7 @@ namespace Forgex::Voxel
         int m_NoiseSeed = 23523; //Hardcoded for now
         Core::Pipeline<Components::ChunkData> m_VoxelPipeline;
 
-        glm::vec3 m_ChunkSampleCount = glm::vec3(32.0f);
+        glm::vec3 m_ChunkSampleCount = glm::vec3(64.0f);
         float m_ChunkSampleDensity = 1.0f;
 
         float m_SurfaceCutoff = 0;

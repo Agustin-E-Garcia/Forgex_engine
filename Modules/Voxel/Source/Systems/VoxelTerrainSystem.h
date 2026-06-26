@@ -15,6 +15,8 @@ namespace Forgex::Voxel::Systems
     class VoxelTerrainSystem : public Core::Interfaces::ISystem
     {
     public:
+        bool RunUpdate() override { return true; }
+
         void Update(entt::registry& registry, float deltaTime) override
         {
             auto view_chunk = registry.view<Components::Chunk, Core::Components::Transform>();

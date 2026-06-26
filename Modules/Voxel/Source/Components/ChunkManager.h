@@ -11,7 +11,7 @@ namespace Forgex::Voxel::Components
     struct VOXEL_API ChunkManager
     {
         entt::entity m_CenterEntity;
-        int m_ViewRange = 16;
+        int m_ViewRange = 8;
 
         glm::vec3 m_LastFrameCenterPosition = glm::vec3(-1);
 

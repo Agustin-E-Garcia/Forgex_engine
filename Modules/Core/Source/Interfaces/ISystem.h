@@ -11,6 +11,10 @@ namespace Forgex::Core::Interfaces
         virtual void Setup(entt::registry& registry) {}
         virtual void Update(entt::registry& registry, float deltaTime) {}
         virtual void Render(entt::registry& registry) {}
+
+        virtual bool RunUpdate() { return false; }
+        virtual bool RunRender() { return false; }
+
         virtual const char* GetName() = 0;
     };
 

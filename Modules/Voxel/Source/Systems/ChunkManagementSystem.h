@@ -12,6 +12,8 @@ namespace Forgex::Voxel::Systems
     class ChunkManagementSystem : public Core::Interfaces::ISystem
     {
     public:
+        bool RunUpdate() override { return true; }
+
         void Update(entt::registry& registry, float deltaTime) override
         {
             auto view = registry.view<Components::ChunkManager>();

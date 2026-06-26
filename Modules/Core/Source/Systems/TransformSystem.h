@@ -9,6 +9,8 @@ namespace Forgex::Core::Systems
 {
     class TransformSystem : public Interfaces::PerEntitySystem<Components::Transform>
     {
+        bool RunUpdate() override { return true; }
+
         void OnUpdate(float deltatime, const entt::entity& entity, Components::Transform& transform) override
         {
             if(!transform.m_Dirty) return;

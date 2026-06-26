@@ -29,6 +29,8 @@ namespace Forgex::Scene
         PROFILE_FUNCTION("Update Systems");
         for(auto& [index, system] : systemRegistry)
         {
+            if(!system->RunUpdate()) continue;
+
             PROFILE_FUNCTION(system->GetName());
             system->Update(m_Registry, deltaTime);
         }
@@ -39,6 +41,8 @@ namespace Forgex::Scene
         PROFILE_FUNCTION("Render Systems");
         for(auto& [index, system] : systemRegistry)
         {
+            if(!system->RunRender()) continue;
+
             PROFILE_FUNCTION(system->GetName());
             system->Render(m_Registry);
         }

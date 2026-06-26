@@ -29,6 +29,8 @@ namespace Forgex::Graphics::Systems
             renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<MaterialAsset>("Resources/Materials/Skybox.FMaterial");
         }
 
+        bool RunRender() override { return true; }
+
         void Render(entt::registry& registry) override
         {
             Resources::Frustum frustum;
