@@ -1,6 +1,5 @@
 #pragma once
 #include "SceneExports.h"
-#include <ForgexCore.h>
 #include "Scene.h"
 
 namespace Forgex::Scene
@@ -8,7 +7,7 @@ namespace Forgex::Scene
     class SCENE_API SceneManager
     {
     public:
-        SceneManager(Core::Registry<Core::Interfaces::ISystem>& systemRegistry);
+        SceneManager(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry);
         ~SceneManager();
 
         void LoadScene(Scene* newScene);
@@ -20,7 +19,7 @@ namespace Forgex::Scene
         Scene* GetActiveScene() { return m_ActiveScene; }
 
     private:
-        Core::Registry<Core::Interfaces::ISystem>& m_SystemRegistry;
+        DataStructures::Registry<Core::Interfaces::ISystem>& m_SystemRegistry;
         Scene* m_ActiveScene;
     };
 }

@@ -20,10 +20,10 @@ namespace Forgex::Graphics::Renderers
         }
     }
 
-    void SceneRenderer::Render(const Resources::RenderFrameData& renderFrameData, const std::vector<Components::Renderable>& renderInfos)
+    void SceneRenderer::Render(const Resources::RenderFrameData& renderFrameData, const Components::Renderable& info)
     {
-        for (const Components::Renderable& info : renderInfos)
-        {
+        PROFILE_FUNCTION("SceneRenderer::Render()");
+
             glUseProgram(info.m_MaterialAsset->GetShaderID());
 
             const int modelLoc = info.m_MaterialAsset->GetModelMatrixLocation();
@@ -61,6 +61,5 @@ namespace Forgex::Graphics::Renderers
             glDisableVertexAttribArray(2);
 
             PrintGLError("Error after drawing");
-        }
     }
 }

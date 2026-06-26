@@ -10,6 +10,6 @@ namespace Forgex::Graphics::Renderers
         SceneRenderer() = default;
         ~SceneRenderer() = default;
 
-        void Render(const Resources::RenderFrameData& renderView, const std::vector<Components::Renderable>& renderInfos);
+        void Render(const Resources::RenderFrameData& renderFrameData, const Components::Renderable& info);
     };
 }

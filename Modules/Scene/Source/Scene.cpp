@@ -18,14 +18,15 @@ namespace Forgex::Scene
         m_Registry.destroy((entt::entity)entity);
     }
 
-    void Scene::Setup(Core::Registry<Core::Interfaces::ISystem>& systemRegistry)
+    void Scene::Setup(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry)
     {
         for(auto& [index, system] : systemRegistry)
             system->Setup(m_Registry);
     }
 
-    void Scene::Update(Core::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime)
+    void Scene::Update(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime)
     {
+        PROFILE_FUNCTION("Update Systems");
         for(auto& [index, system] : systemRegistry)
         {
             PROFILE_FUNCTION(system->GetName());
@@ -33,8 +34,9 @@ namespace Forgex::Scene
         }
     }
 
-    void Scene::Render(Core::Registry<Core::Interfaces::ISystem>& systemRegistry)
+    void Scene::Render(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry)
     {
+        PROFILE_FUNCTION("Render Systems");
         for(auto& [index, system] : systemRegistry)
         {
             PROFILE_FUNCTION(system->GetName());

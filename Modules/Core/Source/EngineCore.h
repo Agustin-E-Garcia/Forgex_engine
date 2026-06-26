@@ -1,11 +1,11 @@
 #pragma once
 #include "CoreExports.h"
-#include "Layer/Event/EventList.h"
-#include "Registry.h"
 #include "Interfaces/IWindow.h"
 #include "Interfaces/IModule.h"
 #include "Interfaces/ISystem.h"
 #include "Layer/LayerStack.h"
+
+#include <ForgexDataStructures.h>
 
 namespace Forgex::Core
 {
@@ -25,8 +25,8 @@ namespace Forgex::Core
         void RegisterOverlay(Interfaces::ILayer* overlay) { m_LayerStack.PushOverlay(overlay); }
 
         Interfaces::IWindow* GetWindow() const { return m_Window; }
-        Registry<Interfaces::IModule>& GetModuleRegistry() { return m_ModuleRegistry; }
-        Registry<Interfaces::ISystem>& GetSystemRegistry() { return m_SystemRegistry; }
+        DataStructures::Registry<Interfaces::IModule>& GetModuleRegistry() { return m_ModuleRegistry; }
+        DataStructures::Registry<Interfaces::ISystem>& GetSystemRegistry() { return m_SystemRegistry; }
 
     private:
         void Init();
@@ -34,8 +34,8 @@ namespace Forgex::Core
         void OnEvent(Layer::Event::Event& event);
 
         Interfaces::IWindow* m_Window;
-        Registry<Interfaces::IModule> m_ModuleRegistry;
-        Registry<Interfaces::ISystem> m_SystemRegistry;
+        DataStructures::Registry<Interfaces::IModule> m_ModuleRegistry;
+        DataStructures::Registry<Interfaces::ISystem> m_SystemRegistry;
         Layer::LayerStack m_LayerStack;
     };
 }

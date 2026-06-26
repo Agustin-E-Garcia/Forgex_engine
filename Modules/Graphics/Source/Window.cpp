@@ -89,6 +89,7 @@ namespace Forgex::Graphics
 
     void Window::Update()
     {
+        PROFILE_FUNCTION("Window Update");
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
     }

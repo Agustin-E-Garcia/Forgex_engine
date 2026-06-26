@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneExports.h"
 #include <ForgexCore.h>
+#include <ForgexDataStructures.h>
 #include <entt.hpp>
 
 namespace Forgex::Scene
@@ -20,9 +21,9 @@ namespace Forgex::Scene
             return m_Registry.emplace<T>((entt::entity)entity);
         }
 
-        void Setup(Core::Registry<Core::Interfaces::ISystem>& systemRegistry);
-        void Update(Core::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime);
-        void Render(Core::Registry<Core::Interfaces::ISystem>& systemRegistry);
+        void Setup(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry);
+        void Update(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry, float deltaTime);
+        void Render(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry);
 
         entt::registry& GetRegistry() { return m_Registry; }
         const char* GetName() const { return m_Name; }

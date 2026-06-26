@@ -2,7 +2,7 @@
 #include <typeindex>
 #include <unordered_map>
 
-namespace Forgex::Core
+namespace Forgex::DataStructures
 {
     template<class BaseClass>
     class Registry

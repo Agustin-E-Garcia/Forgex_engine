@@ -59,6 +59,7 @@ target_include_directories(ImGui PRIVATE ExternalLibraries/ImGui)
 target_include_directories(ImGui INTERFACE ExternalLibraries/ImGui)
 target_link_libraries(ImGui PRIVATE OpenGL::GL)
 
+add_subdirectory(Modules/DataStructures)
 add_subdirectory(Modules/Debug)
 add_subdirectory(Modules/FilesIO)
 add_subdirectory(Modules/Core)

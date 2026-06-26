@@ -31,6 +31,15 @@ namespace Forgex::Graphics
         if(indexData)  m_IndexBufferID = Utils::Buffers::GenerateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexSize * sizeof(int), indexData);
 
         m_GPUSize = vertexSize * sizeof(float) + indexSize * sizeof(int);
+
+        // Compute the local-space AABB once from the positions (stride: vx,vy,vz,nx,ny,nz,uvx,uvy).
+        constexpr int STRIDE = 8;
+        m_LocalBounds = Resources::AABB{};
+        if(vertexData)
+        {
+            for(int i = 0; i + 2 < vertexSize; i += STRIDE)
+                m_LocalBounds.Encapsulate({ vertexData[i], vertexData[i + 1], vertexData[i + 2] });
+        }
     }
 
     void MeshAsset::Unload()

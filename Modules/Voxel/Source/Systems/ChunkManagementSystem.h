@@ -28,6 +28,10 @@ namespace Forgex::Voxel::Systems
                 glm::vec3 centerChunk = glm::floor(centerTransform->m_Position / chunkSize);
                 int range = manager.m_ViewRange;
 
+                if(centerChunk == manager.m_LastFrameCenterPosition) continue;
+
+                manager.m_LastFrameCenterPosition = centerChunk;
+
                 for (auto it = manager.m_ChunkEntityCollection.begin(); it != manager.m_ChunkEntityCollection.end();)
                 {
                     glm::vec3 distance = it->first - centerChunk;
@@ -53,7 +57,6 @@ namespace Forgex::Voxel::Systems
                     if(manager.m_ChunkEntityCollection.contains(chunkPosition)) continue;
 
                     entt::entity entity = registry.create();
-                    Graphics::Components::Renderable& renderable = registry.emplace<Graphics::Components::Renderable>(entity);
 
                     Core::Components::Transform& transform = registry.emplace<Core::Components::Transform>(entity);
                     transform.m_Position = chunkPosition * chunkSize;
@@ -64,7 +67,6 @@ namespace Forgex::Voxel::Systems
                     glm::vec3 samples = settings->GetChunkSampleCount() + glm::vec3(2.0f);
                     chunk.m_Data.m_DensityValues.reserve((int)samples.x * (int)samples.y * (int)samples.z);
 
-                    renderable.m_MaterialAsset = GET_SERVICE(Assets::AssetManager)->LoadAsset<Graphics::MaterialAsset>("Resources/Materials/Terrain.FMaterial");
 
                     chunk.m_DensityFuture = GET_SERVICE(Core::JobManager)->Enqueue<Components::ChunkData>([this, data = chunk.m_Data]() mutable
                         {

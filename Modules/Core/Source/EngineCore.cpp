@@ -36,7 +36,7 @@ namespace Forgex::Core
         while (!m_Window->ShouldClose())
         {
             {
-                PROFILE_FUNCTION("FPS");
+                PROFILE_FUNCTION("Main Loop");
                 float deltaTime = deltaTimeHandler.Update();
 
                 for(Interfaces::ILayer* layer : m_LayerStack)

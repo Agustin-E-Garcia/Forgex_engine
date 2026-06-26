@@ -2,7 +2,7 @@
 
 namespace Forgex::Scene
 {
-    SceneManager::SceneManager(Core::Registry<Core::Interfaces::ISystem>& systemRegistry) : m_SystemRegistry(systemRegistry) {}
+    SceneManager::SceneManager(DataStructures::Registry<Core::Interfaces::ISystem>& systemRegistry) : m_SystemRegistry(systemRegistry) {}
     SceneManager::~SceneManager() {}
 
     void SceneManager::LoadScene(Scene* newScene) { m_ActiveScene = newScene; }

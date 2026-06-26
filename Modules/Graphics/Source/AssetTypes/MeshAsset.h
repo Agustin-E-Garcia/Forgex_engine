@@ -1,5 +1,6 @@
 #pragma once
 #include "../GraphicsExports.h"
+#include "../Resources/AABB.h"
 #include <string>
 #include <ForgexAssets.h>
 
@@ -31,9 +32,12 @@ namespace Forgex::Graphics
         int GetIndexBufferCount() { return m_IndexBufferSize; }
         void GenerateBuffers(const float* vertexData, int vertexSize, const int* indexData, int indexSize);
 
+        const Resources::AABB& GetBounds() const { return m_LocalBounds; }
+
     private:
         int m_VertexBufferID = -1;
         int m_IndexBufferID = -1;
         int m_IndexBufferSize = -1;
+        Resources::AABB m_LocalBounds;
     };
 }

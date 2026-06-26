@@ -1,7 +1,8 @@
 #pragma once
 #include "../CoreExports.h"
 #include "../Interfaces/ISettings.h"
-#include "../Registry.h"
+
+#include <ForgexDataStructures.h>
 
 namespace Forgex::Core::Settings
 {
@@ -15,6 +16,6 @@ namespace Forgex::Core::Settings
         T* GetSettings() { return m_Settings.Get<T>(); }
 
     private:
-        Registry<Interfaces::ISettings> m_Settings;
+        DataStructures::Registry<Interfaces::ISettings> m_Settings;
     };
 }
